@@ -1,6 +1,7 @@
-// Languages of the Erable site. Loaded in <head>: picks the language before the page shows,
-// then fills [data-i18n] (text), [data-i18n-html] (markup) and [data-i18n-attr]
-// ("attribute:key;attribute:key") from the dictionary below.
+// Languages of the Erable site: English unless the visitor picked another (?lang= or the
+// switch, remembered). Loaded in <head> to set the language before the page shows, then fills
+// [data-i18n] (text), [data-i18n-html] (markup) and [data-i18n-attr] ("attribute:key;...")
+// from the dictionary below.
 const LANGS = ["fr", "en", "de"];
 const LOCALES = { fr: "fr-FR", en: "en-GB", de: "de-DE" };
 
@@ -398,12 +399,6 @@ function pickLang() {
       return saved;
     }
   } catch (e) {}
-  for (const wanted of navigator.languages || [navigator.language || "fr"]) {
-    const code = String(wanted).slice(0, 2).toLowerCase();
-    if (LANGS.includes(code)) {
-      return code;
-    }
-  }
   return "en";
 }
 
@@ -412,7 +407,7 @@ document.documentElement.lang = LANG;
 document.documentElement.classList.add("js");
 
 function t(key, values) {
-  let text = (I18N[LANG] && I18N[LANG][key]) ?? I18N.fr[key] ?? key;
+  let text = (I18N[LANG] && I18N[LANG][key]) ?? I18N.en[key] ?? key;
   for (const [name, value] of Object.entries(values || {})) {
     text = text.replaceAll("{" + name + "}", value);
   }
