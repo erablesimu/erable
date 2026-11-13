@@ -1672,7 +1672,10 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
         }
         prebuild.clear();
     };
-    if (!precache) {
+    // Intel's Windows driver crashes reading the cache while a build runs: there the prebuild
+    // starts once the cache is written below (Eglantine 78059315a9).
+    const bool prebuild_now = !precache && device.CanReadPipelineCacheDuringBuilds();
+    if (prebuild_now) {
         start_prebuild();
     }
 
@@ -1685,8 +1688,8 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
     if (skipped_pipelines != 0) {
         LOG_INFO(Render_Vulkan,
                  "{} cached graphics pipelines skipped at boot, {} {} for background prebuild",
-                 skipped_pipelines, precache ? prebuild.size() : deferred_pipelines,
-                 precache ? "held" : "admitted");
+                 skipped_pipelines, prebuild_now ? deferred_pipelines : prebuild.size(),
+                 prebuild_now ? "admitted" : "held");
     }
     {
         std::scoped_lock lock{state.mutex};
@@ -1723,6 +1726,9 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
         vulkan_pipeline_cache.Read(&size, nullptr);
         last_cache_size.store(size, std::memory_order_relaxed);
         last_flush = std::chrono::steady_clock::now();
+    }
+    if (!precache && !prebuild_now && !stop_loading.stop_requested()) {
+        start_prebuild();
     }
     if (state.statistics) {
         state.statistics->Report();
