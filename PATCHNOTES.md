@@ -25,11 +25,16 @@ version. Les sections suivantes gardent l'historique.
   rapport. Une session interrompue par un plantage est récupérée au lancement suivant.
 
 **Zelda Ocarina of Time**
-- Les arbres ne flottent plus en l'air dans la plaine d'Hyrule et ailleurs : Erable attend
-  désormais qu'un shader soit prêt au lieu de sauter le dessin (réglage « Switch 2 draws with
-  unbuilt pipelines » sur « Wait », comme Lichii d'origine).
-- « Bounded wait » ne saute plus que les dessins refaits à chaque image : un dessin fait une seule
-  fois pour une zone, ou qui écrit ailleurs que dans une image, attend toujours son shader.
+- Les arbres ne flottent plus en l'air dans la plaine d'Hyrule et ailleurs. Pendant qu'un shader
+  se prépare, Erable ne saute plus que les dessins refaits à chaque image : un dessin fait une
+  seule fois pour une zone attend son shader.
+- Arbres volants corrigés aussi sur les cartes GeForce GTX 10xx (Pascal), d'après Eglantine.
+- La qualité DLSS choisie change bien la résolution de rendu (Lichii).
+
+**Tous les jeux (suite)**
+- Arrêter un jeu ne peut plus rester bloqué sur certaines attentes du GPU (Lichii).
+- Cartes Intel sous Windows : un plantage au chargement du cache de shaders est évité (d'après
+  Eglantine).
 - Correction des zones sombres en forme de grille sur l'eau et le sol (ombres des lumières).
 - Génération d'images NVIDIA DLSS (2x à 4x) disponible comme type de génération d'images.
 

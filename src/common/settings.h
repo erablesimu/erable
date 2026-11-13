@@ -679,10 +679,10 @@ struct Values {
         linkage, true, "use_vulkan_driver_pipeline_cache", Category::RendererAdvanced,
         Specialization::Default};
 
-    // Wait: a draw skipped while its pipeline builds can be one a game runs once for a whole area
-    // (Ocarina of Time's trees then float in Hyrule Field until the area is loaded again).
+    // Bounded skips only draws into targets the previous frame drew to: a draw a game makes once
+    // for an area waits (Ocarina of Time's trees floated in Hyrule Field when it was skipped).
     SwitchableSetting<NativeAsyncDraws> native_async_draws{linkage,
-                                                           NativeAsyncDraws::Wait,
+                                                           NativeAsyncDraws::Bounded,
                                                            "native_async_draws",
                                                            Category::RendererAdvanced,
                                                            Specialization::Default,
