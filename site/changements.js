@@ -71,6 +71,10 @@ function renderCommits() {
   }
   const list = el("ul", { class: "commits card" });
   for (const commit of commits) {
+    // Commits from before the rename speak of Erable's former name: not listed here.
+    if (/banst/i.test(commit.commit.message)) {
+      continue;
+    }
     const [first, ...rest] = commit.commit.message.split("\n");
     const match = first.match(/^([\w./, -]{2,40}): (.+)$/);
     const scope = match ? match[1] : "erable";
