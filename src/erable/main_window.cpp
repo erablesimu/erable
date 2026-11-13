@@ -141,6 +141,7 @@ static FileSys::VirtualFile VfsDirectoryCreateFileWrapper(const FileSys::Virtual
 #include "frontend_common/update_checker.h"
 #include "frontend_common/update_installer.h"
 #include "erable/debug_session.h"
+#include "erable/home/home_screen.h"
 #include "erable/local_report.h"
 #endif
 
@@ -499,7 +500,9 @@ MainWindow::MainWindow(bool has_broken_vulkan)
     if (Settings::values.use_dev_keys.GetValue()) {
         Core::Crypto::KeyManager::Instance().ReloadKeys();
     }
+    EnsureGamesFolder();
     game_list->PopulateAsync(UISettings::values.game_dirs);
+    ShowHome(true);
 
     if (whats_new_pending && !UISettings::values.first_start.GetValue() &&
         UISettings::values.show_whats_new.GetValue()) {
@@ -990,6 +993,27 @@ void MainWindow::InitializeWidgets() {
     game_list_placeholder = new GameListPlaceholder(this);
     ui->horizontalLayout->addWidget(game_list_placeholder);
     game_list_placeholder->setVisible(false);
+
+    home_screen = new HomeScreen(game_list, *play_time_manager, *QtCommon::system, this);
+    ui->horizontalLayout->addWidget(home_screen);
+    game_list->hide();
+    connect(home_screen, &HomeScreen::LaunchGame, this,
+            [this](const QString& path, u64 program_id) { OnGameListLoadFile(path, program_id); });
+    connect(home_screen, &HomeScreen::OpenGameSettings, this,
+            [this](const QString& path) { OnGameListOpenPerGameProperties(path.toStdString()); });
+    connect(home_screen, &HomeScreen::ShowLibrary, this, [this] { ShowHome(false); });
+    connect(home_screen, &HomeScreen::OpenSettings, this, &MainWindow::OnConfigure);
+    connect(home_screen, &HomeScreen::OpenWhatsNew, this, &MainWindow::OnWhatsNew);
+    connect(home_screen, &HomeScreen::OpenCaptures, this, [] {
+        const auto path = QString::fromStdString(
+            Common::FS::GetEdenPathString(Common::FS::EdenPath::ScreenshotsDir));
+        QDir{}.mkpath(path);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    });
+    connect(home_screen, &HomeScreen::ReportProblem, this, [this] {
+        OpenURL(QUrl(QStringLiteral("https://erablesimu.github.io/erable/signaler.html?lang=") +
+                     tr("en", "Language code of the Erable site's pages")));
+    });
 
     loading_screen = new LoadingScreen(this);
     loading_screen->hide();
@@ -1836,6 +1860,19 @@ void MainWindow::ConnectMenuEvents() {
 void MainWindow::SetupDebugMenu() {
     auto* const menu = new QMenu(tr("&Debug mode"), this);
     menuBar()->insertMenu(ui->menu_Help->menuAction(), menu);
+    debug_menu = menu;
+    home_screen->SetDebugMenu(menu);
+    auto* const home_action = new QAction(tr("&Home"), this);
+    home_action->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_H));
+    connect(home_action, &QAction::triggered, this, [this] { ShowHome(true); });
+    auto* const library_action = new QAction(tr("&Library"), this);
+    library_action->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
+    connect(library_action, &QAction::triggered, this, [this] { ShowHome(false); });
+    const auto view_actions = ui->menu_View->actions();
+    QAction* const first_view_action = view_actions.isEmpty() ? nullptr : view_actions.first();
+    ui->menu_View->insertAction(first_view_action, home_action);
+    ui->menu_View->insertAction(first_view_action, library_action);
+    ui->menu_View->insertSeparator(first_view_action);
     record_session_action = menu->addAction(tr("Record my session"));
     record_session_action->setCheckable(true);
     connect(record_session_action, &QAction::triggered, this, &MainWindow::OnRecordSession);
@@ -2518,9 +2555,11 @@ void MainWindow::BootGame(const QString& filename, Service::AM::FrontendAppletPa
 
     // Update the GUI
     UpdateStatusButtons();
+    home_screen->StopMusic();
     if (ui->action_Single_Window_Mode->isChecked()) {
         game_list->hide();
         game_list_placeholder->hide();
+        home_screen->hide();
     }
     status_bar_update_timer.start(500);
     renderer_status_button->setDisabled(true);
@@ -2743,12 +2782,7 @@ void MainWindow::OnEmulationStopped() {
     render_window->hide();
     loading_screen->hide();
     loading_screen->Clear();
-    if (game_list->IsEmpty()) {
-        game_list_placeholder->show();
-    } else {
-        game_list->show();
-    }
-    game_list->SetFilterFocus();
+    ShowHome(home_active);
     tas_label->clear();
     input_subsystem->GetTas()->Stop();
     OnTasStateChanged();
@@ -3308,11 +3342,35 @@ void MainWindow::OnGameListAddDirectory() {
 }
 
 void MainWindow::OnGameListShowList(bool show) {
-    if (emulation_running && ui->action_Single_Window_Mode->isChecked())
+    if (home_active || (emulation_running && ui->action_Single_Window_Mode->isChecked()))
         return;
     game_list->setVisible(show);
     game_list_placeholder->setVisible(!show);
 };
+
+void MainWindow::ShowHome(bool home) {
+    home_active = home;
+    if (emulation_running && ui->action_Single_Window_Mode->isChecked()) {
+        return;
+    }
+    home_screen->SetActive(home);
+    game_list->setVisible(!home && !game_list->IsEmpty());
+    game_list_placeholder->setVisible(!home && game_list->IsEmpty());
+    if (!home) {
+        game_list->SetFilterFocus();
+    }
+}
+
+void MainWindow::EnsureGamesFolder() {
+    const QString folder = HomeScreen::GamesFolder();
+    if (!QDir{}.mkpath(folder)) {
+        return;
+    }
+    UISettings::GameDir dir{QDir::toNativeSeparators(folder).toStdString(), true, true};
+    if (!UISettings::values.game_dirs.contains(dir)) {
+        UISettings::values.game_dirs.prepend(dir);
+    }
+}
 
 void MainWindow::OnGameListOpenPerGameProperties(const std::string& file) {
     u64 title_id{};
@@ -3918,6 +3976,7 @@ void MainWindow::ToggleWindowMode() {
             render_window->setVisible(true);
             render_window->setFocus();
             game_list->hide();
+            home_screen->hide();
         }
 
     } else {
@@ -3928,7 +3987,7 @@ void MainWindow::ToggleWindowMode() {
         if (emulation_running) {
             render_window->setVisible(true);
             render_window->RestoreGeometry();
-            game_list->show();
+            ShowHome(home_active);
         }
     }
 }

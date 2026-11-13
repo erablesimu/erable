@@ -1,5 +1,128 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="fr" sourcelanguage="en_US">
 <context>
+    <name>HomeScreen</name>
+    <message>
+        <source>Your profile</source>
+        <translation>Ton profil</translation>
+    </message>
+    <message>
+        <source>Home music</source>
+        <translation>Musique de l&apos;accueil</translation>
+    </message>
+    <message>
+        <source>Next tune</source>
+        <translation>Mélodie suivante</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Jouer</translation>
+    </message>
+    <message>
+        <source>Game settings</source>
+        <translation>Réglages du jeu</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Signaler un problème</translation>
+    </message>
+    <message>
+        <source>Library</source>
+        <translation>Bibliothèque</translation>
+    </message>
+    <message>
+        <source>What's new</source>
+        <translation>Nouveautés</translation>
+    </message>
+    <message>
+        <source>Games folder</source>
+        <translation>Dossier Jeux</translation>
+    </message>
+    <message>
+        <source>Captures</source>
+        <translation>Captures</translation>
+    </message>
+    <message>
+        <source>Debug mode</source>
+        <translation>Mode debug</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Réglages</translation>
+    </message>
+    <message>
+        <source>Choose</source>
+        <translation>Choisir</translation>
+    </message>
+    <message>
+        <source>Put your games in the Games folder</source>
+        <translation>Déposez vos jeux dans le dossier Jeux</translation>
+    </message>
+    <message>
+        <source>Music</source>
+        <translation>Musique</translation>
+    </message>
+    <message>
+        <source>Muted</source>
+        <translation>Muet</translation>
+    </message>
+    <message>
+        <source>%1/%2</source>
+        <translation>%1/%2</translation>
+    </message>
+    <message>
+        <source>Add games</source>
+        <translation>Ajouter des jeux</translation>
+    </message>
+    <message>
+        <source>Welcome to Erable</source>
+        <translation>Bienvenue dans Erable</translation>
+    </message>
+    <message>
+        <source>Put your games in %1 and they show up here.</source>
+        <translation>Déposez vos jeux dans %1 : ils apparaissent ici.</translation>
+    </message>
+    <message>
+        <source>Add to favourites</source>
+        <translation>Ajouter aux favoris</translation>
+    </message>
+    <message>
+        <source>Never played</source>
+        <translation>Jamais lancé</translation>
+    </message>
+    <message>
+        <source>Played for %1</source>
+        <translation>Temps de jeu : %1</translation>
+    </message>
+    <message>
+        <source>Remove from favourites</source>
+        <translation>Retirer des favoris</translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <translation>Profil</translation>
+    </message>
+    <message>
+        <source>Change your profile's name</source>
+        <translation>Changer le nom de ton profil</translation>
+    </message>
+    <message>
+        <source>Create your profile</source>
+        <translation>Crée ton profil</translation>
+    </message>
+    <message>
+        <source>Choose the name games show for you. Your saves stay with this profile.</source>
+        <translation>Choisis le nom que les jeux afficheront pour toi. Tes sauvegardes restent avec ce profil.</translation>
+    </message>
+    <message>
+        <source>Your name</source>
+        <translation>Ton nom</translation>
+    </message>
+    <message>
+        <source>Save my profile</source>
+        <translation>Enregistrer mon profil</translation>
+    </message>
+</context>
+<context>
     <name>AboutDialog</name>
     <message>
         <location filename="../../src/erable/aboutdialog.ui" line="14"/>
@@ -8371,6 +8494,14 @@ Quand c&apos;est fait, fermez le jeu, puis choisissez Mode debug &gt; Arrêter e
     <message>
         <source>Report a problem</source>
         <translation>Signaler un problème</translation>
+    </message>
+    <message>
+        <source>&amp;Home</source>
+        <translation>&amp;Accueil</translation>
+    </message>
+    <message>
+        <source>&amp;Library</source>
+        <translation>&amp;Bibliothèque</translation>
     </message>
 </context>
 <context>

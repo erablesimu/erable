@@ -136,6 +136,9 @@ public:
     static constexpr int FullPathRole = SortRole + 2;
     static constexpr int ProgramIdRole = SortRole + 3;
     static constexpr int FileTypeRole = SortRole + 4;
+    /// The game's picture at the home screen's tile size (CoverSize)
+    static constexpr int CoverRole = SortRole + 5;
+    static constexpr u32 CoverSize = 256;
 
     GameListItemPath() = default;
     GameListItemPath(const QString& game_path, const std::vector<u8>& picture_data,
@@ -173,6 +176,11 @@ public:
         QPixmap picture;
         if (!picture.loadFromData(picture_data.data(), static_cast<u32>(picture_data.size()))) {
             picture = GetDefaultIcon(size);
+        }
+        if (!picture.isNull() && picture.width() > static_cast<int>(size)) {
+            setData(picture.scaled(CoverSize, CoverSize, Qt::IgnoreAspectRatio,
+                                   Qt::SmoothTransformation),
+                    CoverRole);
         }
         picture = picture.scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 

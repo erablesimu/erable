@@ -14,6 +14,7 @@ l'Explorateur, ou dans Exécuter (Win + R).
 | Rapports de compatibilité | `%APPDATA%\erable\reports` |
 | Sessions enregistrées (Mode debug) | `%APPDATA%\erable\sessions` |
 | Toutes les données | `%APPDATA%\erable` |
+| Vos jeux (affichés à l'accueil) | `Documents\Erable\Jeux` |
 
 Le journal n'est complet qu'une fois Erable fermé.
 

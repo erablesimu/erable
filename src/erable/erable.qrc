@@ -9,4 +9,9 @@ SPDX-License-Identifier: GPL-2.0-or-later
         <file alias="erable_wordmark.png">../../dist/erable_wordmark.png</file>
         <file alias="erable_wordmark@2x.png">../../dist/erable_wordmark@2x.png</file>
     </qresource>
+    <qresource prefix="/sounds">
+        <file alias="home_1.wav">../../dist/sounds/home_1.wav</file>
+        <file alias="home_2.wav">../../dist/sounds/home_2.wav</file>
+        <file alias="home_3.wav">../../dist/sounds/home_3.wav</file>
+    </qresource>
 </RCC>

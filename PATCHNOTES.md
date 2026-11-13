@@ -24,6 +24,17 @@ version. Les sections suivantes gardent l'historique.
   diagnostics s'activent, et à la fin le journal complet est rangé dans un zip à joindre au
   rapport. Une session interrompue par un plantage est récupérée au lancement suivant.
 
+**Nouvel accueil**
+- Erable s'ouvre sur un accueil façon console : grandes vignettes de vos jeux, actions du jeu
+  choisi (Jouer, Réglages du jeu, Favori, Signaler un problème) et un dock (Bibliothèque,
+  Nouveautés, Dossier Jeux, Captures, Mode debug, Réglages). Il se pilote à la manette.
+- Trois musiques d'accueil originales, au choix, à couper d'un clic (bouton Musique / Muet).
+- Au premier lancement, Erable demande de créer son profil (votre nom) ; le profil « Eden » par
+  défaut peut être renommé sans perdre les sauvegardes. Le nom par défaut devient « Joueur ».
+- Nouveau dossier **Documents\Erable\Jeux** : déposez-y vos jeux, ils apparaissent à l'accueil.
+- La liste et la grille d'avant restent dans Affichage → Bibliothèque (Ctrl + L) ; Ctrl + H
+  revient à l'accueil.
+
 **Zelda Ocarina of Time**
 - Les arbres ne flottent plus en l'air dans la plaine d'Hyrule et ailleurs. Pendant qu'un shader
   se prépare, Erable ne saute plus que les dessins refaits à chaque image : un dessin fait une

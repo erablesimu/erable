@@ -27,6 +27,10 @@ add_executable(erable
     compatibility_report.h
     debug_session.cpp
     debug_session.h
+    home/home_music.cpp
+    home/home_music.h
+    home/home_screen.cpp
+    home/home_screen.h
     local_report.cpp
     local_report.h
     applets/qt_amiibo_settings.cpp
@@ -419,6 +423,8 @@ if (APPLE)
 elseif(WIN32)
     # compile as a win32 gui application instead of a console application
     target_link_libraries(erable PRIVATE Qt6::EntryPointPrivate)
+    # The home screen's music (PlaySound)
+    target_link_libraries(erable PRIVATE winmm)
     if(MSVC)
         target_link_libraries(erable PRIVATE version.lib)
         set_target_properties(erable PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")

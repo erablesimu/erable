@@ -114,6 +114,9 @@ struct Values {
     // The last What's new release shown, and whether to show the next one on launch
     Setting<u32> whats_new_version{linkage, 0, "whats_new_version", Category::Ui};
     Setting<bool> show_whats_new{linkage, true, "show_whats_new", Category::Ui};
+    // Home screen: its music (on or muted) and which of its three loops plays
+    Setting<bool> home_music{linkage, true, "home_music", Category::Ui};
+    Setting<u32, true> home_song{linkage, 0, 0, 2, "home_song", Category::Ui};
     Setting<bool> show_low_ram_warning{linkage, true, "show_low_ram_warning", Category::Ui};
     Setting<bool> pause_when_in_background{linkage,
                                            false,

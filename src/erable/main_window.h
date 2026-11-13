@@ -48,6 +48,7 @@
 class QtConfig;
 class EmuThread;
 class GameList;
+class HomeScreen;
 class GImageInfo;
 class GRenderWindow;
 class LoadingScreen;
@@ -554,6 +555,9 @@ private:
 #endif
 
     GameListPlaceholder* game_list_placeholder = nullptr;
+    HomeScreen* home_screen = nullptr;
+    QMenu* debug_menu = nullptr;
+    bool home_active = true; ///< The home is shown rather than the library when no game runs
 
     std::vector<VkDeviceInfo::Record> vk_device_records;
 
@@ -599,6 +603,10 @@ private:
     bool emulation_running = false;
 
     void SetupDebugMenu();
+    /// Shows the home screen, or the library (game list) when `home` is false.
+    void ShowHome(bool home);
+    /// Creates the Games folder (HomeScreen::GamesFolder) and adds it to the game folders.
+    void EnsureGamesFolder();
     void UpdateDebugSessionUi();
     void ShowSavedSession(const std::filesystem::path& zip, bool interrupted);
     std::optional<CompatibilityReporting::Session> report_session;
