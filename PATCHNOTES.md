@@ -19,6 +19,9 @@ version. Les sections suivantes gardent l'historique.
 - Page « Bugs » sur le site : les problèmes signalés, en cours ou fermés, filtrables par jeu et par
   type, avec une recherche. La liste est enregistrée dans un fichier SQLite à chaque publication.
 - Les journaux s'appellent maintenant `erable_log.txt` (et `erable_crash.dmp`, `erable_gpu.log`).
+- Nouveau menu **Mode debug → Enregistrer ma session** : plus besoin du lanceur `.bat`. Les
+  diagnostics s'activent, et à la fin le journal complet est rangé dans un zip à joindre au
+  rapport. Une session interrompue par un plantage est récupérée au lancement suivant.
 
 **Zelda Ocarina of Time**
 - Correction des zones sombres en forme de grille sur l'eau et le sol (ombres des lumières).

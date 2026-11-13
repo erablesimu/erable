@@ -417,6 +417,7 @@ private slots:
     void OnInstallFirmwareFromZIP();
     void OnInstallDecryptionKeys();
     void OnWhatsNew();
+    void OnRecordSession();
     void OnAbout();
     void OnEdenDependencies();
     void OnApplyRecommendedSettings();
@@ -566,6 +567,8 @@ private:
     QLabel* emu_frametime_label = nullptr;
     QLabel* tas_label = nullptr;
     QLabel* firmware_label = nullptr;
+    QLabel* recording_label = nullptr;
+    QAction* record_session_action = nullptr;
     QPushButton* gpu_accuracy_button = nullptr;
     QPushButton* renderer_status_button = nullptr;
     QPushButton* refresh_button = nullptr;
@@ -594,6 +597,10 @@ private:
 
     // Whether emulation is currently running in Erable.
     bool emulation_running = false;
+
+    void SetupDebugMenu();
+    void UpdateDebugSessionUi();
+    void ShowSavedSession(const std::filesystem::path& zip, bool interrupted);
     std::optional<CompatibilityReporting::Session> report_session;
     bool boot_in_progress = false;
     bool close_pending = false;

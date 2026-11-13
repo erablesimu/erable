@@ -49,8 +49,8 @@ Dialog::Dialog(const CompatibilityReporting::Session& session_, QWidget* parent)
     auto* layout = new QVBoxLayout(this);
 
     auto* introduction = new QLabel(
-        QStringLiteral("Le rapport est enregistré sur ce PC, dans le dossier « reports » de Banst "
-                       "Family. Rien n'est envoyé sur Internet, sauf si vous choisissez de "
+        QStringLiteral("Le rapport est enregistré sur ce PC, dans le dossier « reports » d'Erable. "
+                       "Rien n'est envoyé sur Internet, sauf si vous choisissez de "
                        "l'envoyer par e-mail."),
         this);
     introduction->setWordWrap(true);

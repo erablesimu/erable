@@ -3,11 +3,13 @@
 
 #include <QApplication>
 #include <QMessageBox>
+#include <QProcess>
 #include <cstdlib>
 #include <exception>
 
 #include "common/fs/fs_paths.h"
 #include "common/fs/path_util.h"
+#include "debug_session.h"
 #include "nx2_switches.h"
 #include "startup_checks.h"
 
@@ -86,6 +88,7 @@ static Qt::HighDpiScaleFactorRoundingPolicy GetHighDpiRoundingPolicy() {
 
 int main(int argc, char* argv[]) {
     LoadNx2Switches(argv[0]);
+    DebugSession::Prepare();
 #if ERABLE_ROOM
     bool launch_room = false;
     for (int i = 1; i < argc; i++) {
@@ -209,11 +212,20 @@ int main(int argc, char* argv[]) {
     setlocale(LC_ALL, "C");
 
     try {
-        MainWindow main_window{has_broken_vulkan};
-        main_window.show();
-        app.connect(&app, &QGuiApplication::applicationStateChanged, &main_window,
-                    &MainWindow::OnAppFocusStateChanged);
-        return app.exec();
+        int result;
+        {
+            MainWindow main_window{has_broken_vulkan};
+            main_window.show();
+            app.connect(&app, &QGuiApplication::applicationStateChanged, &main_window,
+                        &MainWindow::OnAppFocusStateChanged);
+            result = app.exec();
+        }
+        // Debug mode > Record my session, after a game ran: record from a new launch.
+        if (DebugSession::RestartRequested()) {
+            QProcess::startDetached(QCoreApplication::applicationFilePath(),
+                                    QCoreApplication::arguments().mid(1));
+        }
+        return result;
     } catch (const std::exception& exception) {
         QMessageBox::critical(nullptr, QObject::tr("Erable startup stopped"),
                               QString::fromUtf8(exception.what()));

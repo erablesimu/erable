@@ -272,6 +272,7 @@ struct FileBackend final : public Backend {
                 mode = FS::FileAccessMode::Append;
         }
         file.emplace(path, mode, FS::FileType::TextFile);
+        file_path = path;
         // Count what is already there so the size limit still applies when appending.
         if (mode == FS::FileAccessMode::Append)
             bytes_written = file->GetSize();
@@ -322,6 +323,8 @@ struct FileBackend final : public Backend {
     void Flush() noexcept override {
         file->Flush();
     }
+
+    std::filesystem::path file_path;
 private:
     std::optional<FS::IOFile> file;
     std::size_t bytes_written = 0;
@@ -491,6 +494,21 @@ void FmtCrashMessageImpl(const char* filename, unsigned int line_num, const char
     logging_instance->file_backend->Write(e);
     logging_instance->file_backend->Flush();
 #endif
+}
+
+void Flush() {
+#ifndef __OPENORBIS__
+    if (logging_instance && logging_instance->file_backend)
+        logging_instance->file_backend->Flush();
+#endif
+}
+
+std::filesystem::path GetFilePath() {
+#ifndef __OPENORBIS__
+    if (logging_instance && logging_instance->file_backend)
+        return logging_instance->file_backend->file_path;
+#endif
+    return {};
 }
 
 void SetGlobalFilter(const Filter& filter) {

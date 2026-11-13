@@ -8295,6 +8295,83 @@ Ce choix se modifie dans Configurer, Graphismes, Avancé.</translation>
         <source>Quit Erable</source>
         <translation>Quitter Erable</translation>
     </message>
+    <message>
+        <source>&amp;Debug mode</source>
+        <translation>&amp;Mode debug</translation>
+    </message>
+    <message>
+        <source>Record my session</source>
+        <translation>Enregistrer ma session</translation>
+    </message>
+    <message>
+        <source>Open recorded sessions</source>
+        <translation>Ouvrir les sessions enregistrées</translation>
+    </message>
+    <message>
+        <source>Report a problem...</source>
+        <translation>Signaler un problème...</translation>
+    </message>
+    <message>
+        <source>en</source>
+        <comment>Language code of the Erable site's pages</comment>
+        <translation>fr</translation>
+    </message>
+    <message>
+        <source>Recording the session</source>
+        <translation>Enregistrement de la session</translation>
+    </message>
+    <message>
+        <source>Erable records diagnostics for this session. Debug mode &gt; Record my session stops and saves it.</source>
+        <translation>Erable enregistre les diagnostics de cette session. Mode debug &gt; Arrêter et enregistrer ma session l&apos;arrête et l&apos;enregistre.</translation>
+    </message>
+    <message>
+        <source>Stop and save my session</source>
+        <translation>Arrêter et enregistrer ma session</translation>
+    </message>
+    <message>
+        <source>Close the game first (Emulation &gt; Stop), so the log holds the whole session. Then choose Debug mode &gt; Stop and save my session.</source>
+        <translation>Fermez d&apos;abord le jeu (Émulation &gt; Arrêter), pour que le journal contienne toute la session. Choisissez ensuite Mode debug &gt; Arrêter et enregistrer ma session.</translation>
+    </message>
+    <message>
+        <source>The session could not be saved.</source>
+        <translation>La session n&apos;a pas pu être enregistrée.</translation>
+    </message>
+    <message>
+        <source>Recording started. Start the game and do what causes the problem.
+
+When you are done, close the game, then choose Debug mode &gt; Stop and save my session: Erable puts the log and diagnostics in a zip to attach to your report.</source>
+        <translation>L&apos;enregistrement a commencé. Lancez le jeu et refaites ce qui provoque le problème.
+
+Quand c&apos;est fait, fermez le jeu, puis choisissez Mode debug &gt; Arrêter et enregistrer ma session : Erable range le journal et les diagnostics dans un zip à joindre à votre rapport.</translation>
+    </message>
+    <message>
+        <source>Close the game first (Emulation &gt; Stop), then choose Record my session again.</source>
+        <translation>Fermez d&apos;abord le jeu (Émulation &gt; Arrêter), puis choisissez de nouveau Enregistrer ma session.</translation>
+    </message>
+    <message>
+        <source>A game already ran since Erable started, so the recording starts with a new launch. Restart Erable now?</source>
+        <translation>Un jeu a déjà été lancé depuis le démarrage d&apos;Erable : l&apos;enregistrement commencera au prochain lancement. Redémarrer Erable maintenant ?</translation>
+    </message>
+    <message>
+        <source>Erable stopped during the recording. The log of that session was saved:</source>
+        <translation>Erable s&apos;est arrêté pendant l&apos;enregistrement. Le journal de cette session a été enregistré :</translation>
+    </message>
+    <message>
+        <source>Your session was saved:</source>
+        <translation>Votre session a été enregistrée :</translation>
+    </message>
+    <message>
+        <source>Attach this zip to your report (Report a problem), or send it to whoever helps you.</source>
+        <translation>Joignez ce zip à votre rapport (Signaler un problème), ou envoyez-le à la personne qui vous aide.</translation>
+    </message>
+    <message>
+        <source>Show the file</source>
+        <translation>Afficher le fichier</translation>
+    </message>
+    <message>
+        <source>Report a problem</source>
+        <translation>Signaler un problème</translation>
+    </message>
 </context>
 <context>
     <name>MigrationWorker</name>

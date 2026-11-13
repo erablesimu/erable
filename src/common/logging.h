@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <filesystem>
+
 #include <chrono>
 #include <algorithm>
 #include <string>
@@ -149,6 +151,13 @@ void Start();
 
 /// Explicitly stops the logger thread and flushes the buffers
 void Stop();
+
+/// Writes what the log file holds in memory to the disk.
+void Flush();
+
+/// The file this session logs to (LOG_FILE, or its "_2" copy when the last one was still open),
+/// or an empty path without a log file.
+[[nodiscard]] std::filesystem::path GetFilePath();
 
 /// The global filter will prevent any messages from even being processed if they are filtered.
 void SetGlobalFilter(const Filter& filter);

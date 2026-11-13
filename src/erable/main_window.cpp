@@ -84,6 +84,7 @@
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QDir>
+#include <QProcess>
 #include <QElapsedTimer>
 #include <QEventLoop>
 #include <QFileDialog>
@@ -139,6 +140,7 @@ static FileSys::VirtualFile VfsDirectoryCreateFileWrapper(const FileSys::Virtual
 #ifdef ENABLE_UPDATE_CHECKER
 #include "frontend_common/update_checker.h"
 #include "frontend_common/update_installer.h"
+#include "erable/debug_session.h"
 #include "erable/local_report.h"
 #endif
 
@@ -503,6 +505,15 @@ MainWindow::MainWindow(bool has_broken_vulkan)
         UISettings::values.show_whats_new.GetValue()) {
         QTimer::singleShot(0, this, &MainWindow::OnWhatsNew);
     }
+
+    if (DebugSession::IsRecording()) {
+        LOG_INFO(Frontend, "Debug session: recording (Debug mode > Record my session)");
+    }
+    QTimer::singleShot(0, this, [this] {
+        if (const auto zip = DebugSession::TakeInterruptedSession()) {
+            ShowSavedSession(*zip, true);
+        }
+    });
 
     // Set up game list mode checkboxes.
     SetGameListMode(UISettings::values.game_list_mode.GetValue());
@@ -1819,6 +1830,120 @@ void MainWindow::ConnectMenuEvents() {
 #endif
     });
 #endif
+    SetupDebugMenu();
+}
+
+void MainWindow::SetupDebugMenu() {
+    auto* const menu = new QMenu(tr("&Debug mode"), this);
+    menuBar()->insertMenu(ui->menu_Help->menuAction(), menu);
+    record_session_action = menu->addAction(tr("Record my session"));
+    record_session_action->setCheckable(true);
+    connect(record_session_action, &QAction::triggered, this, &MainWindow::OnRecordSession);
+    menu->addSeparator();
+    connect(menu->addAction(tr("Open recorded sessions")), &QAction::triggered, this, [] {
+        const auto folder = DebugSession::SessionsDirectory();
+        std::error_code ec;
+        std::filesystem::create_directories(folder, ec);
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(folder.wstring())));
+    });
+    connect(menu->addAction(tr("Report a problem...")), &QAction::triggered, this, [this] {
+        OpenURL(QUrl(QStringLiteral("https://erablesimu.github.io/erable/signaler.html?lang=") +
+                     tr("en", "Language code of the Erable site's pages")));
+    });
+
+    recording_label = new QLabel(QStringLiteral("\u25CF ") + tr("Recording the session"));
+    recording_label->setStyleSheet(QStringLiteral("color: #e5533d; font-weight: 600;"));
+    recording_label->setToolTip(
+        tr("Erable records diagnostics for this session. Debug mode > Record my session stops "
+           "and saves it."));
+    recording_label->setContentsMargins(4, 0, 4, 0);
+    statusBar()->insertPermanentWidget(0, recording_label);
+    UpdateDebugSessionUi();
+}
+
+void MainWindow::UpdateDebugSessionUi() {
+    const bool recording = DebugSession::IsRecording();
+    record_session_action->setChecked(recording);
+    record_session_action->setText(recording ? tr("Stop and save my session")
+                                             : tr("Record my session"));
+    recording_label->setVisible(recording);
+}
+
+void MainWindow::OnRecordSession() {
+    if (DebugSession::IsRecording()) {
+        if (emulation_running) {
+            QMessageBox::information(
+                this, tr("Record my session"),
+                tr("Close the game first (Emulation > Stop), so the log holds the whole session. "
+                   "Then choose Debug mode > Stop and save my session."));
+            UpdateDebugSessionUi();
+            return;
+        }
+        const auto zip = DebugSession::Finish();
+        UpdateDebugSessionUi();
+        if (zip) {
+            ShowSavedSession(*zip, false);
+        } else {
+            QMessageBox::warning(this, tr("Record my session"),
+                                 tr("The session could not be saved."));
+        }
+        return;
+    }
+    if (DebugSession::CanStartNow()) {
+        DebugSession::StartNow();
+        LOG_INFO(Frontend, "Debug session: recording (Debug mode > Record my session)");
+        UpdateDebugSessionUi();
+        QMessageBox::information(
+            this, tr("Record my session"),
+            tr("Recording started. Start the game and do what causes the problem.\n\nWhen you "
+               "are done, close the game, then choose Debug mode > Stop and save my session: "
+               "Erable puts the log and diagnostics in a zip to attach to your report."));
+        return;
+    }
+    UpdateDebugSessionUi();
+    if (emulation_running) {
+        QMessageBox::information(this, tr("Record my session"),
+                                 tr("Close the game first (Emulation > Stop), then choose Record "
+                                    "my session again."));
+        return;
+    }
+    const auto answer = QMessageBox::question(
+        this, tr("Record my session"),
+        tr("A game already ran since Erable started, so the recording starts with a new launch. "
+           "Restart Erable now?"));
+    if (answer == QMessageBox::Yes) {
+        DebugSession::StartAtNextLaunch();
+        close();
+    }
+}
+
+void MainWindow::ShowSavedSession(const std::filesystem::path& zip, bool interrupted) {
+    const auto path = QString::fromStdWString(zip.wstring());
+    QMessageBox box(QMessageBox::Information, tr("Record my session"),
+                    interrupted ? tr("Erable stopped during the recording. The log of that "
+                                     "session was saved:")
+                                : tr("Your session was saved:"),
+                    QMessageBox::NoButton, this);
+    box.setInformativeText(
+        QDir::toNativeSeparators(path) + QStringLiteral("\n\n") +
+        tr("Attach this zip to your report (Report a problem), or send it to whoever helps you."));
+    QPushButton* const open = box.addButton(tr("Show the file"), QMessageBox::AcceptRole);
+    QPushButton* const report = box.addButton(tr("Report a problem"), QMessageBox::ActionRole);
+    box.addButton(QMessageBox::Close);
+    box.setDefaultButton(open);
+    box.exec();
+    if (box.clickedButton() == open || box.clickedButton() == report) {
+#ifdef _WIN32
+        QProcess::startDetached(QStringLiteral("explorer.exe"),
+                                {QStringLiteral("/select,") + QDir::toNativeSeparators(path)});
+#else
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(path).absolutePath()));
+#endif
+    }
+    if (box.clickedButton() == report) {
+        OpenURL(QUrl(QStringLiteral("https://erablesimu.github.io/erable/signaler.html?lang=") +
+                     tr("en", "Language code of the Erable site's pages")));
+    }
 }
 
 void MainWindow::UpdateMenuState() {
@@ -2123,6 +2248,7 @@ bool MainWindow::ConfirmLowRamBoot(const QString& filename,
 
 void MainWindow::BootGame(const QString& filename, Service::AM::FrontendAppletParameters params,
                           StartGameType type) {
+    DebugSession::NoteGameStarted();
 #ifdef ERABLE_NX_TOOLS
     if (nx_metadata_write_in_progress) {
         QMessageBox::information(this, tr("NX Archive"),
@@ -5808,8 +5934,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
     if (!close_pending && !boot_in_progress && QtCommon::emu_thread && emulation_running &&
         UISettings::values.confirm_before_stopping.GetValue() != ConfirmStop::Ask_Never) {
         QMessageBox box(QMessageBox::Question, tr("Erable"),
-                        tr("Close only the game and go back to the game list, or quit Banst "
-                           "Family?"),
+                        tr("Close only the game and go back to the game list, or quit Erable?"),
                         QMessageBox::NoButton, this);
         QPushButton* const close_game = box.addButton(tr("Close the game"), QMessageBox::AcceptRole);
         QPushButton* const quit = box.addButton(tr("Quit Erable"), QMessageBox::DestructiveRole);
@@ -5861,6 +5986,15 @@ void MainWindow::closeEvent(QCloseEvent* event) {
         return;
     }
     LOG_INFO(Frontend, "Closing frontend after emulation cleanup");
+    if (DebugSession::IsRecording() && !DebugSession::RestartRequested()) {
+        if (const auto zip = DebugSession::Finish()) {
+#ifdef _WIN32
+            QProcess::startDetached(QStringLiteral("explorer.exe"),
+                                    {QStringLiteral("/select,") +
+                                     QDir::toNativeSeparators(QString::fromStdWString(zip->wstring()))});
+#endif
+        }
+    }
 
     UpdateUISettings();
     game_list->SaveInterfaceLayout();

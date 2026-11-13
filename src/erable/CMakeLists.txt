@@ -25,6 +25,8 @@ add_executable(erable
     aboutdialog.ui
     compatibility_report.cpp
     compatibility_report.h
+    debug_session.cpp
+    debug_session.h
     local_report.cpp
     local_report.h
     applets/qt_amiibo_settings.cpp
