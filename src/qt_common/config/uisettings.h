@@ -41,10 +41,10 @@ namespace UISettings {
 
 bool IsDarkTheme();
 
-/// The Erable theme (Lichii Dark recoloured), which has custom widgets and icons.
+/// One of Erable's themes (Maple and its seasons), which have custom widgets and icons.
 bool IsErableStyle();
 
-/// The resource path of a Erable theme icon ("reset.png" -> ":/maple/icons/reset.png").
+/// The resource path of the current theme's icon ("reset.png" -> ":/maple/icons/reset.png").
 QString StyleIcon(const QString& file);
 
 struct ContextualShortcut {
@@ -60,19 +60,16 @@ struct Shortcut {
     ContextualShortcut shortcut;
 };
 
+/// Erable's themes: Maple and its two seasons, the same design in other colours.
 enum class Theme {
-    Default,
-    DefaultColorful,
-    Dark,
-    DarkColorful,
-    MidnightBlue,
-    MidnightBlueColorful,
-    Erable,
+    Maple,
+    SpringMaple,
+    WinterMaple,
 };
 
-static constexpr Theme default_theme{Theme::Erable};
+static constexpr Theme default_theme{Theme::Maple};
 
-using Themes = std::array<std::pair<const char*, const char*>, 7>;
+using Themes = std::array<std::pair<const char*, const char*>, 3>;
 extern const Themes themes;
 
 struct GameDir {

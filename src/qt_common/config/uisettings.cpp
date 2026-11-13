@@ -4,6 +4,8 @@
 // SPDX-FileCopyrightText: 2016 Citra Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <algorithm>
+
 #include <QSettings>
 #include "common/fs/fs.h"
 #include "common/fs/path_util.h"
@@ -67,30 +69,26 @@ const std::array<Shortcut, 32> default_hotkeys{{
 // clang-format on
 
 const Themes themes{{
-    {"Default", "default"},
-    {"Default Colorful", "colorful"},
-    {"Dark", "qdarkstyle"},
-    {"Dark Colorful", "colorful_dark"},
-    {"Midnight Blue", "qdarkstyle_midnight_blue"},
-    {"Midnight Blue Colorful", "colorful_midnight_blue"},
-    {"Erable", "maple"},
+    {"Maple", "maple"},
+    {"Spring Maple", "maple_spring"},
+    {"Winter Maple", "maple_winter"},
 }};
 
 bool IsDarkTheme() {
-    const auto& theme = UISettings::values.theme;
-    return theme == std::string("qdarkstyle") || theme == std::string("qdarkstyle_midnight_blue") ||
-           theme == std::string("colorful_dark") ||
-           theme == std::string("colorful_midnight_blue") || theme == std::string("maple");
+    // All of Erable's themes are dark.
+    return true;
 }
 
 Values values = {};
 
 bool IsErableStyle() {
-    return values.theme == std::string("maple");
+    return std::ranges::any_of(themes, [](const auto& theme) { return values.theme == theme.second; });
 }
 
 QString StyleIcon(const QString& file) {
-    return QStringLiteral(":/maple/icons/") + file;
+    const QString theme = IsErableStyle() ? QString::fromStdString(values.theme)
+                                          : QStringLiteral("maple");
+    return QStringLiteral(":/%1/icons/").arg(theme) + file;
 }
 
 Setting<u32, true>& CurrentGameIconSize() {

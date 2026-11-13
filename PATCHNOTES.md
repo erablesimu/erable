@@ -9,6 +9,12 @@ version. Les sections suivantes gardent l'historique.
 - La fenêtre de mise à jour ne montre plus que ce qui a changé depuis votre version, build par
   build, au lieu de tout l'historique depuis le build 24.
 
+**Thèmes**
+- Erable n'a plus que ses propres thèmes : **Maple** (le thème habituel, gris chauds et érable),
+  **Spring Maple** (teinté de vert) et **Winter Maple** (bleu givré). Configurer > Général >
+  Interface. Les anciens thèmes (clair, sombre, bleu nuit…) sont retirés : si vous en utilisiez
+  un, Erable passe sur Maple.
+
 **Accueil en boîtiers**
 - Les jeux sont présentés comme des boîtiers Erable en 3D : le jeu choisi au centre, ses voisins
   tournés vers lui, avec leur reflet. Ils glissent d'un jeu à l'autre (flèches, manette, molette

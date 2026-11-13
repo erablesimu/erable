@@ -378,20 +378,6 @@ QString GetTranslatedGameIconSize(size_t index) {
 
 } // namespace
 
-#ifndef _WIN32
-// TODO(crueter): carboxyl does this, is it needed in qml?
-inline static bool isDarkMode() {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-    const auto scheme = QGuiApplication::styleHints()->colorScheme();
-    return scheme == Qt::ColorScheme::Dark;
-#else
-    const QPalette defaultPalette;
-    const auto text = defaultPalette.color(QPalette::WindowText);
-    const auto window = defaultPalette.color(QPalette::Window);
-    return text.lightness() > window.lightness();
-#endif // QT_VERSION
-}
-#endif // _WIN32
 
 MainWindow::MainWindow(bool has_broken_vulkan)
     : ui{std::make_unique<Ui::MainWindow>()},
@@ -434,7 +420,7 @@ MainWindow::MainWindow(bool has_broken_vulkan)
     if (whats_new_pending) {
         UISettings::values.whats_new_version = WhatsNewDialog::Version;
         UISettings::values.theme =
-            UISettings::themes[static_cast<size_t>(UISettings::Theme::Erable)].second;
+            UISettings::themes[static_cast<size_t>(UISettings::Theme::Maple)].second;
     }
     UpdateUITheme();
 
@@ -6163,54 +6149,75 @@ void MainWindow::filterBarSetChecked(bool state) {
     emit(OnToggleFilterBar());
 }
 
-static void AdjustLinkColor() {
-    QPalette new_pal(qApp->palette());
+namespace {
 
-    if (UISettings::values.theme == "maple")
-        new_pal.setColor(QPalette::Link, QColor(0xf2, 0x80, 0x3f));
-    else if (UISettings::IsDarkTheme())
-        new_pal.setColor(QPalette::Link, QColor(0, 190, 255, 255));
-    else
-        new_pal.setColor(QPalette::Link, QColor(0, 140, 200, 255));
+/// The colours Qt draws with outside the stylesheets (item view text, disabled text, links and
+/// native dialog parts), per theme. tools/ui/make_maple_variants.py prints the seasons' ones.
+struct ThemeColours {
+    const char* theme;
+    QColor window, surface, text, disabled, accent, alternate, tooltip, placeholder;
+    QColor light, midlight, mid, dark, link, link_visited;
+};
 
-    if (qApp->palette().color(QPalette::Link) != new_pal.color(QPalette::Link))
-        qApp->setPalette(new_pal);
+const std::array<ThemeColours, 3> theme_colours{{
+    {"maple", QColor(0x1d1a16), QColor(0x26231f), QColor(0xf1eeea), QColor(0x5c5955),
+     QColor(0xe8622a), QColor(0x211e1a), QColor(0x292622), QColor(0x777470), QColor(0x3b3834),
+     QColor(0x312e2a), QColor(0x292622), QColor(0x1a1713), QColor(0xf2803f), QColor(0xc7461f)},
+    {"maple_spring", QColor(0x181e15), QColor(0x21271e), QColor(0xecf2e9), QColor(0x575d54),
+     QColor(0x5eb432), QColor(0x1c2219), QColor(0x242a21), QColor(0x72786f), QColor(0x363c33),
+     QColor(0x2c3229), QColor(0x242a21), QColor(0x151b12), QColor(0x61ce33), QColor(0x53922f)},
+    {"maple_winter", QColor(0x14191f), QColor(0x1d2228), QColor(0xe8edf3), QColor(0x53585e),
+     QColor(0x44a3d9), QColor(0x181d23), QColor(0x20252b), QColor(0x6e7379), QColor(0x32373d),
+     QColor(0x282d33), QColor(0x20252b), QColor(0x11161c), QColor(0x5aade4), QColor(0x3090bf)},
+}};
+
+const ThemeColours& CurrentThemeColours() {
+    for (const ThemeColours& colours : theme_colours) {
+        if (UISettings::values.theme == colours.theme) {
+            return colours;
+        }
+    }
+    return theme_colours.front();
 }
 
-// The Erable theme styles most widgets through its stylesheet; the palette covers what Qt
-// draws without one: item view text, disabled text, links and the native parts of dialogs.
-static QPalette ErablePalette() {
+QPalette ThemePalette() {
+    const ThemeColours& c = CurrentThemeColours();
     QPalette palette;
-    const QColor window(0x1d, 0x1a, 0x16);
-    const QColor surface(0x26, 0x23, 0x1f);
-    const QColor text(0xf1, 0xee, 0xea);
-    const QColor disabled(0x5c, 0x59, 0x55);
-    const QColor accent(0xe8, 0x62, 0x2a);
-    palette.setColor(QPalette::Window, window);
-    palette.setColor(QPalette::WindowText, text);
-    palette.setColor(QPalette::Base, window);
-    palette.setColor(QPalette::AlternateBase, QColor(0x21, 0x1e, 0x1a));
-    palette.setColor(QPalette::ToolTipBase, QColor(0x29, 0x26, 0x22));
-    palette.setColor(QPalette::ToolTipText, text);
-    palette.setColor(QPalette::PlaceholderText, QColor(0x77, 0x74, 0x70));
-    palette.setColor(QPalette::Text, text);
-    palette.setColor(QPalette::Button, surface);
-    palette.setColor(QPalette::ButtonText, text);
+    palette.setColor(QPalette::Window, c.window);
+    palette.setColor(QPalette::WindowText, c.text);
+    palette.setColor(QPalette::Base, c.window);
+    palette.setColor(QPalette::AlternateBase, c.alternate);
+    palette.setColor(QPalette::ToolTipBase, c.tooltip);
+    palette.setColor(QPalette::ToolTipText, c.text);
+    palette.setColor(QPalette::PlaceholderText, c.placeholder);
+    palette.setColor(QPalette::Text, c.text);
+    palette.setColor(QPalette::Button, c.surface);
+    palette.setColor(QPalette::ButtonText, c.text);
     palette.setColor(QPalette::BrightText, Qt::white);
-    palette.setColor(QPalette::Light, QColor(0x3b, 0x38, 0x34));
-    palette.setColor(QPalette::Midlight, QColor(0x31, 0x2e, 0x2a));
-    palette.setColor(QPalette::Mid, QColor(0x29, 0x26, 0x22));
-    palette.setColor(QPalette::Dark, QColor(0x1a, 0x17, 0x13));
+    palette.setColor(QPalette::Light, c.light);
+    palette.setColor(QPalette::Midlight, c.midlight);
+    palette.setColor(QPalette::Mid, c.mid);
+    palette.setColor(QPalette::Dark, c.dark);
     palette.setColor(QPalette::Shadow, Qt::black);
-    palette.setColor(QPalette::Highlight, accent);
+    palette.setColor(QPalette::Highlight, c.accent);
     palette.setColor(QPalette::HighlightedText, Qt::white);
-    palette.setColor(QPalette::Link, QColor(0xf2, 0x80, 0x3f));
-    palette.setColor(QPalette::LinkVisited, QColor(0xc7, 0x46, 0x1f));
-    palette.setColor(QPalette::Disabled, QPalette::WindowText, disabled);
-    palette.setColor(QPalette::Disabled, QPalette::Text, disabled);
-    palette.setColor(QPalette::Disabled, QPalette::ButtonText, disabled);
+    palette.setColor(QPalette::Link, c.link);
+    palette.setColor(QPalette::LinkVisited, c.link_visited);
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, c.disabled);
+    palette.setColor(QPalette::Disabled, QPalette::Text, c.disabled);
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, c.disabled);
     return palette;
 }
+
+void AdjustLinkColor() {
+    QPalette new_pal(qApp->palette());
+    new_pal.setColor(QPalette::Link, CurrentThemeColours().link);
+    if (qApp->palette().color(QPalette::Link) != new_pal.color(QPalette::Link)) {
+        qApp->setPalette(new_pal);
+    }
+}
+
+} // namespace
 
 void MainWindow::UpdateMenuIcons() {
     const std::array<std::pair<QAction*, const char*>, 55> icons{{
@@ -6282,37 +6289,21 @@ void MainWindow::UpdateUITheme() {
     if (current_theme.isEmpty())
         current_theme = default_theme;
 
-    // Lichii Dark, which builds before Erable had, became the Erable theme; so did the theme's
-    // former folder name ("banst").
-    if (current_theme == QStringLiteral("lichii") || current_theme == QStringLiteral("banst")) {
+    // Only Maple and its seasons remain: any other saved theme (the older light and dark ones,
+    // Lichii Dark, or Maple's former folder name) becomes Maple.
+    if (!UISettings::IsErableStyle()) {
         current_theme = default_theme;
         UISettings::values.theme = default_theme.toStdString();
     }
-
-    static bool erable_palette = false;
-    if (current_theme == QStringLiteral("maple")) {
-        qApp->setPalette(ErablePalette());
-        erable_palette = true;
-    } else if (erable_palette) {
-        qApp->setPalette(QPalette());
-        erable_palette = false;
-    }
+    qApp->setPalette(ThemePalette());
 
 #ifdef _WIN32
     QIcon::setThemeName(current_theme);
     AdjustLinkColor();
 #else
-    if (current_theme == QStringLiteral("default") || current_theme == QStringLiteral("colorful")) {
-        QIcon::setThemeName(current_theme == QStringLiteral("colorful") ? current_theme : startup_icon_theme);
-        QIcon::setThemeSearchPaths(QStringList(default_theme_paths));
-        if (isDarkMode()) {
-            current_theme = QStringLiteral("default_dark");
-        }
-    } else {
-        QIcon::setThemeName(current_theme);
-        QIcon::setThemeSearchPaths(QStringList(QStringLiteral(":/icons")));
-        AdjustLinkColor();
-    }
+    QIcon::setThemeName(current_theme);
+    QIcon::setThemeSearchPaths(QStringList(QStringLiteral(":/icons")));
+    AdjustLinkColor();
 #endif
 
     if (current_theme != default_theme) {

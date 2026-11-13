@@ -20,28 +20,11 @@ Files: dist/qt_themes/default/icons/256x256/eden.png
 Copyright: 2025 Eden Emulator Project
 License: GPL-3.0-or-later
 
-Files: dist/qt_themes/qdarkstyle*/LICENSE.*
-       dist/qt_themes/qdarkstyle*/style.qrc
-       dist/qt_themes/qdarkstyle*/style.qss
-Copyright: 2013 Colin Duquesnoy
-           2019 Daniel Cosmo Pizetta
-License: MIT
-
-Files: dist/qt_themes/qdarkstyle*/rc/*
-Copyright: 2013 Colin Duquesnoy
-           2019 Daniel Cosmo Pizetta
-License: CC-BY-4.0
-
 Files: dist/qt_themes/default/icons/256x256/plus_folder.png
        dist/qt_themes/default/icons/48x48/bad_folder.png
        dist/qt_themes/default/icons/48x48/chip.png
        dist/qt_themes/default/icons/48x48/folder.png
        dist/qt_themes/default/icons/48x48/star.png
-       dist/qt_themes/qdarkstyle/icons/256x256/plus_folder.png
-       dist/qt_themes/qdarkstyle/icons/48x48/bad_folder.png
-       dist/qt_themes/qdarkstyle/icons/48x48/chip.png
-       dist/qt_themes/qdarkstyle/icons/48x48/folder.png
-       dist/qt_themes/qdarkstyle/icons/48x48/star.png
 Copyright: Refactoring UI Inc.
 License: MIT
 Comment: https://github.com/tailwindlabs/heroicons
@@ -77,7 +60,6 @@ License: CC0-1.0
 
 Files: dist/qt_themes/*/icons/16x16/view-refresh.png
        dist/qt_themes/default/icons/16x16/lock.png
-       dist/qt_themes/qdarkstyle/icons/16x16/lock.png
 Copyright: Google, Inc.
 License: Apache-2.0
 
