@@ -15,6 +15,11 @@ version. Les sections suivantes gardent l'historique.
   Interface. Les anciens thèmes (clair, sombre, bleu nuit…) sont retirés : si vous en utilisiez
   un, Erable passe sur Maple.
 
+**Écran de chargement**
+- Nouvel écran de chargement aux couleurs du thème choisi (Maple, Spring Maple ou Winter Maple) :
+  icône et nom du jeu au centre, barre fine avec le pourcentage, feuilles d'érable qui tombent
+  doucement en fond. Le petit jeu des feuilles prend aussi les couleurs du thème.
+
 **Accueil en boîtiers**
 - Les jeux sont présentés comme des boîtiers Erable en 3D : le jeu choisi au centre, ses voisins
   tournés vers lui, avec leur reflet. Ils glissent d'un jeu à l'autre (flèches, manette, molette

@@ -123,12 +123,22 @@ void LeafCatcher::paintEvent(QPaintEvent*) {
     QPainter painter{this};
     painter.setRenderHint(QPainter::Antialiasing);
     const QRectF field = rect();
+    // In the theme's colours: Maple's warm greys, Spring's green, Winter's frost
+    const QPalette colours = palette();
+    const QColor accent = colours.color(QPalette::Highlight);
+    const QColor window = colours.color(QPalette::Window);
+    const QColor text = colours.color(QPalette::WindowText);
+    const QColor muted = colours.color(QPalette::PlaceholderText);
     QLinearGradient sky{field.topLeft(), field.bottomLeft()};
-    sky.setColorAt(0, QColor{0x2a, 0x1a, 0x12});
-    sky.setColorAt(1, QColor{0x17, 0x12, 0x0f});
+    const QColor sky_top = window.lighter(125);
+    sky.setColorAt(0, QColor{sky_top.red(), sky_top.green(), sky_top.blue(), 120});
+    sky.setColorAt(1, QColor{window.red(), window.green(), window.blue(), 170});
     QPainterPath frame;
     frame.addRoundedRect(field.adjusted(1, 1, -1, -1), 18, 18);
     painter.fillPath(frame, sky);
+    painter.setPen(QPen{QColor{255, 255, 255, 22}, 1});
+    painter.drawPath(frame);
+    painter.setPen(Qt::NoPen);
     painter.setClipPath(frame);
 
     const double unit = std::min(field.width(), field.height() * 2.2);
@@ -136,7 +146,7 @@ void LeafCatcher::paintEvent(QPaintEvent*) {
         painter.save();
         painter.translate(leaf.x * field.width(), leaf.y * field.height());
         painter.rotate(leaf.angle);
-        const QColor color = leaf.golden ? QColor{0xff, 0xc8, 0x3d} : QColor{0xf0, 0x70, 0x2f};
+        const QColor color = leaf.golden ? QColor{0xff, 0xc8, 0x3d} : accent;
         painter.fillPath(MapleLeaf(unit * (leaf.golden ? 0.075 : 0.065)), color);
         painter.restore();
     }
@@ -152,24 +162,24 @@ void LeafCatcher::paintEvent(QPaintEvent*) {
     pail.lineTo(left + width * 0.9, top + height);
     pail.lineTo(left + width * 0.1, top + height);
     pail.closeSubpath();
-    painter.fillPath(pail, QColor{0xb8, 0xa8, 0x9c});
-    painter.setPen(QPen{QColor{0x8a, 0x7a, 0x6e}, 3});
+    painter.fillPath(pail, muted.lighter(150));
+    painter.setPen(QPen{muted, 3});
     painter.drawLine(QPointF(left + width * 0.05, top + height * 0.35),
                      QPointF(left + width * 0.95, top + height * 0.35));
-    painter.setPen(QPen{QColor{0xb8, 0xa8, 0x9c}, 2});
+    painter.setPen(QPen{muted.lighter(150), 2});
     painter.setBrush(Qt::NoBrush);
     painter.drawArc(QRectF(left + width * 0.15, top - height * 0.6, width * 0.7, height * 1.2), 0,
                     180 * 16);
 
     painter.setClipping(false);
-    painter.setPen(QColor{0xf6, 0xee, 0xe8});
+    painter.setPen(text);
     QFont font = painter.font();
     font.setBold(true);
     painter.setFont(font);
     const QString line = tr("Leaves: %1   Best: %2").arg(score).arg(best) +
                          (combo >= 2 ? tr("   Streak x%1").arg(std::min(combo, 5)) : QString{});
     painter.drawText(field.adjusted(16, 10, -16, -10), Qt::AlignTop | Qt::AlignLeft, line);
-    painter.setPen(QColor{0xb8, 0xa8, 0x9c});
+    painter.setPen(muted);
     painter.drawText(field.adjusted(16, 10, -16, -10), Qt::AlignTop | Qt::AlignRight,
                      tr("Catch the leaves while the shaders load"));
 }

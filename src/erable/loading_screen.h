@@ -8,9 +8,14 @@
 
 #include <chrono>
 #include <memory>
+#include <QElapsedTimer>
+#include <QPixmap>
 #include <QString>
+#include <QTimer>
 #include <QWidget>
 #include <QtGlobal>
+
+#include "common/container/unordered_map.h"
 
 #if !QT_CONFIG(movie)
 #define ERABLE_QT_MOVIE_MISSING 1
@@ -29,6 +34,7 @@ enum class LoadCallbackStage;
 }
 
 class QBuffer;
+class QLabel;
 class QByteArray;
 class QGraphicsOpacityEffect;
 class QMovie;
@@ -59,9 +65,12 @@ public:
     /// Hides the LoadingScreen with a fade out effect
     void OnLoadComplete();
 
-    // In order to use a custom widget with a stylesheet, you need to override the paintEvent
-    // See https://wiki.qt.io/How_to_Change_the_Background_Color_of_QWidget
+    /// The theme's room: a soft glow, slow waves of light and maple leaves drifting down.
     void paintEvent(QPaintEvent* event) override;
+
+protected:
+    void showEvent(QShowEvent* event) override;
+    void hideEvent(QHideEvent* event) override;
 
 signals:
     void LoadProgress(VideoCore::LoadCallbackStage stage, std::size_t value, std::size_t total);
@@ -70,6 +79,9 @@ signals:
     void Hidden();
 
 private:
+    /// Colours and fonts from the current theme (Maple, Spring Maple or Winter Maple).
+    void ApplyTheme();
+
 #ifndef ERABLE_QT_MOVIE_MISSING
     std::unique_ptr<QMovie> animation;
     std::unique_ptr<QBuffer> backing_buf;
@@ -82,10 +94,14 @@ private:
 
     QGraphicsOpacityEffect* opacity_effect = nullptr;
     QPushButton* skip_button = nullptr;
+    QLabel* game_icon = nullptr;
+    QLabel* game_title = nullptr;
+    QLabel* percent = nullptr;
+    QTimer ambient_timer;
+    QElapsedTimer ambient_clock;
     std::unique_ptr<QPropertyAnimation> fadeout_animation;
 
-    // Definitions for the differences in text and styling for each stage
-    ::Common::unordered_map<VideoCore::LoadCallbackStage, const char*> progressbar_style;
+    // The text of each stage
     ::Common::unordered_map<VideoCore::LoadCallbackStage, QString> stage_translations;
 
     // newly generated shaders are added to the end of the file, so when loading and compiling
