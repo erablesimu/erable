@@ -1,6 +1,6 @@
-- [ ] I have read and followed the [Contribution Guidelines](https://github.com/erablesimu/Erable/blob/ccr-88d1adf7-3obcpe/CONTRIBUTING.md#code-contributions).
-- [ ] I have read and followed the [AI Policy](https://github.com/erablesimu/Erable/blob/ccr-88d1adf7-3obcpe/docs/policies/AI.md).
-- [ ] I have read and followed the [Coding Guidelines](https://github.com/erablesimu/Erable/blob/ccr-88d1adf7-3obcpe/docs/policies/Coding.md) to the best of my ability.
+- [ ] I have read and followed the [Contribution Guidelines](https://github.com/erablesimu/erable/blob/ccr-88d1adf7-3obcpe/CONTRIBUTING.md#code-contributions).
+- [ ] I have read and followed the [AI Policy](https://github.com/erablesimu/erable/blob/ccr-88d1adf7-3obcpe/docs/policies/AI.md).
+- [ ] I have read and followed the [Coding Guidelines](https://github.com/erablesimu/erable/blob/ccr-88d1adf7-3obcpe/docs/policies/Coding.md) to the best of my ability.
 - [ ] **I have put [HUMANMADE] in the title if the pr was human-mande**
 
 ---

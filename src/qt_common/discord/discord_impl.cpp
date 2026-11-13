@@ -102,7 +102,7 @@ std::string DiscordImpl::GetGameString(const std::string& title) {
 
 static constexpr char DEFAULT_DISCORD_TEXT[] = "Erable, émulateur Nintendo Switch 2";
 static constexpr char DEFAULT_DISCORD_IMAGE[] =
-    "https://raw.githubusercontent.com/erablesimu/Erable/ccr-88d1adf7-3obcpe/dist/"
+    "https://raw.githubusercontent.com/erablesimu/erable/ccr-88d1adf7-3obcpe/dist/"
     "erable.png";
 
 void DiscordImpl::UpdateGameStatus(std::string_view game_url, bool has_boxart) {

@@ -15,7 +15,7 @@ votre propre console : rien de tout cela n'est fourni.
 ## Télécharger
 
 Téléchargez Erable uniquement depuis la
-[page des versions](https://github.com/erablesimu/Erable/releases) de ce dépôt.
+[page des versions](https://github.com/erablesimu/erable/releases) de ce dépôt.
 Sous Windows, extrayez tout le zip puis lancez **erable.exe**. Les mises à jour sont ensuite
 proposées automatiquement au démarrage, avec leurs notes de version en français.
 
