@@ -1062,9 +1062,16 @@ void EmitContext::DefineGlobalMemoryFunctions(const IR::Program& program) {
             access(index, ssbo_addr, cond);
         }
     }};
+    // Pascal's driver returns wrong values from non-inlined global loads in task and mesh stages
+    // run as compute (Ocarina of Time's floating trees on a GTX 1060).
+    const spv::FunctionControlMask load_control{
+        profile.has_broken_mesh_global_memory_calls && runtime_info.mesh_as_compute &&
+                (stage == Stage::Task || stage == Stage::Mesh)
+            ? spv::FunctionControlMask::Inline
+            : spv::FunctionControlMask::MaskNone};
     const auto define_load{[&](DefPtr ssbo_member, Id element_pointer, Id type, u32 shift) {
         const Id function_type{TypeFunction(type, U64)};
-        const Id func_id{OpFunction(type, spv::FunctionControlMask::MaskNone, function_type)};
+        const Id func_id{OpFunction(type, load_control, function_type)};
         const Id addr{OpFunctionParameter(U64)};
         if (!profile.support_descriptor_aliasing && shift > 2) {
             AddLabel();

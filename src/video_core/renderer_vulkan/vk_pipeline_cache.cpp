@@ -657,6 +657,8 @@ PipelineCache::PipelineCache(Tegra::MaxwellDeviceMemoryManager& device_memory_,
         .has_broken_fp16_float_controls = driver_id == VK_DRIVER_ID_NVIDIA_PROPRIETARY,
         .max_compute_shared_memory_size = device.GetMaxComputeSharedMemorySize(),
         .has_broken_fp32_denorm_flush = driver_id == VK_DRIVER_ID_QUALCOMM_PROPRIETARY,
+        .has_broken_mesh_global_memory_calls =
+            device.IsNvidia() && device.GetNvidiaArch() <= NvidiaArchitecture::Arch_Pascal,
         .ignore_nan_fp_comparisons = false,
         .has_broken_spirv_subgroup_mask_vector_extract_dynamic =
             driver_id == VK_DRIVER_ID_QUALCOMM_PROPRIETARY &&
