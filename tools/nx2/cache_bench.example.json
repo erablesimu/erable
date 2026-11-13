@@ -1,7 +1,7 @@
 {
   "_comment": "Copy, fill in the game paths and packages, then: cache_bench.py run --config bench.json --dry-run. Steps run through the debug server (docs/nx2/debug-mcp.md); wait_presents counts guest presents since launch.",
   "user_dir": "C:/Users/Zortos/.capy/work/erable-pgo-20261103/runtime/user",
-  "log_file": "C:/Users/Zortos/.capy/work/erable-pgo-20261103/runtime/user/log/eden_log.txt",
+  "log_file": "C:/Users/Zortos/.capy/work/erable-pgo-20261103/runtime/user/log/erable_log.txt",
   "output_dir": "C:/Users/Zortos/.capy/work/cache-bench",
   "debug_server": "127.0.0.1:6545",
   "exe": "erable.exe",

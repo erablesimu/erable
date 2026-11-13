@@ -7,7 +7,7 @@ l'Explorateur, ou dans Exécuter (Win + R).
 
 | Quoi | Chemin |
 |---|---|
-| Journaux (`eden_log.txt`) | `%APPDATA%\erable\log` |
+| Journaux (`erable_log.txt`) | `%APPDATA%\erable\log` |
 | Réglages (`qt-config.ini`) | `%APPDATA%\erable\config` |
 | Cache de shaders, un dossier par jeu | `%APPDATA%\erable\shader` |
 | Cache de shaders de Zelda Ocarina of Time | `%APPDATA%\erable\shader\0400486024dec000` |

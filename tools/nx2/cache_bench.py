@@ -394,7 +394,7 @@ def boot_and_measure(config, run, run_dir):
     game = config["games"][run["game"]]
     cmd, package = command(config, run)
     address = config.get("debug_server", "127.0.0.1:6545")
-    log_file = Path(config.get("log_file", Path(config["user_dir"]) / "log" / "eden_log.txt"))
+    log_file = Path(config.get("log_file", Path(config["user_dir"]) / "log" / "erable_log.txt"))
     launched = time.time()
     process = subprocess.Popen(cmd, cwd=package, env=run_env(config, run),
                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -425,7 +425,7 @@ def boot_and_measure(config, run, run_dir):
             record["kill"] = "did not exit within 60 s"
         time.sleep(1.0)
         if log_file.exists() and log_file.stat().st_mtime >= launched:
-            shutil.copy2(log_file, Path(run_dir) / "eden_log.txt")
+            shutil.copy2(log_file, Path(run_dir) / "erable_log.txt")
         else:
             record["log"] = f"no log written at {log_file}"
     return record
@@ -549,7 +549,7 @@ def run_bench(config, plan, session):
             result["error"] = str(error)
         finally:
             result["cache_left"] = {d.key: d.restore(run_dir / "after") for d in prepared}
-        log = run_dir / "eden_log.txt"
+        log = run_dir / "erable_log.txt"
         if log.exists():
             window = result.get("window") or {}
             result["metrics"] = cache_metrics.parse_log(log, start_s=window.get("start_s"),

@@ -9,7 +9,7 @@ namespace Common::Windows {
 
 /// On an unhandled exception or abort(), logs one Critical "Host crash" line (code, faulting
 /// address and stack as module+offset, thread), flushes the log and writes
-/// <dump_directory>/eden_crash.dmp. Call after Common::Log::Initialize.
+/// <dump_directory>/erable_crash.dmp. Call after Common::Log::Initialize.
 void InstallCrashHandler(const std::filesystem::path& dump_directory);
 
 } // namespace Common::Windows

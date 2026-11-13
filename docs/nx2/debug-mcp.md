@@ -120,7 +120,7 @@ server is on but idle, its thread sleeps in `epoll`/IOCP.
   through their page tables, and never write either. They cannot reach host memory, the key area
   or the file system: an address resolves only through a page the guest has mapped. The adapter's `capture_image` reads only PNGs inside
   capture directories that it created in this session, and checks for path escapes.
-- **Logs.** `log_tail` returns lines that already go to `eden_log.txt`.
+- **Logs.** `log_tail` returns lines that already go to `erable_log.txt`.
 - **No authentication.** Any local process may connect, the same as with the GDB stub. That is
   acceptable on the owner's single-user PC with the switch off by default. If it ever runs on a
   shared machine, add a token file in the dump directory that the adapter reads.
@@ -441,5 +441,5 @@ the server again on the same port.
   one `FrameDump`.
 - One request at a time. A second client waits while a capture runs.
 - `log_tail` sees lines logged after the game finished loading. The boot itself is in
-  `eden_log.txt`.
+  `erable_log.txt`.
 - Runtime rejections last for one boot. Starting the next session clears them.

@@ -112,7 +112,7 @@ void Report(EXCEPTION_POINTERS* pointers) {
     const DWORD error = written ? 0 : GetLastError();
     CloseHandle(file);
     LOG_CRASH("Host crash: minidump of process {} {} ({:#x})", GetCurrentProcessId(),
-              written ? "written next to the log as eden_crash.dmp" : "failed", error);
+              written ? "written next to the log as erable_crash.dmp" : "failed", error);
 }
 
 // Only the first thread to crash reports. A second one waits a while for it to end the process,
@@ -148,7 +148,7 @@ void OnAbort(int) {
 } // Anonymous namespace
 
 void InstallCrashHandler(const std::filesystem::path& dump_directory) {
-    const std::wstring path = (dump_directory / "eden_crash.dmp").wstring();
+    const std::wstring path = (dump_directory / "erable_crash.dmp").wstring();
     if (path.size() < MAX_PATH) {
         std::wmemcpy(dump_path, path.c_str(), path.size() + 1);
         if (const HMODULE dbghelp = LoadLibraryW(L"dbghelp.dll")) {

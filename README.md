@@ -48,7 +48,7 @@ performances dans [docs/banst-pistes.md](docs/banst-pistes.md).
 ## Signaler un problème
 
 Clic droit sur le jeu, puis **Rapport de compatibilité…**, ou remplissez le formulaire du
-[site d'Erable](https://erablesimu.github.io/erable/signaler.html?lang=fr) en joignant `eden_log.txt`
+[site d'Erable](https://erablesimu.github.io/erable/signaler.html?lang=fr) en joignant `erable_log.txt`
 (dossier `%APPDATA%\erable\log`, une fois l'émulateur fermé). Les notes de chaque version et
 les dernières modifications sont sur [le site d'Erable](https://erablesimu.github.io/erable/changements.html?lang=fr).
 
