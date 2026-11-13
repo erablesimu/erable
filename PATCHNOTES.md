@@ -37,6 +37,10 @@ version. Les sections suivantes gardent l'historique.
 - La liste et la grille d'avant restent dans Affichage → Bibliothèque (Ctrl + L) ; Ctrl + H
   revient à l'accueil.
 
+**Chargement des shaders**
+- Un petit jeu fait patienter pendant le chargement des shaders : déplacez le seau (souris ou
+  flèches) pour attraper les feuilles d'érable ; une feuille dorée vaut cinq.
+
 **Zelda Ocarina of Time**
 - Les arbres ne flottent plus en l'air dans la plaine d'Hyrule et ailleurs. Pendant qu'un shader
   se prépare, Erable ne saute plus que les dessins refaits à chaque image : un dessin fait une

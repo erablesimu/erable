@@ -14,6 +14,7 @@
 #include <QPropertyAnimation>
 #include <QPushButton>
 #include <QStyleOption>
+#include "erable/leaf_catcher.h"
 #include "common/container/unordered_map.h"
 #include "core/frontend/framebuffer_layout.h"
 #include "core/loader/loader.h"
@@ -104,6 +105,11 @@ LoadingScreen::LoadingScreen(QWidget* parent)
                                "on a later launch."));
     skip_button->hide();
     ui->verticalLayout->insertWidget(2, skip_button, 0, Qt::AlignHCenter | Qt::AlignTop);
+    // A small game while the shaders build (Build and Warm stages)
+    leaf_catcher = new LeafCatcher(this);
+    leaf_catcher->hide();
+    ui->verticalLayout->insertWidget(3, leaf_catcher, 0, Qt::AlignHCenter);
+
     connect(skip_button, &QPushButton::clicked, this, [this] {
         VideoCommon::ShaderWarm::RequestSkipWarm();
         skip_button->setEnabled(false);
@@ -155,6 +161,7 @@ void LoadingScreen::Prepare(Loader::AppLoader& loader) {
 }
 
 void LoadingScreen::OnLoadComplete() {
+    leaf_catcher->SetRunning(false);
     fadeout_animation->start(QPropertyAnimation::KeepWhenStopped);
 }
 
@@ -173,6 +180,10 @@ void LoadingScreen::OnLoadProgress(VideoCore::LoadCallbackStage stage, std::size
         }
         skip_button->setVisible(stage == VideoCore::LoadCallbackStage::Warm);
         skip_button->setEnabled(true);
+        const bool building = stage == VideoCore::LoadCallbackStage::Build ||
+                              stage == VideoCore::LoadCallbackStage::Warm;
+        leaf_catcher->setVisible(building);
+        leaf_catcher->SetRunning(building);
         previous_stage = stage;
         // reset back to fast shader compiling since the stage changed
         slow_shader_compile_start = false;

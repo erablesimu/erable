@@ -31,6 +31,8 @@ add_executable(erable
     home/home_music.h
     home/home_screen.cpp
     home/home_screen.h
+    leaf_catcher.cpp
+    leaf_catcher.h
     local_report.cpp
     local_report.h
     applets/qt_amiibo_settings.cpp

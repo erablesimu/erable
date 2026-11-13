@@ -35,6 +35,8 @@ class QMovie;
 class QPropertyAnimation;
 class QPushButton;
 
+class LeafCatcher;
+
 class LoadingScreen : public QWidget {
     Q_OBJECT
 
@@ -76,6 +78,7 @@ private:
     std::unique_ptr<Ui::LoadingScreen> ui;
     std::size_t previous_total = 0;
     VideoCore::LoadCallbackStage previous_stage;
+    LeafCatcher* leaf_catcher = nullptr;
 
     QGraphicsOpacityEffect* opacity_effect = nullptr;
     QPushButton* skip_button = nullptr;

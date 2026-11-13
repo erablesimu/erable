@@ -1,5 +1,20 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="fr" sourcelanguage="en_US">
 <context>
+    <name>LeafCatcher</name>
+    <message>
+        <source>Leaves: %1   Best: %2</source>
+        <translation>Feuilles : %1   Record : %2</translation>
+    </message>
+    <message>
+        <source>   Streak x%1</source>
+        <translation>   Série x%1</translation>
+    </message>
+    <message>
+        <source>Catch the leaves while the shaders load</source>
+        <translation>Attrape les feuilles pendant le chargement des shaders</translation>
+    </message>
+</context>
+<context>
     <name>HomeScreen</name>
     <message>
         <source>Your profile</source>
