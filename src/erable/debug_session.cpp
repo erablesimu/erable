@@ -14,6 +14,7 @@
 
 #include <fmt/format.h>
 
+#include <QProcessEnvironment>
 #include <QString>
 
 #include "common/fs/fs_paths.h"
@@ -28,12 +29,14 @@ namespace DebugSession {
 namespace {
 
 // What the trace launcher (erable-trace.bat) set: frame hitches and their causes, the sound a game
-// sends, the game's file reads and the texture cache.
-constexpr std::array<std::pair<const char*, const char*>, 4> Switches{{
+// sends, the game's file reads and the texture cache; and the GPU thread's time per second by
+// zone, idle included, which shows CPU work saved even when the frame rate is capped.
+constexpr std::array<std::pair<const char*, const char*>, 5> Switches{{
     {"EDEN_NX2_STUTTER_TRACE", "1"},
     {"EDEN_NX2_AUDIO_LEVEL", "1"},
     {"EDEN_NX2_FS_READ_TRACE", "1"},
     {"EDEN_NX2_TC_LOG", "1"},
+    {"EDEN_NX2_GPU_PROFILE", "1"},
 }};
 
 constexpr std::string_view Pending = "pending";
@@ -135,6 +138,15 @@ std::optional<fs::path> Collect(const fs::path& log, std::time_t since, std::str
          << "Switches:";
     for (const auto& [name, value] : Switches) {
         info << ' ' << name << '=' << value;
+    }
+    info << '\n';
+    // Every switch in effect, those of nx2_switches.txt included (an A/B test sets one there).
+    info << "In effect:";
+    const QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
+    for (const QString& name : environment.keys()) {
+        if (name.startsWith(QStringLiteral("EDEN_NX2_"))) {
+            info << ' ' << name.toStdString() << '=' << environment.value(name).toStdString();
+        }
     }
     info << '\n';
     return folder;
