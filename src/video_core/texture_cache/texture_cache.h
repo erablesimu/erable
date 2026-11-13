@@ -3098,6 +3098,8 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
             join_bad_overlap_ids.push_back(overlap_id);
         }
     };
+    std::optional<StutterTrace::SiteScope> step_site{std::in_place,
+                                                     StutterTrace::Site::ImageOverlaps};
     ForEachImageInRegion(cpu_addr, size_bytes, region_check);
     const auto region_check_gpu = [&](ImageId overlap_id, ImageBase& overlap) {
         if (!join_overlaps_found.contains(overlap_id)) {
@@ -3112,6 +3114,7 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
     ForEachSparseImageInRegion(channel_state->gpu_memory.GetID(), gpu_addr, size_bytes,
                                region_check_gpu);
 
+    step_site.emplace(StutterTrace::Site::ImageRescale);
     bool can_rescale = info.rescaleable;
     bool any_rescaled = false;
     for (const auto& copy : join_copies_to_do) {
@@ -3136,6 +3139,7 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
             ScaleDown(sibling);
         }
     }
+    step_site.reset();
 
     if constexpr (requires { runtime.UseOpaqueAstcFormat(); }) {
         // Opaque ASTC goes to BC1 rather than BC3 when it is re-compressed (the Vulkan runtime
@@ -3199,6 +3203,7 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
         new_image.flags |= ImageFlagBits::Sparse;
     }
 
+    step_site.emplace(StutterTrace::Site::ImageReplace);
     for (const ImageId overlap_id : join_ignore_textures) {
         Image& overlap = slot_images[overlap_id];
         // Remapped images no longer describe the current guest memory. Discard their GPU
@@ -3265,6 +3270,7 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
             return false;
         }
     };
+    step_site.emplace(StutterTrace::Site::ImageJoin);
     std::ranges::sort(join_copies_to_do, [this](const JoinCopy& lhs, const JoinCopy& rhs) {
         const ImageBase& lhs_image = slot_images[lhs.id];
         const ImageBase& rhs_image = slot_images[rhs.id];
@@ -3356,6 +3362,7 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
         }
         copied_whole = std::ranges::all_of(written, [](u8 whole) { return whole != 0; });
     }
+    step_site.emplace(StutterTrace::Site::ImageUpload);
     if (overwritten_by_clear()) {
         // Stays CpuModified: UpdateRenderTargets' PrepareImage drops the upload only when
         // IsFullClear agrees the clear covers the whole image, and uploads it otherwise.
@@ -3371,6 +3378,7 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
         // TODO: Only upload what we need
         RefreshContents(new_image, new_image_id);
     }
+    step_site.emplace(StutterTrace::Site::ImageJoin);
 
     if (can_rescale) {
         ScaleUp(new_image);
@@ -3411,6 +3419,8 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
         UnregisterImage(copy_object.id);
         DeleteImage(copy_object.id);
     }
+
+    step_site.reset();
 
     RegisterImage(new_image_id);
     return new_image_id;

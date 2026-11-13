@@ -98,6 +98,11 @@ enum class Site : u8 {
     MemoryFree,      ///< Device memory blocks given back to the driver
     ImageBackend,    ///< Of ImageCreate: the host image itself (create, memory, views, clear)
     AstcScan,        ///< Of ImageCreate: an ASTC image's guest data read to see if it is opaque
+    ImageOverlaps,   ///< Of ImageCreate: finding the images the new one overlaps
+    ImageRescale,    ///< Of ImageCreate: scaling the overlapped images up or down to match
+    ImageReplace,    ///< Of ImageCreate: deleting the remapped or identical images it replaces
+    ImageUpload,     ///< Of ImageCreate: filling it from guest memory (unless copies cover it)
+    ImageJoin,       ///< Of ImageCreate: aliases, copies from the overlaps and their deletion
     Count,
 };
 
@@ -106,7 +111,8 @@ inline constexpr std::array<std::string_view, SiteCount> site_names{
     "memory_allocate", "staging_create", "buffer_create",    "buffer_delete",
     "buffer_collect",  "buffer_download", "image_create",    "image_delete",
     "texture_collect", "texture_download", "scheduler_finish", "memory_free",
-    "image_backend",   "astc_scan",
+    "image_backend",   "astc_scan",       "image_overlaps",  "image_rescale",
+    "image_replace",   "image_upload",    "image_join",
 };
 
 [[nodiscard]] inline bool ReadEnv() {
