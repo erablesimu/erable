@@ -146,7 +146,8 @@ std::optional<fs::path> Zip(const fs::path& folder) {
     std::error_code ec;
     fs::remove(zip, ec);
     const bool written = QtCommon::Compress::compressDir(
-        QString::fromStdWString(zip.wstring()), QString::fromStdWString(folder.wstring()), {},
+        QString::fromStdWString(zip.wstring()), QString::fromStdWString(folder.wstring()),
+        QtCommon::Compress::Options(),
         [](std::size_t, std::size_t) { return true; });
     if (!written) {
         return std::nullopt;
