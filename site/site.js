@@ -1,18 +1,17 @@
-// Shared by the pages of the Erable site.
+// Shared by the pages of the Erable site (after i18n.js).
 const REPO = "erablesimu/erable";
 const API = "https://api.github.com/repos/" + REPO;
 
 async function getJson(path) {
   const response = await fetch(API + path, { headers: { Accept: "application/vnd.github+json" } });
   if (!response.ok) {
-    throw new Error(response.status === 403 ? "GitHub limite le nombre de visites : réessayez dans une heure." :
-                    "GitHub a répondu " + response.status + ".");
+    throw new Error(response.status === 403 ? t("error.rate") : t("error.status", { status: response.status }));
   }
   return response.json();
 }
 
 function formatDate(iso) {
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  return new Date(iso).toLocaleDateString(LOCALES[LANG], { day: "numeric", month: "long", year: "numeric" });
 }
 
 function el(tag, attributes, ...children) {
@@ -24,4 +23,11 @@ function el(tag, attributes, ...children) {
     node.append(child);
   }
   return node;
+}
+
+// The latest release, fetched once per page
+let latestRelease;
+function getLatestRelease() {
+  latestRelease ??= getJson("/releases/latest");
+  return latestRelease;
 }

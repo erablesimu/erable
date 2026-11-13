@@ -4,72 +4,100 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Erable</title>
-<meta name="description" content="L'émulateur Nintendo Switch 2 de la famille : téléchargement, changements et signalement de problèmes.">
+<meta name="i18n-title" content="home.title">
+<meta name="description" content="Erable, l'émulateur Nintendo Switch 2 de la famille.">
+<meta name="theme-color" content="#d2501f">
 <link rel="icon" href="erable.png">
 <link rel="stylesheet" href="style.css">
+<script src="i18n.js"></script>
 </head>
 <body>
 <header class="site">
   <div class="wrap">
     <a class="brand" href="./"><img src="erable.png" alt="">Erable</a>
-    <nav aria-label="Navigation principale">
-      <a href="./" aria-current="page">Accueil</a>
-      <a href="changements.html">Changements</a>
-      <a href="signaler.html">Signaler un problème</a>
-      <a href="tutoriel/">Tutoriels</a>
+    <nav aria-label="Navigation">
+      <a href="./" aria-current="page" data-i18n="nav.home">Accueil</a>
+      <a href="tutoriels.html" data-i18n="nav.tutorials">Tutoriels</a>
+      <a href="changements.html" data-i18n="nav.changes">Changements</a>
+      <a href="signaler.html" data-i18n="nav.report">Signaler</a>
     </nav>
-  </div>
-</header>
-<main>
-  <div class="wrap">
-    <section class="hero">
-      <img src="erable.png" alt="Logo Erable">
-      <div>
-        <h1>Erable</h1>
-        <p class="lead">L'émulateur Nintendo Switch 2 de la famille, en français, réglé pour nos PC et nos jeux.</p>
-        <div class="actions">
-          <a class="btn" id="download" href="https://github.com/erablesimu/erable/releases/latest">Télécharger pour Windows</a>
-          <a class="btn secondary" href="changements.html">Quoi de neuf ?</a>
-        </div>
-        <p class="meta" id="latest">Extrayez tout le zip, puis lancez erable.exe. Les mises à jour arrivent ensuite toutes seules.</p>
-      </div>
-    </section>
-
-    <div class="grid">
-      <a class="card" href="changements.html">
-        <h3>Changements</h3>
-        <p>Les notes de chaque version et les dernières modifications du code.</p>
-      </a>
-      <a class="card" href="signaler.html">
-        <h3>Signaler un problème</h3>
-        <p>Un jeu plante, l'image ou le son est faux ? Décrivez-le en quelques lignes.</p>
-      </a>
-      <a class="card" href="tutoriel/">
-        <h3>Tutoriels</h3>
-        <p>Installer Erable, ajouter clés et firmware, optimiser Zelda Ocarina of Time.</p>
-      </a>
+    <div class="lang" role="group" data-i18n-attr="aria-label:nav.language">
+      <button type="button" data-set-lang="fr" lang="fr" title="Français">FR</button>
+      <button type="button" data-set-lang="en" lang="en" title="English">EN</button>
+      <button type="button" data-set-lang="de" lang="de" title="Deutsch">DE</button>
     </div>
   </div>
+</header>
+
+<section class="hero">
+  <div class="leaves" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="wrap">
+    <div>
+      <a class="pill" id="version-pill" href="changements.html"><span class="dot"></span><span id="version-text" data-i18n="home.pill">Dernière version</span></a>
+      <h1 data-i18n-html="home.h1"></h1>
+      <p class="lead" data-i18n="home.lead"></p>
+      <div class="actions">
+        <a class="btn" id="download" href="https://github.com/erablesimu/erable/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span data-i18n="home.download"></span></a>
+        <a class="btn secondary" href="tutoriels.html"><span data-i18n="home.tutorials"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
+      </div>
+      <p class="hero-note" data-i18n="home.note"></p>
+    </div>
+    <div class="hero-art"><img src="erable.png" alt="Erable"></div>
+  </div>
+</section>
+<main>
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-i18n="home.featuresEyebrow"></p>
+      <h2 data-i18n="home.featuresTitle"></h2>
+      <p data-i18n="home.featuresSub"></p>
+    </div>
+    <div class="grid">
+      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div><h3 data-i18n="home.f1t"></h3><p data-i18n="home.f1p"></p></div>
+      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M3 21v-5h5"/></svg></div><h3 data-i18n="home.f2t"></h3><p data-i18n="home.f2p"></p></div>
+      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h4M8 9v4"/><circle cx="15.5" cy="10.5" r=".8" fill="currentColor"/><circle cx="17.5" cy="13" r=".8" fill="currentColor"/><path d="M7 5h10a5 5 0 0 1 4.9 6l-1 5a3 3 0 0 1-5.2 1.4L14 15h-4l-1.7 2.4A3 3 0 0 1 3.1 16l-1-5A5 5 0 0 1 7 5z"/></svg></div><h3 data-i18n="home.f3t"></h3><p data-i18n="home.f3p"></p></div>
+      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><h3 data-i18n="home.f4t"></h3><p data-i18n="home.f4p"></p></div>
+      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 11h.01M12 11h.01M15 11h.01"/></svg></div><h3 data-i18n="home.f5t"></h3><p data-i18n="home.f5p"></p></div>
+      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg></div><h3 data-i18n="home.f6t"></h3><p data-i18n="home.f6p"></p></div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow" data-i18n="home.stepsEyebrow"></p>
+      <h2 data-i18n="home.stepsTitle"></h2>
+    </div>
+    <div class="steps-grid">
+      <div class="card step reveal"><h3 data-i18n="home.s1t"></h3><p data-i18n="home.s1p"></p></div>
+      <div class="card step reveal"><h3 data-i18n="home.s2t"></h3><p data-i18n="home.s2p"></p></div>
+      <div class="card step reveal"><h3 data-i18n="home.s3t"></h3><p data-i18n="home.s3p"></p></div>
+    </div>
+    <p class="reveal"><a class="more" href="tuto/installer.html"><span data-i18n="home.stepsMore"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a></p>
+  </section>
+
+  <section class="section wrap">
+    <div class="latest card reveal">
+      <div>
+        <p class="eyebrow" data-i18n="home.latestEyebrow"></p>
+        <h2 data-i18n="home.latestTitle"></h2>
+        <p class="meta" data-i18n="home.latestSub"></p>
+        <p class="meta" id="latest-date"></p>
+        <a class="more" href="changements.html"><span data-i18n="home.latestMore"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
+      </div>
+      <div id="latest-notes" class="notes"><p class="status" data-i18n="home.latestLoading"></p></div>
+    </div>
+  </section>
 </main>
 <footer class="site">
   <div class="wrap">
-    Erable, l'émulateur de la famille. Construit sur
-    <a href="https://github.com/zortos293/Lichii">Lichii</a>, sous licence GPL. Non affilié à Nintendo :
-    jeux, clés et firmware viennent de votre propre console.
-    <a href="https://github.com/erablesimu/erable">Code source</a>.
+    <a class="brand" href="./"><img src="erable.png" alt="">Erable</a>
+    <p data-i18n-html="footer.text"></p>
+    <a class="btn secondary small" href="https://github.com/erablesimu/erable"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg><span data-i18n="footer.source">Code source</span></a>
   </div>
 </footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="site.js"></script>
-<script>
-  getJson("/releases/latest").then((release) => {
-    const zip = release.assets.find((asset) => /^erable-windows-x86_64\.zip$/.test(asset.name));
-    if (zip) {
-      document.getElementById("download").href = zip.browser_download_url;
-    }
-    document.getElementById("latest").textContent =
-      "Version " + release.tag_name + " du " + formatDate(release.published_at) +
-      ". Extrayez tout le zip, puis lancez erable.exe. Les mises à jour arrivent ensuite toutes seules.";
-  }).catch(() => {});
-</script>
+<script src="home.js"></script>
 </body>
 </html>

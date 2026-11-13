@@ -13,8 +13,9 @@ version. Les sections suivantes gardent l'historique.
 - Le code aussi passe au nom Erable (dossiers, programmes, options de build). Les caches de
   shaders déjà construits restent valables.
 - Le dépôt s'appelle maintenant github.com/erablesimu/erable.
-- Site erablesimu.github.io/erable : téléchargement, notes de version, modifications du code et formulaire pour
-  signaler un problème (Aide > À propos > Report an Issue y mène).
+- Site erablesimu.github.io/erable, en français, anglais et allemand : téléchargement, tutoriels
+  (émulateur et jeux, avec un filtre par jeu), notes de version et formulaire pour signaler un
+  problème (Aide > À propos > Report an Issue y mène).
 
 **Zelda Ocarina of Time**
 - Correction des zones sombres en forme de grille sur l'eau et le sol (ombres des lumières).

@@ -14,17 +14,17 @@ form.addEventListener("submit", (event) => {
   event.preventDefault();
   const value = (id) => document.getElementById(id).value.trim();
   const gameName = game.value === "other" ? value("game-other") : game.value;
-  const section = (heading, text) => (text ? "### " + heading + "\n\n" + text + "\n\n" : "");
+  const kind = t("report.k" + form.querySelector("input[name=kind]:checked").value);
+  const section = (heading, text) => (text ? "### " + t(heading) + "\n\n" + text + "\n\n" : "");
   const body =
-    section("Jeu", gameName || "Aucun en particulier") +
-    section("Type de problème", value("kind")) +
-    section("Version d'Erable", value("version") || "Non précisée") +
-    section("PC", value("pc")) +
-    section("Ce qui se passe", value("what")) +
-    section("Où et quand", value("where")) +
-    "### Journal\n\n_Glissez ici `eden_log.txt` (dossier `%APPDATA%\\erable\\log`, Erable fermé)._\n";
-  const title = (gameName ? "[" + gameName + "] " : "") + value("title");
-  const url = "https://github.com/" + REPO + "/issues/new?" +
-    new URLSearchParams({ title, body }).toString();
+    section("report.bodyGame", gameName || t("report.bodyNone")) +
+    section("report.bodyKind", kind) +
+    section("report.bodyVersion", value("version") || t("report.bodyUnknown")) +
+    section("report.bodyPc", value("pc")) +
+    section("report.bodyWhat", value("what")) +
+    section("report.bodyWhere", value("where")) +
+    "### " + t("report.bodyLog") + "\n\n" + t("report.bodyLogHint") + "\n";
+  const title = (gameName ? "[" + gameName + "] " : "") + "[" + kind + "] " + value("title");
+  const url = "https://github.com/" + REPO + "/issues/new?" + new URLSearchParams({ title, body }).toString();
   window.open(url, "_blank", "noopener");
 });

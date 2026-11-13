@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Erable</title>
+<meta name="i18n-title" content="tuto.installTitle">
+<meta name="description" content="Installer Erable">
+<meta name="theme-color" content="#d2501f">
+<link rel="icon" href="../erable.png">
+<link rel="stylesheet" href="../style.css">
+<script src="../i18n.js"></script>
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href=".././"><img src="../erable.png" alt="">Erable</a>
+    <nav aria-label="Navigation">
+      <a href=".././" data-i18n="nav.home">Accueil</a>
+      <a href="../tutoriels.html" aria-current="page" data-i18n="nav.tutorials">Tutoriels</a>
+      <a href="../changements.html" data-i18n="nav.changes">Changements</a>
+      <a href="../signaler.html" data-i18n="nav.report">Signaler</a>
+    </nav>
+    <div class="lang" role="group" data-i18n-attr="aria-label:nav.language">
+      <button type="button" data-set-lang="fr" lang="fr" title="Français">FR</button>
+      <button type="button" data-set-lang="en" lang="en" title="English">EN</button>
+      <button type="button" data-set-lang="de" lang="de" title="Deutsch">DE</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="tuto-hero">
+    <div class="wrap">
+      <a class="back" href="../tutoriels.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg><span data-i18n="tutos.back"></span></a>
+      <p class="eyebrow"><span data-i18n="tutos.emuTitle"></span></p>
+      <h1 data-lang="fr">Installer Erable</h1>
+      <p class="lead" data-lang="fr">De zéro à votre premier jeu, pas à pas.</p>
+      <h1 data-lang="en">Install Erable</h1>
+      <p class="lead" data-lang="en">From nothing to your first game, step by step.</p>
+      <h1 data-lang="de">Erable installieren</h1>
+      <p class="lead" data-lang="de">Von null bis zum ersten Spiel, Schritt für Schritt.</p>
+    </div>
+  </section>
+  <div class="wrap tuto-layout">
+    <aside>
+      <nav class="toc" data-lang="fr"><strong data-i18n="tutos.toc"></strong><ol><li><a href="#installer">Installer Erable</a></li><li><a href="#console">Firmware et clés</a></li><li><a href="#langue">Jeux en français</a></li><li><a href="#manette">Manette</a></li><li><a href="#jeux">Ajouter vos jeux</a></li></ol></nav>
+      <nav class="toc" data-lang="en"><strong data-i18n="tutos.toc"></strong><ol><li><a href="#installer">Install Erable</a></li><li><a href="#console">Firmware and keys</a></li><li><a href="#langue">Game language</a></li><li><a href="#manette">Controller</a></li><li><a href="#jeux">Add your games</a></li></ol></nav>
+      <nav class="toc" data-lang="de"><strong data-i18n="tutos.toc"></strong><ol><li><a href="#installer">Erable installieren</a></li><li><a href="#console">Firmware und Schlüssel</a></li><li><a href="#langue">Spielsprache</a></li><li><a href="#manette">Controller</a></li><li><a href="#jeux">Spiele hinzufügen</a></li></ol></nav>
+    </aside>
+    <div class="tuto-body">
+      <article data-lang="fr">
+<section class="card tuto-step" id="installer"><h2><span class="num">1</span>Installer Erable</h2>
+<ol class="steps">
+<li>Téléchargez <code>erable-windows-x86_64.zip</code> depuis la dernière version :<br><a class="btn" href="https://github.com/erablesimu/erable/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Télécharger Erable</a></li>
+<li>Faites un clic droit sur le zip → <span class="menu">Extraire tout…</span></li>
+<li>Dans le dossier obtenu, lancez <code>erable.exe</code>.</li>
+</ol>
+<div class="note">Les mises à jour arrivent toutes seules : au démarrage, Erable propose d'installer la nouvelle version quand il y en a une.</div>
+<div class="warn">Si Windows signale qu'il manque des bibliothèques, lancez d'abord <code>vc_redist.x64.exe</code>, qui se trouve dans le même dossier.</div>
+</section>
+<section class="card tuto-step" id="console"><h2><span class="num">2</span>Ajouter le firmware et les clés de votre Switch</h2>
+<p>L'émulateur a besoin du système (firmware) et des clés (<code>prod.keys</code>) <strong>extraits de votre propre console</strong>. Ces fichiers appartiennent à Nintendo : ils ne sont pas fournis avec Erable, et il ne faut ni les télécharger ni les partager.</p>
+<ol class="steps">
+<li>Extrayez le firmware et <code>prod.keys</code> de votre Switch.</li>
+<li>Dans Erable, en haut à gauche : <span class="menu">Tools → Install Firmware → From ZIP</span>, puis choisissez le zip du firmware.</li>
+<li>Toujours en haut à gauche : <span class="menu">Tools → Install Decryption Keys</span>, puis choisissez votre fichier <code>prod.keys</code>.</li>
+</ol>
+<figure><img src="img/tools-menu.png" alt="Menu Tools d'Erable avec Install Decryption Keys et Install Firmware" loading="lazy"><figcaption>Le menu <em>Tools</em> : <em>Install Decryption Keys</em> et <em>Install Firmware</em>.</figcaption></figure>
+<div class="warn">Ne téléchargez jamais de clés ou de firmware sur Internet : ces fichiers circulent surtout sur des sites qui diffusent aussi des virus.</div>
+</section>
+<section class="card tuto-step" id="langue"><h2><span class="num">3</span>Jeux en français</h2>
+<ol class="steps">
+<li>En haut à gauche : <span class="menu">Emulation → Configure</span>, puis <span class="menu">System</span>.</li>
+<li><strong>Language</strong> : <code>French (français)</code>.</li>
+<li><strong>Region</strong> : <code>Europe</code>.</li>
+<li>Validez avec <span class="menu">OK</span>.</li>
+</ol>
+<figure><img src="img/system-language.png" alt="Onglet System de la configuration, langue French (français)" loading="lazy"><figcaption>Onglet <em>System</em> : la langue des jeux.</figcaption></figure>
+</section>
+<section class="card tuto-step" id="manette"><h2><span class="num">4</span>Jouer avec une manette</h2>
+<ol class="steps">
+<li>Branchez votre manette, puis allez dans <span class="menu">Emulation → Configure → Controls</span>.</li>
+<li><strong>Input Device</strong> : choisissez votre manette (en général la dernière de la liste).</li>
+<li>Cliquez sur chaque case (A, B, X, Y, sticks, gâchettes…), puis appuyez sur la touche correspondante de la manette.</li>
+<li>Validez avec <span class="menu">OK</span>.</li>
+</ol>
+<figure><img src="img/controls.png" alt="Onglet Controls avec une manette connectée et les touches configurées" loading="lazy"><figcaption>Onglet <em>Controls</em> : la case bleue <em>[waiting]</em> attend que vous appuyiez sur une touche.</figcaption></figure>
+<div class="note">Si la manette n'apparaît pas : fermez Steam (il capture les manettes), essayez un autre câble USB, puis relancez Erable.</div>
+</section>
+<section class="card tuto-step" id="jeux"><h2><span class="num">5</span>Ajouter vos jeux et jouer</h2>
+<ol class="steps">
+<li>Rangez vos jeux (extraits de vos cartouches ou de vos achats) dans un dossier <code>Jeux Switch 2</code>, un sous-dossier par jeu.</li>
+<li>Dans la liste des jeux, cliquez sur <span class="menu">+ Add New Game Directory</span>.</li>
+<li>Sélectionnez le dossier du jeu, puis <span class="menu">Sélectionner un dossier</span>.</li>
+<li>Double-cliquez sur le jeu pour le lancer.</li>
+</ol>
+<figure><img src="img/game-folder.png" alt="Fenêtre de sélection du dossier d'un jeu" loading="lazy"><figcaption>Choisir le dossier d'un jeu.</figcaption></figure>
+<figure><img src="img/game-list.png" alt="Liste des jeux avec Zelda Ocarina of Time et Pokémon Pokopia" loading="lazy"><figcaption>Les jeux apparaissent dans la liste, avec leur temps de jeu et leurs add-ons.</figcaption></figure>
+<div class="note">La première fois, un jeu peut saccader quelques minutes : l'émulateur prépare ses shaders, puis tout devient plus fluide. Un souci ? <a href="../signaler.html">Signalez-le ici</a>.</div>
+</section>
+      </article>
+      <article data-lang="en">
+<section class="card tuto-step" id="installer"><h2><span class="num">1</span>Install Erable</h2>
+<ol class="steps">
+<li>Download <code>erable-windows-x86_64.zip</code> from the latest version:<br><a class="btn" href="https://github.com/erablesimu/erable/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Download Erable</a></li>
+<li>Right-click the zip → <span class="menu">Extract All…</span></li>
+<li>In the folder you get, run <code>erable.exe</code>.</li>
+</ol>
+<div class="note">Updates come on their own: at startup, Erable offers to install the new version when there is one.</div>
+<div class="warn">If Windows says libraries are missing, first run <code>vc_redist.x64.exe</code>, which is in the same folder.</div>
+</section>
+<section class="card tuto-step" id="console"><h2><span class="num">2</span>Add your Switch's firmware and keys</h2>
+<p>The emulator needs the system (firmware) and the keys (<code>prod.keys</code>) <strong>dumped from your own console</strong>. These files belong to Nintendo: they don't come with Erable, and you must neither download nor share them.</p>
+<ol class="steps">
+<li>Dump the firmware and <code>prod.keys</code> from your Switch.</li>
+<li>In Erable, top left: <span class="menu">Tools → Install Firmware → From ZIP</span>, then pick the firmware zip.</li>
+<li>Still top left: <span class="menu">Tools → Install Decryption Keys</span>, then pick your <code>prod.keys</code> file.</li>
+</ol>
+<figure><img src="img/tools-menu.png" alt="Erable's Tools menu with Install Decryption Keys and Install Firmware" loading="lazy"><figcaption>The <em>Tools</em> menu: <em>Install Decryption Keys</em> and <em>Install Firmware</em>.</figcaption></figure>
+<div class="warn">Never download keys or firmware from the Internet: these files mostly circulate on sites that also spread viruses.</div>
+</section>
+<section class="card tuto-step" id="langue"><h2><span class="num">3</span>Games in your language</h2>
+<ol class="steps">
+<li>Top left: <span class="menu">Emulation → Configure</span>, then <span class="menu">System</span>.</li>
+<li><strong>Language</strong>: your language, e.g. <code>British English</code>.</li>
+<li><strong>Region</strong>: <code>Europe</code> (or <code>USA</code>).</li>
+<li>Confirm with <span class="menu">OK</span>.</li>
+</ol>
+<figure><img src="img/system-language.png" alt="System tab of the configuration with the game language" loading="lazy"><figcaption>The <em>System</em> tab: the games' language.</figcaption></figure>
+</section>
+<section class="card tuto-step" id="manette"><h2><span class="num">4</span>Play with a controller</h2>
+<ol class="steps">
+<li>Plug in your controller, then go to <span class="menu">Emulation → Configure → Controls</span>.</li>
+<li><strong>Input Device</strong>: pick your controller (usually the last one in the list).</li>
+<li>Click each box (A, B, X, Y, sticks, triggers…), then press the matching button on the controller.</li>
+<li>Confirm with <span class="menu">OK</span>.</li>
+</ol>
+<figure><img src="img/controls.png" alt="Controls tab with a connected controller and its buttons mapped" loading="lazy"><figcaption>The <em>Controls</em> tab: the blue <em>[waiting]</em> box waits for you to press a button.</figcaption></figure>
+<div class="note">If the controller doesn't show up: close Steam (it captures controllers), try another USB cable, then restart Erable.</div>
+</section>
+<section class="card tuto-step" id="jeux"><h2><span class="num">5</span>Add your games and play</h2>
+<ol class="steps">
+<li>Keep your games (dumped from your cartridges or purchases) in a <code>Switch 2 Games</code> folder, one subfolder per game.</li>
+<li>In the game list, click <span class="menu">+ Add New Game Directory</span>.</li>
+<li>Select the game's folder, then <span class="menu">Select Folder</span>.</li>
+<li>Double-click the game to start it.</li>
+</ol>
+<figure><img src="img/game-folder.png" alt="Window for picking a game's folder" loading="lazy"><figcaption>Picking a game's folder.</figcaption></figure>
+<figure><img src="img/game-list.png" alt="Game list with Zelda Ocarina of Time and Pokémon Pokopia" loading="lazy"><figcaption>Games show up in the list with their play time and add-ons.</figcaption></figure>
+<div class="note">The first time, a game may stutter for a few minutes while the emulator prepares its shaders; then it all gets smoother. A problem? <a href="../signaler.html">Report it here</a>.</div>
+</section>
+      </article>
+      <article data-lang="de">
+<section class="card tuto-step" id="installer"><h2><span class="num">1</span>Erable installieren</h2>
+<ol class="steps">
+<li>Lade <code>erable-windows-x86_64.zip</code> aus der neuesten Version herunter:<br><a class="btn" href="https://github.com/erablesimu/erable/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Erable herunterladen</a></li>
+<li>Rechtsklick auf die ZIP-Datei → <span class="menu">Alle extrahieren…</span></li>
+<li>Starte im entpackten Ordner <code>erable.exe</code>.</li>
+</ol>
+<div class="note">Updates kommen von selbst: Beim Start bietet Erable an, eine neue Version zu installieren, sobald es eine gibt.</div>
+<div class="warn">Meldet Windows fehlende Bibliotheken, starte zuerst <code>vc_redist.x64.exe</code> aus demselben Ordner.</div>
+</section>
+<section class="card tuto-step" id="console"><h2><span class="num">2</span>Firmware und Schlüssel deiner Switch hinzufügen</h2>
+<p>Der Emulator braucht das System (Firmware) und die Schlüssel (<code>prod.keys</code>) <strong>aus deiner eigenen Konsole</strong>. Diese Dateien gehören Nintendo: Sie sind nicht in Erable enthalten, und du darfst sie weder herunterladen noch weitergeben.</p>
+<ol class="steps">
+<li>Lies Firmware und <code>prod.keys</code> aus deiner Switch aus.</li>
+<li>In Erable oben links: <span class="menu">Tools → Install Firmware → From ZIP</span>, dann die ZIP-Datei der Firmware wählen.</li>
+<li>Ebenfalls oben links: <span class="menu">Tools → Install Decryption Keys</span>, dann deine Datei <code>prod.keys</code> wählen.</li>
+</ol>
+<figure><img src="img/tools-menu.png" alt="Tools-Menü von Erable mit Install Decryption Keys und Install Firmware" loading="lazy"><figcaption>Das Menü <em>Tools</em>: <em>Install Decryption Keys</em> und <em>Install Firmware</em>.</figcaption></figure>
+<div class="warn">Lade nie Schlüssel oder Firmware aus dem Internet herunter: Diese Dateien kursieren vor allem auf Seiten, die auch Viren verbreiten.</div>
+</section>
+<section class="card tuto-step" id="langue"><h2><span class="num">3</span>Spiele auf Deutsch</h2>
+<ol class="steps">
+<li>Oben links: <span class="menu">Emulation → Configure</span>, dann <span class="menu">System</span>.</li>
+<li><strong>Language</strong>: <code>German (Deutsch)</code>.</li>
+<li><strong>Region</strong>: <code>Europe</code>.</li>
+<li>Mit <span class="menu">OK</span> bestätigen.</li>
+</ol>
+<figure><img src="img/system-language.png" alt="Reiter System der Einstellungen mit der Spielsprache" loading="lazy"><figcaption>Reiter <em>System</em>: die Sprache der Spiele.</figcaption></figure>
+</section>
+<section class="card tuto-step" id="manette"><h2><span class="num">4</span>Mit einem Controller spielen</h2>
+<ol class="steps">
+<li>Schließe deinen Controller an und öffne <span class="menu">Emulation → Configure → Controls</span>.</li>
+<li><strong>Input Device</strong>: Wähle deinen Controller (meist der letzte in der Liste).</li>
+<li>Klicke auf jedes Feld (A, B, X, Y, Sticks, Trigger …) und drücke dann die passende Taste am Controller.</li>
+<li>Mit <span class="menu">OK</span> bestätigen.</li>
+</ol>
+<figure><img src="img/controls.png" alt="Reiter Controls mit verbundenem Controller und belegten Tasten" loading="lazy"><figcaption>Reiter <em>Controls</em>: Das blaue Feld <em>[waiting]</em> wartet auf einen Tastendruck.</figcaption></figure>
+<div class="note">Taucht der Controller nicht auf: Schließe Steam (es fängt Controller ab), probiere ein anderes USB-Kabel und starte Erable neu.</div>
+</section>
+<section class="card tuto-step" id="jeux"><h2><span class="num">5</span>Spiele hinzufügen und spielen</h2>
+<ol class="steps">
+<li>Lege deine Spiele (aus deinen Modulen oder Käufen ausgelesen) in einen Ordner <code>Switch-2-Spiele</code>, einen Unterordner pro Spiel.</li>
+<li>Klicke in der Spieleliste auf <span class="menu">+ Add New Game Directory</span>.</li>
+<li>Wähle den Ordner des Spiels und dann <span class="menu">Ordner auswählen</span>.</li>
+<li>Doppelklicke auf das Spiel, um es zu starten.</li>
+</ol>
+<figure><img src="img/game-folder.png" alt="Fenster zur Auswahl des Spielordners" loading="lazy"><figcaption>Den Ordner eines Spiels auswählen.</figcaption></figure>
+<figure><img src="img/game-list.png" alt="Spieleliste mit Zelda Ocarina of Time und Pokémon Pokopia" loading="lazy"><figcaption>Die Spiele erscheinen in der Liste, mit Spielzeit und Add-ons.</figcaption></figure>
+<div class="note">Beim ersten Mal kann ein Spiel ein paar Minuten ruckeln, während der Emulator seine Shader vorbereitet; danach läuft alles flüssiger. Ein Problem? <a href="../signaler.html">Hier melden</a>.</div>
+</section>
+      </article>
+    </div>
+  </div>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <a class="brand" href=".././"><img src="../erable.png" alt="">Erable</a>
+    <p data-i18n-html="footer.text"></p>
+    <a class="btn secondary small" href="https://github.com/erablesimu/erable"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg><span data-i18n="footer.source">Code source</span></a>
+  </div>
+</footer>
+
+</body>
+</html>

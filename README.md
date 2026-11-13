@@ -21,9 +21,9 @@ proposées automatiquement au démarrage, avec leurs notes de version en frança
 
 ## Tutoriels
 
-- [Installer Erable](docs/tutoriel/index.html) : installation, firmware et clés de votre
+- [Installer Erable](https://erablesimu.github.io/erable/tuto/installer.html) : installation, firmware et clés de votre
   console, jeux en français, manette.
-- [Optimiser Zelda Ocarina of Time](docs/tutoriel/zelda-ocarina.html) : réglages, DLSS,
+- [Optimiser Zelda Ocarina of Time](https://erablesimu.github.io/erable/tuto/zelda-ocarina.html) : réglages, DLSS,
   précompilation des shaders et partage du cache entre PC.
 - [Raccourcis](raccourcis.md) : dossiers utiles, lanceur de diagnostic et menus.
 
