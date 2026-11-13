@@ -104,6 +104,7 @@ enum class Site : u8 {
     ImageUpload,     ///< Of ImageCreate: filling it from guest memory (unless copies cover it)
     ImageJoin,       ///< Of ImageCreate: aliases, copies from the overlaps and their deletion
     UploadBatch,     ///< Small images a pass over a draw's textures filled on several threads
+    MemoryAllocateBig, ///< Of MemoryAllocate: allocations over one 16 MiB block (own memory)
     Count,
 };
 
@@ -114,6 +115,7 @@ inline constexpr std::array<std::string_view, SiteCount> site_names{
     "texture_collect", "texture_download", "scheduler_finish", "memory_free",
     "image_backend",   "astc_scan",       "image_overlaps",  "image_rescale",
     "image_replace",   "image_upload",    "image_join",      "upload_batch",
+    "memory_allocate_big",
 };
 
 [[nodiscard]] inline bool ReadEnv() {

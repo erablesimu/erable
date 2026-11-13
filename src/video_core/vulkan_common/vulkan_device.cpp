@@ -440,6 +440,13 @@ VKAPI_ATTR VkResult VKAPI_CALL TimedAllocateMemory(VkDevice device,
                                                    VkDeviceMemory* memory) {
     using namespace VideoCommon::StutterTrace;
     const SiteScope site{Site::MemoryAllocate};
+    // Blocks images and buffers share are 16 MiB at most; larger ones are memory of their own
+    // (images over 8 MiB, big staging buffers): which of the two zone loads wait for.
+    constexpr VkDeviceSize BlockSize = 16u * 1024u * 1024u;
+    std::optional<SiteScope> big_site;
+    if (allocate_info->allocationSize > BlockSize) {
+        big_site.emplace(Site::MemoryAllocateBig);
+    }
     return g_vma_allocate_memory(device, allocate_info, allocator, memory);
 }
 
