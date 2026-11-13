@@ -9,6 +9,7 @@
 #include <numbers>
 #include <random>
 
+#include <QApplication>
 #include <QKeyEvent>
 #include <QLinearGradient>
 #include <QMouseEvent>
@@ -149,7 +150,7 @@ void LeafCatcher::Drop() {
 }
 
 void LeafCatcher::Catch(const Leaf& leaf) {
-    const QColor accent = palette().color(QPalette::Highlight);
+    const QColor accent = qApp->palette().color(QPalette::Highlight);
     QColor color = Shade(accent, leaf.shade);
     QString text;
     if (leaf.kind == Kind::Syrup) {
@@ -254,7 +255,8 @@ void LeafCatcher::Step() {
 }
 
 void LeafCatcher::PaintScenery(QPainter& painter, const QRectF& field) const {
-    const QPalette colours = palette();
+    // The application's palette: the stylesheet makes this widget's highlight translucent.
+    const QPalette colours = qApp->palette();
     const QColor accent = colours.color(QPalette::Highlight);
     const QColor window = colours.color(QPalette::Window);
     const double w = field.width();
@@ -327,7 +329,7 @@ void LeafCatcher::PaintScenery(QPainter& painter, const QRectF& field) const {
 
 void LeafCatcher::PaintLeaf(QPainter& painter, const Leaf& leaf, const QRectF& field,
                             double unit) const {
-    const QColor accent = palette().color(QPalette::Highlight);
+    const QColor accent = qApp->palette().color(QPalette::Highlight);
     const QPointF centre{leaf.x * field.width(), leaf.y * field.height()};
     painter.save();
     painter.translate(centre);
@@ -377,7 +379,7 @@ void LeafCatcher::PaintLeaf(QPainter& painter, const Leaf& leaf, const QRectF& f
 }
 
 void LeafCatcher::PaintBasket(QPainter& painter, const QRectF& field) const {
-    const QPalette colours = palette();
+    const QPalette colours = qApp->palette();
     const QColor accent = colours.color(QPalette::Highlight);
     const double width = BasketWidth() * field.width() * (1.0 + 0.08 * squash);
     const double height = field.height() * 0.12 * (1.0 - 0.12 * squash);
@@ -422,7 +424,7 @@ void LeafCatcher::PaintBasket(QPainter& painter, const QRectF& field) const {
 }
 
 void LeafCatcher::PaintHud(QPainter& painter, const QRectF& field) const {
-    const QPalette colours = palette();
+    const QPalette colours = qApp->palette();
     const QColor accent = colours.color(QPalette::Highlight);
     const QColor text = colours.color(QPalette::WindowText);
     QFont font = painter.font();
