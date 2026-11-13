@@ -10,6 +10,7 @@ on:
       - 'dist/erable.png'
       - '.github/workflows/pages.yml'
       - 'tools/site/export_bugs.py'
+      - 'tools/site/stamp_assets.py'
   issues:
     types: [opened, edited, closed, reopened, labeled, unlabeled, deleted, transferred]
   workflow_dispatch:
@@ -41,6 +42,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 tools/site/export_bugs.py _site/bugs.sqlite
+      - name: Version the scripts and stylesheets
+        run: python3 tools/site/stamp_assets.py _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
