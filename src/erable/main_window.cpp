@@ -1860,7 +1860,7 @@ void MainWindow::ConnectMenuEvents() {
 void MainWindow::SetupDebugMenu() {
     auto* const menu = new QMenu(tr("&Debug mode"), this);
     menuBar()->insertMenu(ui->menu_Help->menuAction(), menu);
-    debug_menu = menu;
+    debug_mode_menu = menu;
     home_screen->SetDebugMenu(menu);
     auto* const home_action = new QAction(tr("&Home"), this);
     home_action->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_H));

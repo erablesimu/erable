@@ -556,7 +556,7 @@ private:
 
     GameListPlaceholder* game_list_placeholder = nullptr;
     HomeScreen* home_screen = nullptr;
-    QMenu* debug_menu = nullptr;
+    QMenu* debug_mode_menu = nullptr; ///< Debug mode > Record my session, also opened from the home
     bool home_active = true; ///< The home is shown rather than the library when no game runs
 
     std::vector<VkDeviceInfo::Record> vk_device_records;
