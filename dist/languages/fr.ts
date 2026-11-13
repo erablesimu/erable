@@ -2,12 +2,16 @@
 <context>
     <name>LeafCatcher</name>
     <message>
-        <source>Leaves: %1   Best: %2</source>
-        <translation>Feuilles : %1   Record : %2</translation>
+        <source>Best %1</source>
+        <translation>Record %1</translation>
     </message>
     <message>
-        <source>   Streak x%1</source>
-        <translation>   Série x%1</translation>
+        <source>Gust of wind!</source>
+        <translation>Coup de vent !</translation>
+    </message>
+    <message>
+        <source>Maple syrup! Wider basket</source>
+        <translation>Sirop d&apos;érable ! Panier élargi</translation>
     </message>
     <message>
         <source>Catch the leaves while the shaders load</source>

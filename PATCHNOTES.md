@@ -18,7 +18,11 @@ version. Les sections suivantes gardent l'historique.
 **Écran de chargement**
 - Nouvel écran de chargement aux couleurs du thème choisi (Maple, Spring Maple ou Winter Maple) :
   icône et nom du jeu au centre, barre fine avec le pourcentage, feuilles d'érable qui tombent
-  doucement en fond. Le petit jeu des feuilles prend aussi les couleurs du thème.
+  doucement en fond.
+- Le petit jeu des feuilles est refait : une vallée d'érables au crépuscule, des feuilles
+  nervurées, un panier en osier qui penche quand il bouge, des étincelles et des points qui
+  s'envolent à chaque prise. Feuille dorée (x5), séries jusqu'à x5, goutte de sirop d'érable qui
+  élargit le panier, coups de vent qui poussent les feuilles. Aux couleurs du thème.
 
 **Accueil en boîtiers**
 - Les jeux sont présentés comme des boîtiers Erable en 3D : le jeu choisi au centre, ses voisins
