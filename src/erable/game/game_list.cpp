@@ -89,6 +89,11 @@ GameList::GameList(FileSys::VirtualFilesystem vfs_, FileSys::ManualContentProvid
                 if (!this->isActiveWindow() || !this->isVisible()) {
                     return;
                 }
+                // The list moves and opens with these; the others belong to the home screen.
+                if (key != Qt::Key_Up && key != Qt::Key_Down && key != Qt::Key_Left &&
+                    key != Qt::Key_Right && key != Qt::Key_Enter && key != Qt::Key_Escape) {
+                    return;
+                }
                 QKeyEvent* event = new QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier);
                 QCoreApplication::postEvent(m_currentView, event);
             });

@@ -136,6 +136,30 @@
         <source>Save my profile</source>
         <translation>Enregistrer mon profil</translation>
     </message>
+    <message>
+        <source>Controller</source>
+        <translation>Manette</translation>
+    </message>
+    <message>
+        <source>No controller</source>
+        <translation>Pas de manette</translation>
+    </message>
+    <message>
+        <source>Shaders ready</source>
+        <translation>Shaders prêts</translation>
+    </message>
+    <message>
+        <source>Shaders prepared at first launch</source>
+        <translation>Shaders préparés au premier lancement</translation>
+    </message>
+    <message>
+        <source>Favourite</source>
+        <translation>Favori</translation>
+    </message>
+    <message>
+        <source>Ctrl + L  Library</source>
+        <translation>Ctrl + L  Bibliothèque</translation>
+    </message>
 </context>
 <context>
     <name>AboutDialog</name>

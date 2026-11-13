@@ -16,10 +16,11 @@
 class ControllerNavigation;
 class GameList;
 class GameTile;
+class HintBar;
+class PillButton;
 class QHBoxLayout;
 class QLabel;
 class QMenu;
-class QPushButton;
 class QScrollArea;
 
 namespace Core {
@@ -62,6 +63,7 @@ signals:
 protected:
     void keyPressEvent(QKeyEvent* event) override;
     void showEvent(QShowEvent* event) override;
+    void paintEvent(QPaintEvent* event) override;
 
 private:
     struct Game {
@@ -81,8 +83,10 @@ private:
     /// when requested from the profile button).
     void EnsureProfile(bool requested = false);
     void UpdateMusic();
+    void UpdateStatus();
     void Launch();
     void ToggleFavorite();
+    void OpenGameSettingsOfSelected();
     void OpenGamesFolder();
 
     GameList* game_list;
@@ -97,19 +101,21 @@ private:
     bool active = false;
     bool profile_checked = false;
 
-    QPushButton* profile_button = nullptr;
+    PillButton* profile_button = nullptr;
+    PillButton* music_button = nullptr;
+    PillButton* song_button = nullptr;
+    QLabel* controller_label = nullptr;
     QLabel* clock = nullptr;
-    QPushButton* music_button = nullptr;
-    QPushButton* song_button = nullptr;
     QLabel* title = nullptr;
     QLabel* meta = nullptr;
     QScrollArea* scroll = nullptr;
     QHBoxLayout* row = nullptr;
-    QPushButton* play_button = nullptr;
-    QPushButton* settings_button = nullptr;
-    QPushButton* favorite_button = nullptr;
-    QPushButton* report_button = nullptr;
-    QTimer clock_timer;
+    PillButton* play_button = nullptr;
+    PillButton* settings_button = nullptr;
+    PillButton* favorite_button = nullptr;
+    PillButton* report_button = nullptr;
+    HintBar* hints = nullptr;
+    QTimer status_timer;
     QTimer refresh_timer;
     HomeMusic music;
 };

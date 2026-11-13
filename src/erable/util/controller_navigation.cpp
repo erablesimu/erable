@@ -76,6 +76,10 @@ void ControllerNavigation::ControllerUpdateButton() {
         TriggerButton(Settings::NativeButton::DLeft, Qt::Key_Left);
         TriggerButton(Settings::NativeButton::DRight, Qt::Key_Right);
         TriggerButton(Settings::NativeButton::DUp, Qt::Key_Up);
+        // The home screen's actions: game settings, favourite, report a problem
+        TriggerButton(Settings::NativeButton::Plus, Qt::Key_Plus);
+        TriggerButton(Settings::NativeButton::Y, Qt::Key_Y);
+        TriggerButton(Settings::NativeButton::Minus, Qt::Key_Minus);
         break;
     case Core::HID::NpadStyleIndex::JoyconLeft:
         TriggerButton(Settings::NativeButton::DDown, Qt::Key_Enter);
