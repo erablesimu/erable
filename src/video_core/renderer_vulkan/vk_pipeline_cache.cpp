@@ -1112,8 +1112,15 @@ void PipelineCache::LoadDiskResources(u64 title_id, std::stop_token stop_loading
     StutterTrace::BootMarker("shader_load_begin");
     const auto shader_dir{Common::FS::GetEdenPath(Common::FS::EdenPath::ShaderDir)};
     const auto base_dir{shader_dir / fmt::format("{:016x}", title_id)};
-    if (!Common::FS::CreateDir(shader_dir) || !Common::FS::CreateDir(base_dir)) {
-        LOG_ERROR(Common_Filesystem, "Failed to create pipeline cache directories");
+    if (!Common::FS::CreateDirs(base_dir)) {
+        LOG_ERROR(Render_Vulkan,
+                  "Pipeline cache disabled for this session: failed to create the cache "
+                  "directory for title {:016x}",
+                  title_id);
+        // Not the previous title's files: this load can follow another title's (Eglantine
+        // a7c83d1c45).
+        pipeline_cache_filename.clear();
+        vulkan_pipeline_cache_filename.clear();
         return;
     }
     namespace CacheV2 = VideoCommon::ShaderCacheV2;
