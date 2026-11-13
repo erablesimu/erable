@@ -9,6 +9,17 @@ version. Les sections suivantes gardent l'historique.
 - La fenêtre de mise à jour ne montre plus que ce qui a changé depuis votre version, build par
   build, au lieu de tout l'historique depuis le build 24.
 
+**Moins de saccades (Lichii)**
+- Après le chargement, Erable prépare en arrière-plan tous les shaders mis de côté au démarrage,
+  les plus récents d'abord, sans retarder ceux dont le jeu a besoin tout de suite.
+- Le cache des effets précompilés est reconstruit quand ses réglages ou le jeu changent.
+
+**Divers**
+- Génération d'images Lossless Scaling sur les cartes graphiques sans calcul 16 bits (Lichii).
+- FSR 3.1 mis à jour (3.1.6).
+- Les programmes Windows portent leur nom et leur version (Propriétés > Détails), ce qui rassure
+  certains antivirus.
+
 ## build-27
 
 **Accueil**
