@@ -18,6 +18,9 @@ version. Les sections suivantes gardent l'historique.
   `%APPDATA%\erable\cache\covers` ; sinon le boîtier utilise l'icône du jeu.
 
 **Moins de saccades (Lichii)**
+- En entrant dans une zone, les petites textures d'un même dessin sont remplies ensemble sur
+  plusieurs cœurs du processeur au lieu d'une par une (Ocarina en crée plus de 2 000 à
+  l'arrivée dans le monde).
 - Après le chargement, Erable prépare en arrière-plan tous les shaders mis de côté au démarrage,
   les plus récents d'abord, sans retarder ceux dont le jeu a besoin tout de suite.
 - Le cache des effets précompilés est reconstruit quand ses réglages ou le jeu changent.

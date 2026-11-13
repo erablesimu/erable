@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <deque>
@@ -21,6 +22,7 @@
 #include "video_core/page_filter.h"
 #include "common/container/unordered_map.h"
 #include "common/container/unordered_set.h"
+#include <thread>
 #include <vector>
 #include <boost/container/small_vector.hpp>
 #include <boost/container/static_vector.hpp>
@@ -506,6 +508,22 @@ private:
     template <typename StagingBuffer>
     void UploadImageContents(Image& image, StagingBuffer& staging_buffer);
 
+    /// Whether RefreshContents may leave `image`'s upload to FlushUploadBatch: a small image
+    /// unswizzled (or converted) on the CPU, while a pass over a draw's textures is open.
+    [[nodiscard]] bool CanBatchUpload(const Image& image) const noexcept;
+    /// Fills the staging buffers of the uploads RefreshContents left pending, on several threads,
+    /// then records their copies in the order they were asked for.
+    void FlushUploadBatch();
+    /// Opens (or closes) a pass whose small uploads are batched; nests.
+    void BeginUploadBatch() noexcept {
+        ++upload_batch_depth;
+    }
+    void EndUploadBatch() {
+        if (--upload_batch_depth == 0) {
+            FlushUploadBatch();
+        }
+    }
+
     /// Create a new image view from a guest descriptor
     [[nodiscard]] ImageViewId CreateImageView(const TICEntry& config);
 
@@ -766,6 +784,23 @@ private:
 
     Common::ThreadWorker texture_decode_worker{1, "TextureDecoder", {},
                                                Common::ThreadPlacement::Efficiency};
+
+    using UploadStaging = decltype(std::declval<Runtime&>().UploadStagingBuffer(size_t{}));
+    struct PendingUpload {
+        ImageId image_id;
+        UploadStaging staging;
+        boost::container::small_vector<BufferImageCopy, 16> copies;
+    };
+    /// Uploads RefreshContents left to FlushUploadBatch, in the order it was asked for them
+    std::vector<PendingUpload> pending_uploads;
+    u32 upload_batch_depth = 0;
+    /// Set while JoinImages copies into the image it makes: its upload must come first
+    bool upload_batch_held = false;
+    u64 batched_uploads = 0;
+    u64 upload_batches = 0;
+    /// Fills the batched staging buffers: an area's first frame makes hundreds of small images.
+    Common::ThreadWorker upload_workers{
+        std::clamp<size_t>(std::thread::hardware_concurrency() / 2, 2, 6), "TextureUpload"};
     std::vector<std::unique_ptr<AsyncDecodeContext>> async_decodes;
     /// Guest memory images were uploaded from since the last cold hint (device address, size).
     std::vector<std::pair<DAddr, u64>> uploaded_ranges;

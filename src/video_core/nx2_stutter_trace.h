@@ -103,6 +103,7 @@ enum class Site : u8 {
     ImageReplace,    ///< Of ImageCreate: deleting the remapped or identical images it replaces
     ImageUpload,     ///< Of ImageCreate: filling it from guest memory (unless copies cover it)
     ImageJoin,       ///< Of ImageCreate: aliases, copies from the overlaps and their deletion
+    UploadBatch,     ///< Small images a pass over a draw's textures filled on several threads
     Count,
 };
 
@@ -112,7 +113,7 @@ inline constexpr std::array<std::string_view, SiteCount> site_names{
     "buffer_collect",  "buffer_download", "image_create",    "image_delete",
     "texture_collect", "texture_download", "scheduler_finish", "memory_free",
     "image_backend",   "astc_scan",       "image_overlaps",  "image_rescale",
-    "image_replace",   "image_upload",    "image_join",
+    "image_replace",   "image_upload",    "image_join",      "upload_batch",
 };
 
 [[nodiscard]] inline bool ReadEnv() {

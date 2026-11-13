@@ -586,8 +586,9 @@ void TextureCache<P>::TickFrame() {
                  images_created, images_deleted, gc_deletes + gc_costly_deletes, gc_costly_deletes,
                  gc_download_deletes,
                  async_decodes_queued, astc_opaque_images, astc_alpha_images);
-        LOG_INFO(HW_GPU, "Texture cache last 600 frames: {} uploads from guest memory, {} MiB (largest {} MiB, {} by layer)",
-                 images_uploaded, uploaded_bytes >> 20, largest_upload >> 20, layer_uploads);
+        LOG_INFO(HW_GPU, "Texture cache last 600 frames: {} uploads from guest memory, {} MiB (largest {} MiB, {} by layer, {} filled in {} parallel batches)",
+                 images_uploaded, uploaded_bytes >> 20, largest_upload >> 20, layer_uploads,
+                 batched_uploads, upload_batches);
         LOG_INFO(HW_GPU,
                  "Texture cache last 600 frames: stale uploads skipped {} ({} MiB), {} uploaded "
                  "for buffer-written pages; {} MiB of pages marked stale",
@@ -595,6 +596,7 @@ void TextureCache<P>::TickFrame() {
                  (stale_pages.Count() << StalePages::PAGE_BITS) >> 20);
         tc_stale_skips = tc_stale_skip_bytes = tc_stale_gpu_written = 0;
         images_uploaded = uploaded_bytes = largest_upload = layer_uploads = 0;
+        batched_uploads = upload_batches = 0;
         astc_opaque_images = astc_alpha_images = 0;
         std::vector<std::pair<u32, u64>> shapes;
         for (const auto& [key, value] : created_shapes) shapes.emplace_back(value.first, key);
@@ -705,6 +707,11 @@ bool TextureCache<P>::PublishComputeCollisionImage(u32 index) {
 template <class P>
 void TextureCache<P>::FillImageViews(std::span<ImageViewInOut> views, bool compute, bool blacklist) {
     bool has_blacklisted = false;
+    // The small uploads of the views' new images are filled together, on several threads.
+    BeginUploadBatch();
+    SCOPE_EXIT {
+        EndUploadBatch();
+    };
     do {
         has_deleted_images = false;
         if (blacklist) {
@@ -732,6 +739,8 @@ void TextureCache<P>::FillImageViews(std::span<ImageViewInOut> views, bool compu
                 }
             }
         }
+        // A pass again resolves views whose images may be gone: their uploads are made first.
+        FlushUploadBatch();
     } while (has_deleted_images || (blacklist && has_blacklisted));
 }
 
@@ -2234,7 +2243,14 @@ void TextureCache<P>::RefreshContents(Image& image, ImageId image_id) {
     ++images_uploaded;
     uploaded_bytes += image.guest_size_bytes;
     largest_upload = (std::max<u64>)(largest_upload, image.guest_size_bytes);
-    if (!UploadInChunks(image)) {
+    if (CanBatchUpload(image)) {
+        // Filled with the pass's other small uploads in FlushUploadBatch, on several threads
+        pending_uploads.push_back(PendingUpload{
+            .image_id = image_id,
+            .staging = runtime.UploadStagingBuffer(MapSizeBytes(image)),
+            .copies = {},
+        });
+    } else if (!UploadInChunks(image)) {
         auto staging = runtime.UploadStagingBuffer(MapSizeBytes(image));
         UploadImageContents(image, staging);
         runtime.InsertUploadMemoryBarrier();
@@ -2564,6 +2580,62 @@ void TextureCache<P>::UploadImageContents(Image& image, StagingBuffer& staging) 
                                           mapped_span, &unswizzle_worker);
         image.UploadMemory(staging, copies);
     }
+}
+
+template <class P>
+bool TextureCache<P>::CanBatchUpload(const Image& image) const noexcept {
+    // Larger images already unswizzle on several threads on their own (UnswizzleWorker). Not
+    // with OpenGL: its staging map fences its buffer when destroyed, before a batch records.
+    return std::is_trivially_destructible_v<UploadStaging> && upload_batch_depth != 0 &&
+           !upload_batch_held &&
+           image.guest_size_bytes < Tegra::Texture::ParallelUnswizzleMinBytes &&
+           False(image.flags & (ImageFlagBits::AcceleratedUpload | ImageFlagBits::Sparse |
+                                ImageFlagBits::Unbacked | ImageFlagBits::TrimmedLevels)) &&
+           image.info.num_samples == 1;
+}
+
+template <class P>
+void TextureCache<P>::FlushUploadBatch() {
+    if (pending_uploads.empty()) {
+        return;
+    }
+    const StutterTrace::SiteScope site{StutterTrace::Site::UploadBatch};
+    // Taken out first: nothing below may add to it, but a flush must never see its own batch.
+    std::vector<PendingUpload> uploads = std::move(pending_uploads);
+    pending_uploads.clear();
+    ++upload_batches;
+    batched_uploads += uploads.size();
+    // What UploadImageContents does on the CPU, with buffers of the thread's own
+    const auto fill = [this](PendingUpload& upload) {
+        thread_local Common::ScratchBuffer<u8> swizzle_scratch;
+        thread_local Common::ScratchBuffer<u8> convert_scratch;
+        const Image& image = slot_images[upload.image_id];
+        const std::span<u8> mapped_span = upload.staging.mapped_span;
+        Tegra::Memory::GpuGuestMemory<u8, Tegra::Memory::GuestMemoryFlags::UnsafeRead> swizzle_data(
+            *gpu_memory, image.gpu_addr, image.guest_size_bytes, &swizzle_scratch);
+        if (True(image.flags & ImageFlagBits::Converted)) {
+            convert_scratch.resize_destructive(image.unswizzled_size_bytes);
+            upload.copies = UnswizzleImage(*gpu_memory, image.gpu_addr, image.info, swizzle_data,
+                                           convert_scratch);
+            ConvertImage(convert_scratch, image.info, mapped_span, upload.copies);
+        } else {
+            upload.copies = UnswizzleImage(*gpu_memory, image.gpu_addr, image.info, swizzle_data,
+                                           mapped_span);
+        }
+    };
+    if (uploads.size() == 1) {
+        fill(uploads.front());
+    } else {
+        // The GPU thread waits here, so nothing moves the images or their guest memory mappings.
+        for (PendingUpload& upload : uploads) {
+            upload_workers.QueueWork([&fill, &upload] { fill(upload); });
+        }
+        upload_workers.WaitForRequests();
+    }
+    for (PendingUpload& upload : uploads) {
+        slot_images[upload.image_id].UploadMemory(upload.staging, upload.copies);
+    }
+    runtime.InsertUploadMemoryBarrier();
 }
 
 template <class P>
@@ -2966,6 +3038,7 @@ void TextureCache<P>::TickAsyncUnswizzle() {
 
 template <class P>
 bool TextureCache<P>::ScaleUp(Image& image) {
+    FlushUploadBatch(); // the rescale copies the image's contents
     const bool has_copy = image.HasScaled();
     const bool rescaled = image.ScaleUp();
     if (!has_copy && image.HasScaled()) {
@@ -2980,6 +3053,9 @@ bool TextureCache<P>::ScaleUp(Image& image) {
 
 template <class P>
 bool TextureCache<P>::ScaleDown(Image& image) {
+    if (True(image.flags & ImageFlagBits::Rescaled)) {
+        FlushUploadBatch(); // the rescale copies the image's contents
+    }
     const bool rescaled = image.ScaleDown();
     if (!rescaled) {
         return false;
@@ -3115,6 +3191,19 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
                                region_check_gpu);
 
     step_site.emplace(StutterTrace::Site::ImageRescale);
+    // Copies, aliases and deletions below use the overlaps' contents, and their copies into the
+    // new image must follow its upload: none of them waits in the upload batch.
+    const bool joins_others = !join_copies_to_do.empty() || !join_left_aliased_ids.empty() ||
+                              !join_right_aliased_ids.empty() || !join_bad_overlap_ids.empty() ||
+                              !join_ignore_textures.empty();
+    if (joins_others) {
+        FlushUploadBatch();
+    }
+    const bool batch_held_before = upload_batch_held;
+    upload_batch_held = batch_held_before || joins_others;
+    SCOPE_EXIT {
+        upload_batch_held = batch_held_before;
+    };
     bool can_rescale = info.rescaleable;
     bool any_rescaled = false;
     for (const auto& copy : join_copies_to_do) {
@@ -4077,6 +4166,10 @@ void TextureCache<P>::UntrackImage(ImageBase& image, ImageId image_id) {
 
 template <class P>
 void TextureCache<P>::DeleteImage(ImageId image_id, bool immediate_delete) {
+    if (std::ranges::any_of(pending_uploads,
+                            [image_id](const PendingUpload& upload) { return upload.image_id == image_id; })) {
+        FlushUploadBatch();
+    }
     const StutterTrace::SiteScope site{StutterTrace::Site::ImageDelete};
     ImageBase& image = slot_images[image_id];
     ++images_deleted;
@@ -4246,6 +4339,9 @@ template <class P>
 void TextureCache<P>::SynchronizeAliases(ImageId image_id) {
     boost::container::small_vector<const AliasedImage*, 8> aliased_images;
     Image& image = slot_images[image_id];
+    if (!pending_uploads.empty() && image.newest_alias_tick > image.modification_tick) {
+        FlushUploadBatch(); // the copies between aliases read and write their contents
+    }
     // Nothing aliased was modified after this image: skip walking its (possibly long) alias list
     // for every draw that samples it (~7% of the GPU back thread in DK Bananza's open areas).
     if (image.newest_alias_tick <= image.modification_tick) {
