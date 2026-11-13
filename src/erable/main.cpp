@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <QApplication>
+#include <QCryptographicHash>
+#include <QDir>
+#include <QLocalServer>
+#include <QLocalSocket>
 #include <QMessageBox>
 #include <QProcess>
 #include <cstdlib>
@@ -192,6 +196,32 @@ int main(int argc, char* argv[]) {
 
     QApplication app(argc, argv);
 
+    // One Erable at a time: a second launch brings the running one forward and quits. The key is
+    // per user, so two Windows accounts each keep their own.
+    const QString instance_key =
+        QStringLiteral("erable-") +
+        QString::fromLatin1(QCryptographicHash::hash(QDir::homePath().toUtf8(),
+                                                     QCryptographicHash::Sha1)
+                                .toHex()
+                                .left(16));
+    {
+        QLocalSocket running;
+        running.connectToServer(instance_key);
+        if (running.waitForConnected(500)) {
+            // The running one answers at once unless it hangs (a game it cannot close).
+            if (!running.waitForReadyRead(3000)) {
+                QMessageBox::warning(
+                    nullptr, QObject::tr("Erable is already open"),
+                    QObject::tr("Erable is already running but does not respond. Close erable.exe "
+                                "in the Task Manager (Ctrl + Shift + Esc), then start Erable again."));
+            }
+            return 0;
+        }
+    }
+    QLocalServer instance_server;
+    QLocalServer::removeServer(instance_key); // left behind by a run that crashed (Unix sockets)
+    instance_server.listen(instance_key);
+
 #ifdef _WIN32
     OverrideWindowsFont();
 #endif
@@ -216,10 +246,25 @@ int main(int argc, char* argv[]) {
         {
             MainWindow main_window{has_broken_vulkan};
             main_window.show();
+            QObject::connect(&instance_server, &QLocalServer::newConnection, &main_window,
+                             [&instance_server, &main_window] {
+                                 while (QLocalSocket* other = instance_server.nextPendingConnection()) {
+                                     other->write("ok");
+                                     other->flush();
+                                     other->disconnectFromServer();
+                                     other->deleteLater();
+                                 }
+                                 main_window.setWindowState(main_window.windowState() &
+                                                            ~Qt::WindowMinimized);
+                                 main_window.show();
+                                 main_window.raise();
+                                 main_window.activateWindow();
+                             });
             app.connect(&app, &QGuiApplication::applicationStateChanged, &main_window,
                         &MainWindow::OnAppFocusStateChanged);
             result = app.exec();
         }
+        instance_server.close();
         // Debug mode > Record my session, after a game ran: record from a new launch.
         if (DebugSession::RestartRequested()) {
             QProcess::startDetached(QCoreApplication::applicationFilePath(),

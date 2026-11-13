@@ -9444,6 +9444,14 @@ p, li { white-space: pre-wrap; }
         <source>Favorites</source>
         <translation>Favoris</translation>
     </message>
+    <message>
+        <source>Erable is already open</source>
+        <translation>Erable est déjà ouvert</translation>
+    </message>
+    <message>
+        <source>Erable is already running but does not respond. Close erable.exe in the Task Manager (Ctrl + Shift + Esc), then start Erable again.</source>
+        <translation>Erable est déjà ouvert mais ne répond plus. Fermez erable.exe dans le Gestionnaire des tâches (Ctrl + Maj + Échap), puis relancez Erable.</translation>
+    </message>
 </context>
 <context>
     <name>QtAmiiboSettingsDialog</name>

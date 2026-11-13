@@ -25,6 +25,8 @@ version. Les sections suivantes gardent l'historique.
   rapport. Une session interrompue par un plantage est récupérée au lancement suivant.
 
 **Nouvel accueil**
+- Un seul Erable à la fois : le relancer ramène la fenêtre déjà ouverte au premier plan. Si
+  l'ancien ne répond plus, Erable explique comment le fermer dans le Gestionnaire des tâches.
 - Erable s'ouvre sur un accueil façon console : grandes vignettes de vos jeux, actions du jeu
   choisi (Jouer, Réglages du jeu, Favori, Signaler un problème) et un dock (Bibliothèque,
   Nouveautés, Dossier Jeux, Captures, Mode debug, Réglages). Il se pilote à la manette.
