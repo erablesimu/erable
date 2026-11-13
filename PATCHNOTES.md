@@ -25,6 +25,9 @@ version. Les sections suivantes gardent l'historique.
   rapport. Une session interrompue par un plantage est récupérée au lancement suivant.
 
 **Zelda Ocarina of Time**
+- Les arbres ne flottent plus en l'air dans la plaine d'Hyrule et ailleurs : Erable attend
+  désormais qu'un shader soit prêt au lieu de sauter le dessin (réglage « Switch 2 draws with
+  unbuilt pipelines » sur « Wait », comme Lichii d'origine).
 - Correction des zones sombres en forme de grille sur l'eau et le sol (ombres des lumières).
 - Génération d'images NVIDIA DLSS (2x à 4x) disponible comme type de génération d'images.
 
