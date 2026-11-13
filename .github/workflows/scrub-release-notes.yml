@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: Copyright 2026 Erable
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Run by hand: rewrites the published releases' notes without Erable's former name.
+name: scrub-release-notes
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Rewrite the release notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 tools/ci/scrub_release_notes.py
