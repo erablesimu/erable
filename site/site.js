@@ -1,4 +1,4 @@
-// Shared by the pages of erable-simu.com.
+// Shared by the pages of the Erable site.
 const REPO = "erablesimu/erable";
 const API = "https://api.github.com/repos/" + REPO;
 

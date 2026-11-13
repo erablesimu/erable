@@ -1,4 +1,4 @@
-# Publishes site/ (with the logo and the tutorials) to GitHub Pages, served at erable-simu.com.
+# Publishes site/ (with the logo and the tutorials) to GitHub Pages, served at erablesimu.github.io/erable.
 name: Site
 
 on:

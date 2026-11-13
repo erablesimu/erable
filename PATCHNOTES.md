@@ -13,7 +13,7 @@ version. Les sections suivantes gardent l'historique.
 - Le code aussi passe au nom Erable (dossiers, programmes, options de build). Les caches de
   shaders déjà construits restent valables.
 - Le dépôt s'appelle maintenant github.com/erablesimu/erable.
-- Site erable-simu.com : téléchargement, notes de version, modifications du code et formulaire pour
+- Site erablesimu.github.io/erable : téléchargement, notes de version, modifications du code et formulaire pour
   signaler un problème (Aide > À propos > Report an Issue y mène).
 
 **Zelda Ocarina of Time**
