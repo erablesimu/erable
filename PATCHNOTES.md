@@ -31,6 +31,12 @@ version. Les sections suivantes gardent l'historique.
   les plus récents d'abord, sans retarder ceux dont le jeu a besoin tout de suite.
 - Le cache des effets précompilés est reconstruit quand ses réglages ou le jeu changent.
 
+**Moins de travail pour le processeur (Eglantine)**
+- Les pages de mémoire que le jeu réécrit à chaque image ne sont plus protégées puis débloquées
+  en boucle (Ocarina : environ 70 % d'appels système en moins, image 25,9 → 24,7 ms mesurée par
+  Eglantine). `EDEN_NX2_HOT_PAGES=0` revient à l'ancien comportement.
+- Les adresses de la carte graphique les plus consultées sont gardées en cache.
+
 **Divers**
 - Couper la musique de l'accueil (ou en changer) est enregistré tout de suite, même si Erable
   est fermé de force ensuite.
