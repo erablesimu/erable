@@ -1,4 +1,5 @@
-# Publishes site/ (with the logo) to GitHub Pages, served at erablesimu.github.io/erable.
+# Publishes site/ (with the logo and bugs.sqlite, the repository's issues for the bug list) to
+# GitHub Pages, served at erablesimu.github.io/erable. Issue changes publish it again.
 name: Site
 
 on:
@@ -8,10 +9,14 @@ on:
       - 'site/**'
       - 'dist/erable.png'
       - '.github/workflows/pages.yml'
+      - 'tools/site/export_bugs.py'
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, deleted, transferred]
   workflow_dispatch:
 
 permissions:
   contents: read
+  issues: read
   pages: write
   id-token: write
 
@@ -32,6 +37,10 @@ jobs:
           mkdir -p _site
           cp -r site/. _site/
           cp dist/erable.png _site/erable.png
+      - name: Export the issues for the bug list
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 tools/site/export_bugs.py _site/bugs.sqlite
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

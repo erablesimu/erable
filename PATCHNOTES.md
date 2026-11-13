@@ -16,6 +16,9 @@ version. Les sections suivantes gardent l'historique.
 - Site erablesimu.github.io/erable, en français, anglais et allemand : téléchargement, tutoriels
   (émulateur et jeux, avec un filtre par jeu), notes de version et formulaire pour signaler un
   problème (Aide > À propos > Report an Issue y mène).
+- Page « Bugs » sur le site : les problèmes signalés, en cours ou fermés, filtrables par jeu et par
+  type, avec une recherche. La liste est enregistrée dans un fichier SQLite à chaque publication.
+- Les journaux s'appellent maintenant `erable_log.txt` (et `erable_crash.dmp`, `erable_gpu.log`).
 
 **Zelda Ocarina of Time**
 - Correction des zones sombres en forme de grille sur l'eau et le sol (ombres des lumières).

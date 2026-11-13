@@ -364,6 +364,30 @@ ol.steps li::marker { color: var(--accent); font-weight: 800; }
 .note::before { content: "💡"; }
 .warn::before { content: "⚠️"; }
 
+/* Known bugs */
+.stats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.stat { display: inline-flex; gap: 6px; align-items: baseline; padding: 6px 14px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-weight: 550; box-shadow: var(--shadow); }
+.stat strong { font-size: 1.15rem; color: var(--text); }
+.stat.open strong { color: var(--accent); }
+.stat.fixed strong { color: #3fb950; }
+.bug-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 14px; margin: 20px 0; }
+.bug-tools .tabs { margin: 0; }
+.bug-tools .tabs button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.bug-tools select, .bug-tools input { width: auto; flex: 1 1 180px; }
+#bug-list { display: grid; gap: 12px; margin-bottom: 16px; }
+a.bug { display: block; border-left: 4px solid var(--accent); }
+a.bug.fixed { border-left-color: #3fb950; }
+a.bug.closed { border-left-color: var(--border); }
+a.bug h3 { margin: 10px 0 4px; font-size: 1.08rem; overflow-wrap: anywhere; }
+a.bug .meta { margin: 0; }
+.bug-details { margin: 0 0 6px; color: var(--muted); font-size: 0.93rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.status-badge { font-size: 0.76rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+.status-badge.open { background: var(--accent-soft); color: var(--accent); }
+.status-badge.fixed { background: rgba(63, 185, 80, 0.15); color: #2f9a43; }
+.status-badge.closed { background: var(--surface-2); color: var(--muted); }
+@media (prefers-color-scheme: dark) { .status-badge.fixed { color: #56d364; } }
+.status.card { margin: 0; }
+
 /* Footer */
 footer.site { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; padding: 32px 0 40px; background: var(--bg-2); }
 footer.site .wrap { display: flex; gap: 16px 32px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
