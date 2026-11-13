@@ -116,13 +116,13 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          cmake --build build/release --target erable erable-cmd erable-updater erable-legacy-launcher --parallel
+          cmake --build build/release --target erable erable-cmd erable-updater --parallel
           sccache --show-stats
 
       - name: Package Windows binary
         shell: pwsh
         run: |
-          foreach ($exe in 'erable.exe', 'eden-cli.exe', 'erable-updater.exe', 'banstdog.exe') {
+          foreach ($exe in 'erable.exe', 'eden-cli.exe', 'erable-updater.exe') {
             if (-not (Test-Path "build/release/bin/$exe")) {
               throw "build/release/bin/$exe was not produced"
             }
@@ -223,7 +223,7 @@ jobs:
       - name: Build
         shell: msys2 {0}
         run: |
-          cmake --build build/release --target erable erable-cmd erable-legacy-launcher --parallel
+          cmake --build build/release --target erable erable-cmd --parallel
           ccache --show-stats
 
       # A dynamic MinGW build is not portable on its own: windeployqt6 brings the Qt libraries and
@@ -237,7 +237,6 @@ jobs:
           cd build/release/bin
           test -f erable.exe
           test -f eden-cli.exe
-          test -f banstdog.exe
           windeployqt6 --no-translations --no-compiler-runtime --no-opengl-sw \
             --no-system-dxc-compiler --no-system-d3d-compiler erable.exe
           deps() {

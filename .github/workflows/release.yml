@@ -123,11 +123,6 @@ jobs:
               (cd "$artifact" && zip -qr "${GITHUB_WORKSPACE}/release-assets/$(strip_sha "$name").zip" .)
             fi
           done
-          # Versions from before the rename to Erable look for banstdog-windows-*.zip: the same zip
-          # under that name lets them update (its banstdog.exe starts erable.exe).
-          for file in release-assets/erable-windows-*.zip; do
-            cp "$file" "release-assets/banstdog-${file#release-assets/erable-}"
-          done
           files=(release-assets/*)
           ((${#files[@]} > 0)) || { echo "Build artifacts contained no release files" >&2; exit 1; }
           printf 'Prepared %s release assets\n' "${#files[@]}"

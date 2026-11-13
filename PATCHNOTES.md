@@ -9,7 +9,8 @@ version. Les sections suivantes gardent l'historique.
 - Le programme s'appelle maintenant erable.exe et ses données sont dans `%APPDATA%\erable`.
   L'ancien dossier `%APPDATA%\banstdog` est déplacé automatiquement au premier lancement :
   sauvegardes, réglages, clés et cache de shaders sont conservés.
-- Les anciens raccourcis vers banstdog.exe continuent de marcher : banstdog.exe ouvre erable.exe.
+- Cette version s'installe à la main (le zip de la page des versions, extrait par-dessus l'ancien
+  dossier). Recréez ensuite vos raccourcis vers erable.exe : banstdog.exe n'existe plus.
 - Le code aussi passe au nom Erable (dossiers, programmes, options de build). Les caches de
   shaders déjà construits restent valables.
 - Le dépôt s'appelle maintenant github.com/erablesimu/erable.
