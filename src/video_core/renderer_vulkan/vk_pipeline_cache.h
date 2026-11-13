@@ -186,7 +186,20 @@ private:
                                 std::shared_ptr<AsyncGraphicsTranslation>>;
 
     /// Whether the current native draw may be skipped while its pipeline is built
-    [[nodiscard]] bool CanSkipNativeDraw() const;
+    [[nodiscard]] bool CanSkipNativeDraw();
+
+    /// The current draw's target: colour target 0, else the depth target (0: none).
+    [[nodiscard]] u64 CurrentDrawTarget() const;
+
+    /// Notes the current draw's target for this frame (CurrentGraphicsPipeline).
+    void NoteDrawTarget();
+
+    /// Whether the current draw's target was drawn to in the previous frame. A target that
+    /// wasn't may hold what the game draws once and keeps (a map made when an area loads, which
+    /// left Ocarina of Time's trees floating): a draw into it, or one without a target, waits
+    /// for its pipeline instead of being skipped, as a skipped one would stay wrong for good.
+    /// Counts the draws it keeps for the log.
+    [[nodiscard]] bool TargetDrawnLastFrame();
 
     /// Queues graphics_key's translation. False when it has to be made on the GPU thread.
     bool QueueGraphicsTranslation();
@@ -348,6 +361,13 @@ private:
     ::Common::unordered_map<GraphicsPipelineCacheKey, std::unique_ptr<GraphicsPipeline>> graphics_cache;
 
     bool async_translation{}; ///< Asynchronous shaders, unless EDEN_NX2_ASYNC_TRANSLATION=0
+
+    /// Targets drawn this frame and the previous one (NoteDrawTarget; draw thread only)
+    std::vector<u64> targets_this_frame;
+    std::vector<u64> targets_last_frame;
+    u64 targets_frame{};
+    u64 last_noted_target{~u64{0}};
+    u64 kept_new_target_draws{}; ///< Draws kept waiting by TargetDrawnLastFrame since the last log
     AsyncGraphicsTranslations translating_graphics; ///< GPU thread only
     /// Stage hashes whose translation needs the engine: their pipelines translate on the GPU thread
     std::unordered_set<u64> engine_bound_stages;

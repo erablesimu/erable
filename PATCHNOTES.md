@@ -28,6 +28,8 @@ version. Les sections suivantes gardent l'historique.
 - Les arbres ne flottent plus en l'air dans la plaine d'Hyrule et ailleurs : Erable attend
   désormais qu'un shader soit prêt au lieu de sauter le dessin (réglage « Switch 2 draws with
   unbuilt pipelines » sur « Wait », comme Lichii d'origine).
+- « Bounded wait » ne saute plus que les dessins refaits à chaque image : un dessin fait une seule
+  fois pour une zone, ou qui écrit ailleurs que dans une image, attend toujours son shader.
 - Correction des zones sombres en forme de grille sur l'eau et le sol (ombres des lumières).
 - Génération d'images NVIDIA DLSS (2x à 4x) disponible comme type de génération d'images.
 

@@ -932,7 +932,7 @@ void PipelineCache::SaveUsedPipelines() {
 }
 
 GraphicsPipeline* PipelineCache::CurrentGraphicsPipeline() {
-
+    NoteDrawTarget();
     if (!RefreshStages(graphics_key.unique_hashes)) {
         current_pipeline = nullptr;
         return nullptr;
@@ -2320,9 +2320,11 @@ GraphicsPipeline* PipelineCache::BuiltPipeline(GraphicsPipeline* pipeline) noexc
         }
     }
     // Native draws are judged by the heuristic only when a mode other than Wait is chosen.
-    const bool can_discard = CanDiscardPendingDraw(
-        native, maxwell3d->regs.zeta_enable != 0, draw_state.draw_element_count,
-        draw_state.draw_element_count, native && mode != NativePendingMode::Wait);
+    const bool can_discard =
+        CanDiscardPendingDraw(native, maxwell3d->regs.zeta_enable != 0,
+                              draw_state.draw_element_count, draw_state.draw_element_count,
+                              native && mode != NativePendingMode::Wait) &&
+        (!native || mode == NativePendingMode::Wait || TargetDrawnLastFrame());
     bool discard = can_discard;
     if (native) {
         switch (DecideNativePending(mode, can_discard, native_wait_budget_us)) {
@@ -3139,7 +3141,7 @@ AsyncTranslationReport& GetAsyncTranslationReport() {
 }
 } // Anonymous namespace
 
-bool PipelineCache::CanSkipNativeDraw() const {
+bool PipelineCache::CanSkipNativeDraw() {
     if (!use_asynchronous_shaders || !maxwell3d->GetNativeMacroEngine().native_turing ||
         Settings::values.native_async_draws.GetValue() == Settings::NativeAsyncDraws::Wait) {
         return false;
@@ -3147,7 +3149,64 @@ bool PipelineCache::CanSkipNativeDraw() const {
     const auto& draw_state = maxwell3d->draw_manager.draw_state;
     return CanDiscardPendingDraw(true, maxwell3d->regs.zeta_enable != 0,
                                  draw_state.draw_element_count, draw_state.draw_element_count,
-                                 true);
+                                 true) &&
+           TargetDrawnLastFrame();
+}
+
+u64 PipelineCache::CurrentDrawTarget() const {
+    const auto& regs = maxwell3d->regs;
+    if (regs.rt_control.count > 0 && regs.rt[0].Address() != 0 &&
+        regs.rt[0].format != Tegra::RenderTargetFormat::NONE) {
+        return regs.rt[0].Address();
+    }
+    return regs.zeta_enable ? regs.zeta.Address() : 0;
+}
+
+void PipelineCache::NoteDrawTarget() {
+    if (targets_frame != frame_count) {
+        targets_frame = frame_count;
+        std::swap(targets_this_frame, targets_last_frame);
+        targets_this_frame.clear();
+        last_noted_target = ~u64{0};
+    }
+    const u64 target = CurrentDrawTarget();
+    // Draws come in runs into the same target: only a change of target looks the list up.
+    if (target == last_noted_target) {
+        return;
+    }
+    last_noted_target = target;
+    constexpr size_t MaxTargets = 512;
+    if (targets_this_frame.size() < MaxTargets &&
+        std::ranges::find(targets_this_frame, target) == targets_this_frame.end()) {
+        targets_this_frame.push_back(target);
+    }
+}
+
+bool PipelineCache::TargetDrawnLastFrame() {
+    // EDEN_NX2_SKIP_NEW_TARGETS=1 skips them like the rest, as before.
+    static const bool skip_new_targets = [] {
+        const char* const value = std::getenv("EDEN_NX2_SKIP_NEW_TARGETS");
+        return value != nullptr && value[0] == '1';
+    }();
+    const u64 target = CurrentDrawTarget();
+    // A draw without a colour or depth target writes elsewhere (storage, transform feedback):
+    // nothing tells whether it is redone each frame, so it waits too.
+    if (skip_new_targets ||
+        (target != 0 &&
+         std::ranges::find(targets_last_frame, target) != targets_last_frame.end())) {
+        return true;
+    }
+    ++kept_new_target_draws;
+    static auto window = std::chrono::steady_clock::now();
+    if (std::chrono::steady_clock::now() - window > std::chrono::seconds{10}) {
+        LOG_INFO(Render_Vulkan,
+                 "Async shaders: {} draws into targets not drawn the frame before (or without one) "
+                 "waited for their pipeline in the last 10 s",
+                 kept_new_target_draws);
+        kept_new_target_draws = 0;
+        window = std::chrono::steady_clock::now();
+    }
+    return false;
 }
 
 bool PipelineCache::QueueGraphicsTranslation() {
