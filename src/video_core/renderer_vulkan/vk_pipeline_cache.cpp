@@ -3475,7 +3475,7 @@ bool PipelineCache::AdoptGraphicsTranslation(AsyncGraphicsTranslations::iterator
                 engine_bound_stages.insert(hash);
             }
         }
-        slot = CreateGraphicsPipeline(nullptr);
+        slot = CreateGraphicsPipeline(nullptr, false);
     } else {
         slot = std::move(entry->pipeline);
         if (slot) {
