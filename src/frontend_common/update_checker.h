@@ -9,6 +9,7 @@
 
 #include <optional>
 #include <span>
+#include <string>
 #include <string_view>
 #include "common/net/net.h"
 
@@ -38,5 +39,10 @@ std::optional<Common::Net::Release> GetUpdate();
 std::optional<Common::Net::Release> SelectUpdate(
     std::span<const Common::Net::Release> releases, std::string_view build_tag,
     std::string_view platform, Common::Net::LinuxPackage package = Common::Net::LinuxPackage::Any);
+
+// The notes of every release after build_tag up to update_tag, newest first, each headed with
+// its build number when there are several. Empty when the tags are not build tags.
+std::string CombineNotes(std::span<const Common::Net::Release> releases,
+                         std::string_view build_tag, std::string_view update_tag);
 
 } // namespace UpdateChecker

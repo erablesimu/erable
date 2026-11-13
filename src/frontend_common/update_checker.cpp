@@ -5,7 +5,10 @@
 // Licensed under GPLv2 or any later version
 // Refer to the license.txt file included.
 
+#include <algorithm>
 #include <charconv>
+#include <string>
+#include <vector>
 #include "common/logging.h"
 #include "common/scm_rev.h"
 #include "frontend_common/update_checker.h"
@@ -28,7 +31,49 @@ std::optional<u64> ParseBuildNumber(std::string_view tag) {
     return number;
 }
 
+/// A release's notes: its text above "# Packages".
+std::string_view NotesOf(const Common::Net::Release& release) {
+    std::string_view body{release.body};
+    if (const auto pos = body.find("# Packages"); pos != std::string_view::npos) {
+        body = body.substr(0, pos);
+    }
+    while (!body.empty() && (body.back() == '\n' || body.back() == '\r' || body.back() == ' ')) {
+        body.remove_suffix(1);
+    }
+    return body;
+}
+
 } // namespace
+
+std::string CombineNotes(std::span<const Common::Net::Release> releases,
+                         std::string_view build_tag, std::string_view update_tag) {
+    const auto installed = ParseBuildNumber(build_tag);
+    const auto update = ParseBuildNumber(update_tag);
+    if (!installed || !update) {
+        return {};
+    }
+    std::vector<std::pair<u64, const Common::Net::Release*>> newer;
+    for (const auto& release : releases) {
+        const auto number = ParseBuildNumber(release.tag);
+        if (number && *number > *installed && *number <= *update) {
+            newer.emplace_back(*number, &release);
+        }
+    }
+    std::ranges::sort(newer, [](const auto& lhs, const auto& rhs) { return lhs.first > rhs.first; });
+    std::string notes;
+    for (const auto& [number, release] : newer) {
+        const auto text = NotesOf(*release);
+        if (text.find_first_not_of(" \r\n") == std::string_view::npos) {
+            continue;
+        }
+        if (newer.size() > 1) {
+            notes += "## Build " + std::to_string(number) + "\n\n";
+        }
+        notes += text;
+        notes += "\n\n";
+    }
+    return notes;
+}
 
 Failure ClassifyFailure(int status) {
     if (status == 403 || status == 429) {
@@ -77,6 +122,12 @@ CheckResult Check() {
                                Common::Net::CurrentLinuxPackage());
     if (update) {
         LOG_INFO(Frontend, "Received update {}", update->title);
+        // Every build since the installed one, newest first, rather than the latest one's notes
+        // alone (each build's notes hold only what it changed).
+        if (auto notes = CombineNotes(list.releases, Common::g_build_release_tag, update->tag);
+            !notes.empty()) {
+            update->body = std::move(notes) + "# Packages\n";
+        }
     } else {
         LOG_INFO(Frontend, "No update newer than {} for {} among {} releases",
                  Common::g_build_release_tag, Common::g_build_release_platform,

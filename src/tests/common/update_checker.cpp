@@ -234,3 +234,21 @@ TEST_CASE("Release requests handle HTTP failures without throwing", "[updater]")
         Common::Net::MakeRequest("http://127.0.0.1:" + std::to_string(port), "/releases");
     CHECK(response.has_value() == (status == 200));
 }
+
+TEST_CASE("Erable's update notes cover every build since the installed one", "[updater]") {
+    auto with_notes = [](std::string tag, std::string notes) {
+        auto release = MakeRelease(tag, "erable-windows-x86_64.zip");
+        release.body = notes + "\n\n# Packages\n\nlinks\n";
+        return release;
+    };
+    const auto releases = std::array{
+        with_notes("build-26", "notes 26"),
+        with_notes("build-28", "notes 28"),
+        with_notes("build-27", "notes 27"),
+        with_notes("build-25", "notes 25"),
+    };
+    CHECK(UpdateChecker::CombineNotes(releases, "build-26", "build-28") ==
+          "## Build 28\n\nnotes 28\n\n## Build 27\n\nnotes 27\n\n");
+    CHECK(UpdateChecker::CombineNotes(releases, "build-27", "build-28") == "notes 28\n\n");
+    CHECK(UpdateChecker::CombineNotes(releases, "dev", "build-28").empty());
+}

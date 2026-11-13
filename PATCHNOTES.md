@@ -5,24 +5,22 @@ version. Les sections suivantes gardent l'historique.
 
 ## Nouveautés de cette version
 
-**Banst Family devient Erable**
-- Le programme s'appelle maintenant erable.exe et ses données sont dans `%APPDATA%\erable`.
-  L'ancien dossier `%APPDATA%\banstdog` est déplacé automatiquement au premier lancement :
-  sauvegardes, réglages, clés et cache de shaders sont conservés.
-- Cette version s'installe à la main (le zip de la page des versions, extrait par-dessus l'ancien
-  dossier). Recréez ensuite vos raccourcis vers erable.exe : banstdog.exe n'existe plus.
-- Le code aussi passe au nom Erable (dossiers, programmes, options de build). Les caches de
-  shaders déjà construits restent valables.
-- Le dépôt s'appelle maintenant github.com/erablesimu/erable.
-- Site erablesimu.github.io/erable, en français, anglais et allemand : téléchargement, tutoriels
-  (émulateur et jeux, avec un filtre par jeu), notes de version et formulaire pour signaler un
-  problème (Aide > À propos > Report an Issue y mène).
-- Page « Bugs » sur le site : les problèmes signalés, en cours ou fermés, filtrables par jeu et par
-  type, avec une recherche. La liste est enregistrée dans un fichier SQLite à chaque publication.
-- Les journaux s'appellent maintenant `erable_log.txt` (et `erable_crash.dmp`, `erable_gpu.log`).
-- Nouveau menu **Mode debug → Enregistrer ma session** : plus besoin du lanceur `.bat`. Les
-  diagnostics s'activent, et à la fin le journal complet est rangé dans un zip à joindre au
-  rapport. Une session interrompue par un plantage est récupérée au lancement suivant.
+**Mises à jour**
+- La fenêtre de mise à jour ne montre plus que ce qui a changé depuis votre version, build par
+  build, au lieu de tout l'historique depuis le build 24.
+
+## build-27
+
+**Accueil**
+- L'accueil est redessiné : grandes vignettes, jeu choisi mis en avant, dock d'icônes, état de la
+  manette, horloge et indication « Shaders prêts » pour les jeux déjà préparés.
+- À la manette : Plus ouvre les réglages du jeu, Y le met en favori, Moins signale un problème.
+
+**Mode debug**
+- Le zip de « Enregistrer ma session » n'est plus vide : il contient bien le journal.
+- Mesures plus fines des saccades dues aux textures, pour les prochaines optimisations.
+
+## build-26
 
 **Nouvel accueil**
 - Un seul Erable à la fois : le relancer ramène la fenêtre déjà ouverte au premier plan. Si
@@ -52,6 +50,38 @@ version. Les sections suivantes gardent l'historique.
 - Arrêter un jeu ne peut plus rester bloqué sur certaines attentes du GPU (Lichii).
 - Cartes Intel sous Windows : un plantage au chargement du cache de shaders est évité (d'après
   Eglantine).
+
+## build-25
+
+**Banst Family devient Erable (suite)**
+- Cette version s'installe à la main (le zip de la page des versions, extrait par-dessus l'ancien
+  dossier). Recréez ensuite vos raccourcis vers erable.exe : banstdog.exe n'existe plus.
+- Nouveau menu **Mode debug → Enregistrer ma session** : plus besoin du lanceur `.bat`. Les
+  diagnostics s'activent, et à la fin le journal complet est rangé dans un zip à joindre au
+  rapport. Une session interrompue par un plantage est récupérée au lancement suivant.
+
+**Zelda Ocarina of Time**
+- Les arbres ne flottent plus en l'air dans la plaine d'Hyrule et ailleurs (Erable attend qu'un
+  shader soit prêt au lieu de sauter le dessin).
+
+## build-24
+
+**Banst Family devient Erable**
+- Le programme s'appelle maintenant erable.exe et ses données sont dans `%APPDATA%\erable`.
+  L'ancien dossier `%APPDATA%\banstdog` est déplacé automatiquement au premier lancement :
+  sauvegardes, réglages, clés et cache de shaders sont conservés.
+- Les anciens raccourcis vers banstdog.exe continuent de marcher : banstdog.exe ouvre erable.exe.
+- Le code aussi passe au nom Erable (dossiers, programmes, options de build). Les caches de
+  shaders déjà construits restent valables.
+- Le dépôt s'appelle maintenant github.com/erablesimu/erable.
+- Site erablesimu.github.io/erable, en français, anglais et allemand : téléchargement, tutoriels
+  (émulateur et jeux, avec un filtre par jeu), notes de version et formulaire pour signaler un
+  problème (Aide > À propos > Report an Issue y mène).
+- Page « Bugs » sur le site : les problèmes signalés, en cours ou fermés, filtrables par jeu et par
+  type, avec une recherche. La liste est enregistrée dans un fichier SQLite à chaque publication.
+- Les journaux s'appellent maintenant `erable_log.txt` (et `erable_crash.dmp`, `erable_gpu.log`).
+
+**Zelda Ocarina of Time**
 - Correction des zones sombres en forme de grille sur l'eau et le sol (ombres des lumières).
 - Génération d'images NVIDIA DLSS (2x à 4x) disponible comme type de génération d'images.
 
