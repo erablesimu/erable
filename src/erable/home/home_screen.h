@@ -59,6 +59,8 @@ signals:
     void OpenWhatsNew();
     void OpenCaptures();
     void ReportProblem();
+    /// The music was muted, unmuted or changed: saved at once, so a crash or a forced close keeps it.
+    void MusicSettingsChanged();
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;

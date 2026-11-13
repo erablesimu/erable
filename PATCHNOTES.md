@@ -15,6 +15,8 @@ version. Les sections suivantes gardent l'historique.
 - Le cache des effets précompilés est reconstruit quand ses réglages ou le jeu changent.
 
 **Divers**
+- Couper la musique de l'accueil (ou en changer) est enregistré tout de suite, même si Erable
+  est fermé de force ensuite.
 - Génération d'images Lossless Scaling sur les cartes graphiques sans calcul 16 bits (Lichii).
 - FSR 3.1 mis à jour (3.1.6).
 - Les programmes Windows portent leur nom et leur version (Propriétés > Détails), ce qui rassure

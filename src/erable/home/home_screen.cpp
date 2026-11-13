@@ -526,8 +526,12 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     music_button->setCheckable(true);
     music_button->setToolTip(tr("Home music"));
     connect(music_button, &QAbstractButton::toggled, this, [this](bool on) {
+        const bool changed = UISettings::values.home_music.GetValue() != on;
         UISettings::values.home_music = on;
         UpdateMusic();
+        if (changed) {
+            emit MusicSettingsChanged();
+        }
     });
     top->addWidget(music_button);
     song_button = new PillButton({}, {}, false, this);
@@ -539,6 +543,7 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         music.Stop();
         music_button->setChecked(true);
         UpdateMusic();
+        emit MusicSettingsChanged();
     });
     top->addWidget(song_button);
     top->addSpacing(10);

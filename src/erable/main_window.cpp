@@ -1003,6 +1003,7 @@ void MainWindow::InitializeWidgets() {
             [this](const QString& path) { OnGameListOpenPerGameProperties(path.toStdString()); });
     connect(home_screen, &HomeScreen::ShowLibrary, this, [this] { ShowHome(false); });
     connect(home_screen, &HomeScreen::OpenSettings, this, &MainWindow::OnConfigure);
+    connect(home_screen, &HomeScreen::MusicSettingsChanged, this, &MainWindow::OnSaveConfig);
     connect(home_screen, &HomeScreen::OpenWhatsNew, this, &MainWindow::OnWhatsNew);
     connect(home_screen, &HomeScreen::OpenCaptures, this, [] {
         const auto path = QString::fromStdString(
