@@ -11,7 +11,7 @@ const I18N = {
     "nav.report": "Signaler",
     "nav.tutorials": "Tutoriels",
     "nav.language": "Langue",
-    "footer.text": "Erable, l'émulateur Nintendo Switch 2 de la famille. Construit sur <a href=\"https://github.com/zortos293/Lichii\">Lichii</a>, sous licence GPL. Non affilié à Nintendo : jeux, clés et firmware viennent de votre propre console.",
+    "footer.text": "Erable, l'émulateur Nintendo Switch 2 de la famille. Logiciel libre sous licence GPL. Non affilié à Nintendo : jeux, clés et firmware viennent de votre propre console.",
     "footer.source": "Code source",
 
     "home.title": "Erable – l'émulateur Switch 2 de la famille",
@@ -138,7 +138,7 @@ const I18N = {
     "nav.report": "Report",
     "nav.tutorials": "Guides",
     "nav.language": "Language",
-    "footer.text": "Erable, the family's Nintendo Switch 2 emulator. Built on <a href=\"https://github.com/zortos293/Lichii\">Lichii</a>, licensed under the GPL. Not affiliated with Nintendo: games, keys and firmware come from your own console.",
+    "footer.text": "Erable, the family's Nintendo Switch 2 emulator. Free software under the GPL. Not affiliated with Nintendo: games, keys and firmware come from your own console.",
     "footer.source": "Source code",
 
     "home.title": "Erable – the family's Switch 2 emulator",
@@ -265,7 +265,7 @@ const I18N = {
     "nav.report": "Melden",
     "nav.tutorials": "Anleitungen",
     "nav.language": "Sprache",
-    "footer.text": "Erable, der Nintendo-Switch-2-Emulator der Familie. Basiert auf <a href=\"https://github.com/zortos293/Lichii\">Lichii</a>, lizenziert unter der GPL. Nicht mit Nintendo verbunden: Spiele, Schlüssel und Firmware stammen von deiner eigenen Konsole.",
+    "footer.text": "Erable, der Nintendo-Switch-2-Emulator der Familie. Freie Software unter der GPL. Nicht mit Nintendo verbunden: Spiele, Schlüssel und Firmware stammen von deiner eigenen Konsole.",
     "footer.source": "Quellcode",
 
     "home.title": "Erable – der Switch-2-Emulator der Familie",

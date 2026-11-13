@@ -46,10 +46,10 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;&amp;quot;Nintendo Switch&amp;quot; est une marque déposée de Nintendo. Erable n’est en aucun cas affilié à Nintendo.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <source>Erable is the family's Nintendo Switch 2 emulator. Built on Lichii.
+        <source>Erable is the family's Nintendo Switch 2 emulator. Free software under the GPL.
 
 This software should not be used to play games you have not legally obtained.</source>
-        <translation>Erable est l'émulateur Nintendo Switch 2 de la famille. Construit sur Lichii.
+        <translation>Erable est l'émulateur Nintendo Switch 2 de la famille. Logiciel libre sous licence GPL.
 
 Ce logiciel ne doit pas servir à jouer à des jeux que vous n'avez pas obtenus légalement.</translation>
     </message>
