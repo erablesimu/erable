@@ -6,7 +6,8 @@ run-name: >-
 # Entry point of every build. It decides what the run is (daily / rc / stable / branch), then calls
 # one reusable workflow per OS and a final one that publishes the GitHub release.
 #
-#   workflow_dispatch              build-N release from the default branch, or a branch build
+#   workflow_dispatch              build-N release from the default branch (N follows the run number
+#                                  and the highest build-N tag), or a branch build
 #                                  of another ref (pushes never start a build, to spare minutes)
 # (No scheduled daily build here, to spare Actions minutes: run a daily by hand when wanted.)
 #   pull_request + ci:build label  branch build of a same-repo PR, rebuilt on each push
