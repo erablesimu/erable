@@ -44,7 +44,7 @@ bool IsDarkTheme();
 /// The Erable theme (Lichii Dark recoloured), which has custom widgets and icons.
 bool IsErableStyle();
 
-/// The resource path of a Erable theme icon ("reset.png" -> ":/banst/icons/reset.png").
+/// The resource path of a Erable theme icon ("reset.png" -> ":/maple/icons/reset.png").
 QString StyleIcon(const QString& file);
 
 struct ContextualShortcut {
@@ -67,10 +67,10 @@ enum class Theme {
     DarkColorful,
     MidnightBlue,
     MidnightBlueColorful,
-    BanstFamily,
+    Erable,
 };
 
-static constexpr Theme default_theme{Theme::BanstFamily};
+static constexpr Theme default_theme{Theme::Erable};
 
 using Themes = std::array<std::pair<const char*, const char*>, 7>;
 extern const Themes themes;

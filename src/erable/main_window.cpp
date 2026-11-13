@@ -434,7 +434,7 @@ MainWindow::MainWindow(bool has_broken_vulkan)
     if (whats_new_pending) {
         UISettings::values.whats_new_version = WhatsNewDialog::Version;
         UISettings::values.theme =
-            UISettings::themes[static_cast<size_t>(UISettings::Theme::BanstFamily)].second;
+            UISettings::themes[static_cast<size_t>(UISettings::Theme::Erable)].second;
     }
     UpdateUITheme();
 
@@ -6166,7 +6166,7 @@ void MainWindow::filterBarSetChecked(bool state) {
 static void AdjustLinkColor() {
     QPalette new_pal(qApp->palette());
 
-    if (UISettings::values.theme == "banst")
+    if (UISettings::values.theme == "maple")
         new_pal.setColor(QPalette::Link, QColor(0xf2, 0x80, 0x3f));
     else if (UISettings::IsDarkTheme())
         new_pal.setColor(QPalette::Link, QColor(0, 190, 255, 255));
@@ -6179,7 +6179,7 @@ static void AdjustLinkColor() {
 
 // The Erable theme styles most widgets through its stylesheet; the palette covers what Qt
 // draws without one: item view text, disabled text, links and the native parts of dialogs.
-static QPalette BanstPalette() {
+static QPalette ErablePalette() {
     QPalette palette;
     const QColor window(0x1d, 0x1a, 0x16);
     const QColor surface(0x26, 0x23, 0x1f);
@@ -6282,19 +6282,20 @@ void MainWindow::UpdateUITheme() {
     if (current_theme.isEmpty())
         current_theme = default_theme;
 
-    // Lichii Dark, which builds before Erable had, became the Erable theme.
-    if (current_theme == QStringLiteral("lichii")) {
+    // Lichii Dark, which builds before Erable had, became the Erable theme; so did the theme's
+    // former folder name ("banst").
+    if (current_theme == QStringLiteral("lichii") || current_theme == QStringLiteral("banst")) {
         current_theme = default_theme;
         UISettings::values.theme = default_theme.toStdString();
     }
 
-    static bool banst_palette = false;
-    if (current_theme == QStringLiteral("banst")) {
-        qApp->setPalette(BanstPalette());
-        banst_palette = true;
-    } else if (banst_palette) {
+    static bool erable_palette = false;
+    if (current_theme == QStringLiteral("maple")) {
+        qApp->setPalette(ErablePalette());
+        erable_palette = true;
+    } else if (erable_palette) {
         qApp->setPalette(QPalette());
-        banst_palette = false;
+        erable_palette = false;
     }
 
 #ifdef _WIN32

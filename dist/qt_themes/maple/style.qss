@@ -109,11 +109,11 @@ QMenu::indicator {
 
 QMenu::indicator:non-exclusive:checked,
 QMenu::indicator:exclusive:checked {
-    image: url(:/banst/icons/check_on.png);
+    image: url(:/maple/icons/check_on.png);
 }
 
 QMenu::right-arrow {
-    image: url(:/banst/icons/chevron_right.png);
+    image: url(:/maple/icons/chevron_right.png);
     width: 12px;
     height: 12px;
     padding-right: 6px;
@@ -168,7 +168,7 @@ QPushButton:default:disabled {
 }
 
 QPushButton::menu-indicator {
-    image: url(:/banst/icons/chevron_down.png);
+    image: url(:/maple/icons/chevron_down.png);
     subcontrol-position: right center;
     subcontrol-origin: padding;
     right: 6px;
@@ -266,13 +266,13 @@ QComboBox::drop-down {
 }
 
 QComboBox::down-arrow {
-    image: url(:/banst/icons/chevron_down.png);
+    image: url(:/maple/icons/chevron_down.png);
     width: 12px;
     height: 12px;
 }
 
 QComboBox::down-arrow:disabled {
-    image: url(:/banst/icons/chevron_down_disabled.png);
+    image: url(:/maple/icons/chevron_down_disabled.png);
 }
 
 QComboBox QAbstractItemView {
@@ -322,25 +322,25 @@ QAbstractSpinBox::down-button {
 }
 
 QAbstractSpinBox::up-arrow {
-    image: url(:/banst/icons/chevron_up.png);
+    image: url(:/maple/icons/chevron_up.png);
     width: 10px;
     height: 10px;
 }
 
 QAbstractSpinBox::down-arrow {
-    image: url(:/banst/icons/chevron_down.png);
+    image: url(:/maple/icons/chevron_down.png);
     width: 10px;
     height: 10px;
 }
 
 QAbstractSpinBox::up-arrow:disabled,
 QAbstractSpinBox::up-arrow:off {
-    image: url(:/banst/icons/chevron_up_disabled.png);
+    image: url(:/maple/icons/chevron_up_disabled.png);
 }
 
 QAbstractSpinBox::down-arrow:disabled,
 QAbstractSpinBox::down-arrow:off {
-    image: url(:/banst/icons/chevron_down_disabled.png);
+    image: url(:/maple/icons/chevron_down_disabled.png);
 }
 
 QCalendarWidget QWidget {
@@ -368,33 +368,33 @@ QTableView::indicator {
 QCheckBox::indicator:unchecked,
 QGroupBox::indicator:unchecked,
 QAbstractItemView::indicator:unchecked {
-    image: url(:/banst/icons/check_off.png);
+    image: url(:/maple/icons/check_off.png);
 }
 
 QCheckBox::indicator:unchecked:hover,
 QGroupBox::indicator:unchecked:hover {
-    image: url(:/banst/icons/check_off_hover.png);
+    image: url(:/maple/icons/check_off_hover.png);
 }
 
 QCheckBox::indicator:checked,
 QGroupBox::indicator:checked,
 QAbstractItemView::indicator:checked {
-    image: url(:/banst/icons/check_on.png);
+    image: url(:/maple/icons/check_on.png);
 }
 
 QCheckBox::indicator:indeterminate,
 QAbstractItemView::indicator:indeterminate {
-    image: url(:/banst/icons/check_mixed.png);
+    image: url(:/maple/icons/check_mixed.png);
 }
 
 QCheckBox::indicator:unchecked:disabled,
 QGroupBox::indicator:unchecked:disabled {
-    image: url(:/banst/icons/check_off_disabled.png);
+    image: url(:/maple/icons/check_off_disabled.png);
 }
 
 QCheckBox::indicator:checked:disabled,
 QGroupBox::indicator:checked:disabled {
-    image: url(:/banst/icons/check_on_disabled.png);
+    image: url(:/maple/icons/check_on_disabled.png);
 }
 
 /* A setting that switches a feature on or off. ConfigurationShared::UseToggles marks them. */
@@ -404,23 +404,23 @@ QCheckBox[toggle="true"]::indicator {
 }
 
 QCheckBox[toggle="true"]::indicator:unchecked {
-    image: url(:/banst/icons/toggle_off.png);
+    image: url(:/maple/icons/toggle_off.png);
 }
 
 QCheckBox[toggle="true"]::indicator:unchecked:hover {
-    image: url(:/banst/icons/toggle_off_hover.png);
+    image: url(:/maple/icons/toggle_off_hover.png);
 }
 
 QCheckBox[toggle="true"]::indicator:checked {
-    image: url(:/banst/icons/toggle_on.png);
+    image: url(:/maple/icons/toggle_on.png);
 }
 
 QCheckBox[toggle="true"]::indicator:unchecked:disabled {
-    image: url(:/banst/icons/toggle_off_disabled.png);
+    image: url(:/maple/icons/toggle_off_disabled.png);
 }
 
 QCheckBox[toggle="true"]::indicator:checked:disabled {
-    image: url(:/banst/icons/toggle_on_disabled.png);
+    image: url(:/maple/icons/toggle_on_disabled.png);
 }
 
 QRadioButton::indicator {
@@ -429,23 +429,23 @@ QRadioButton::indicator {
 }
 
 QRadioButton::indicator:unchecked {
-    image: url(:/banst/icons/radio_off.png);
+    image: url(:/maple/icons/radio_off.png);
 }
 
 QRadioButton::indicator:unchecked:hover {
-    image: url(:/banst/icons/radio_off_hover.png);
+    image: url(:/maple/icons/radio_off_hover.png);
 }
 
 QRadioButton::indicator:checked {
-    image: url(:/banst/icons/radio_on.png);
+    image: url(:/maple/icons/radio_on.png);
 }
 
 QRadioButton::indicator:unchecked:disabled {
-    image: url(:/banst/icons/radio_off_disabled.png);
+    image: url(:/maple/icons/radio_off_disabled.png);
 }
 
 QRadioButton::indicator:checked:disabled {
-    image: url(:/banst/icons/radio_on_disabled.png);
+    image: url(:/maple/icons/radio_on_disabled.png);
 }
 
 /* Per-game settings: a value changed for this game, and its reset button. */
@@ -652,19 +652,19 @@ QTabBar::scroller {
 }
 
 QTabBar QToolButton::left-arrow {
-    image: url(:/banst/icons/chevron_left.png);
+    image: url(:/maple/icons/chevron_left.png);
 }
 
 QTabBar QToolButton::left-arrow:disabled {
-    image: url(:/banst/icons/chevron_left_disabled.png);
+    image: url(:/maple/icons/chevron_left_disabled.png);
 }
 
 QTabBar QToolButton::right-arrow {
-    image: url(:/banst/icons/chevron_right.png);
+    image: url(:/maple/icons/chevron_right.png);
 }
 
 QTabBar QToolButton::right-arrow:disabled {
-    image: url(:/banst/icons/chevron_right_disabled.png);
+    image: url(:/maple/icons/chevron_right_disabled.png);
 }
 
 /* Group boxes become section headers ------------------------------------ */
@@ -723,12 +723,12 @@ QTreeView::branch:selected {
 
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
-    image: url(:/banst/icons/chevron_right.png);
+    image: url(:/maple/icons/chevron_right.png);
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings {
-    image: url(:/banst/icons/chevron_down.png);
+    image: url(:/maple/icons/chevron_down.png);
 }
 
 QHeaderView {
@@ -750,13 +750,13 @@ QHeaderView::section:hover {
 }
 
 QHeaderView::down-arrow {
-    image: url(:/banst/icons/chevron_down.png);
+    image: url(:/maple/icons/chevron_down.png);
     width: 10px;
     height: 10px;
 }
 
 QHeaderView::up-arrow {
-    image: url(:/banst/icons/chevron_up.png);
+    image: url(:/maple/icons/chevron_up.png);
     width: 10px;
     height: 10px;
 }

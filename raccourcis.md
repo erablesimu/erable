@@ -66,4 +66,4 @@ Lignes à ajouter avant `start` selon le test :
 - Lancer un build : https://github.com/erablesimu/erable/actions/workflows/ci.yml
 - Versions publiées : https://github.com/erablesimu/erable/releases
 - Notes de version : `PATCHNOTES.md`
-- Pistes et mesures : `docs/banst-pistes.md`
+- Pistes et mesures : `docs/pistes.md`

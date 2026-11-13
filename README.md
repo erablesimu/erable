@@ -43,7 +43,7 @@ shaders, journaux et rapports de compatibilité.
 - Mises à jour automatiques depuis ce dépôt, notes de version lisibles et statut Discord.
 
 Le détail de chaque version est dans [PATCHNOTES.md](PATCHNOTES.md), et les mesures de
-performances dans [docs/banst-pistes.md](docs/banst-pistes.md).
+performances dans [docs/pistes.md](docs/pistes.md).
 
 ## Signaler un problème
 

@@ -73,24 +73,24 @@ const Themes themes{{
     {"Dark Colorful", "colorful_dark"},
     {"Midnight Blue", "qdarkstyle_midnight_blue"},
     {"Midnight Blue Colorful", "colorful_midnight_blue"},
-    {"Erable", "banst"},
+    {"Erable", "maple"},
 }};
 
 bool IsDarkTheme() {
     const auto& theme = UISettings::values.theme;
     return theme == std::string("qdarkstyle") || theme == std::string("qdarkstyle_midnight_blue") ||
            theme == std::string("colorful_dark") ||
-           theme == std::string("colorful_midnight_blue") || theme == std::string("banst");
+           theme == std::string("colorful_midnight_blue") || theme == std::string("maple");
 }
 
 Values values = {};
 
 bool IsErableStyle() {
-    return values.theme == std::string("banst");
+    return values.theme == std::string("maple");
 }
 
 QString StyleIcon(const QString& file) {
-    return QStringLiteral(":/banst/icons/") + file;
+    return QStringLiteral(":/maple/icons/") + file;
 }
 
 Setting<u32, true>& CurrentGameIconSize() {

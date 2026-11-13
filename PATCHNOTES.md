@@ -77,9 +77,9 @@ version. Les sections suivantes gardent l'historique.
 
 ## build-25
 
-**Banst Family devient Erable (suite)**
+**Nouveau nom : Erable (suite)**
 - Cette version s'installe à la main (le zip de la page des versions, extrait par-dessus l'ancien
-  dossier). Recréez ensuite vos raccourcis vers erable.exe : banstdog.exe n'existe plus.
+  dossier). Recréez ensuite vos raccourcis vers erable.exe : l'ancien programme n'existe plus.
 - Nouveau menu **Mode debug → Enregistrer ma session** : plus besoin du lanceur `.bat`. Les
   diagnostics s'activent, et à la fin le journal complet est rangé dans un zip à joindre au
   rapport. Une session interrompue par un plantage est récupérée au lancement suivant.
@@ -90,11 +90,11 @@ version. Les sections suivantes gardent l'historique.
 
 ## build-24
 
-**Banst Family devient Erable**
+**Nouveau nom : Erable**
 - Le programme s'appelle maintenant erable.exe et ses données sont dans `%APPDATA%\erable`.
-  L'ancien dossier `%APPDATA%\banstdog` est déplacé automatiquement au premier lancement :
+  L'ancien dossier de données est déplacé automatiquement au premier lancement :
   sauvegardes, réglages, clés et cache de shaders sont conservés.
-- Les anciens raccourcis vers banstdog.exe continuent de marcher : banstdog.exe ouvre erable.exe.
+- Les anciens raccourcis continuent de marcher : l'ancien programme ouvre erable.exe.
 - Le code aussi passe au nom Erable (dossiers, programmes, options de build). Les caches de
   shaders déjà construits restent valables.
 - Le dépôt s'appelle maintenant github.com/erablesimu/erable.
