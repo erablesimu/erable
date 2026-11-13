@@ -6972,6 +6972,30 @@ Message de débogage :</translation>
         <source>Estimated Time %1</source>
         <translation>Temps Estimé %1</translation>
     </message>
+    <message>
+        <source>Tip: Ctrl + H brings you back to the home screen.</source>
+        <translation>Astuce : Ctrl + H ramène à l&apos;accueil.</translation>
+    </message>
+    <message>
+        <source>Tip: L + Plus + Minus on the controller closes the game.</source>
+        <translation>Astuce : L + Plus + Moins sur la manette ferme le jeu.</translation>
+    </message>
+    <message>
+        <source>Tip: F11 switches to full screen.</source>
+        <translation>Astuce : F11 passe en plein écran.</translation>
+    </message>
+    <message>
+        <source>Tip: put your games in Documents\Erable\Jeux and they show up on the home screen.</source>
+        <translation>Astuce : déposez vos jeux dans Documents\Erable\Jeux, ils apparaissent à l&apos;accueil.</translation>
+    </message>
+    <message>
+        <source>Tip: Spring Maple and Winter Maple are in Configure &gt; General &gt; Interface.</source>
+        <translation>Astuce : les thèmes Spring Maple et Winter Maple sont dans Configurer &gt; Général &gt; Interface.</translation>
+    </message>
+    <message>
+        <source>Tip: Debug mode &gt; Record my session saves a log to attach to a report.</source>
+        <translation>Astuce : Mode debug &gt; Enregistrer ma session crée un journal à joindre à un rapport.</translation>
+    </message>
 </context>
 <context>
     <name>Lobby</name>

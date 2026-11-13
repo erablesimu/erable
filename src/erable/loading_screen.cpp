@@ -13,12 +13,15 @@
 #include <QPixmap>
 #include <QPropertyAnimation>
 #include <QPushButton>
+#include <QStyle>
 #include <QApplication>
 #include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPainterPath>
+#include <QConicalGradient>
 #include <QRadialGradient>
+#include <array>
 #include <QVBoxLayout>
 #include <algorithm>
 #include <initializer_list>
@@ -141,6 +144,13 @@ LoadingScreen::LoadingScreen(QWidget* parent)
     game_title = new QLabel(this);
     game_title->setObjectName(QStringLiteral("game_title"));
     game_title->setAlignment(Qt::AlignHCenter);
+    tip = new QLabel(this);
+    tip->setObjectName(QStringLiteral("tip"));
+    tip->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    tip->setWordWrap(true);
+    tip->setFixedWidth(BarWidth + 80);
+    connect(&tip_timer, &QTimer::timeout, this, &LoadingScreen::NextTip);
+    tip_timer.setInterval(6500);
     percent = new QLabel(this);
     percent->setObjectName(QStringLiteral("percent"));
     percent->setAlignment(Qt::AlignRight | Qt::AlignBottom);
@@ -172,7 +182,7 @@ LoadingScreen::LoadingScreen(QWidget* parent)
     stage_box->setLayout(stage_row);
     column->addStretch(1);
     column->addWidget(game_icon, 0, Qt::AlignHCenter);
-    column->addSpacing(16);
+    column->addSpacing(30); // room for the ring around the icon
     column->addWidget(game_title, 0, Qt::AlignHCenter);
     column->addSpacing(30);
     column->addWidget(stage_box, 0, Qt::AlignHCenter);
@@ -181,6 +191,8 @@ LoadingScreen::LoadingScreen(QWidget* parent)
     column->addSpacing(8);
     ui->value->setFixedWidth(BarWidth);
     column->addWidget(ui->value, 0, Qt::AlignHCenter);
+    column->addSpacing(14);
+    column->addWidget(tip, 0, Qt::AlignHCenter);
     column->addSpacing(18);
     column->addWidget(skip_button, 0, Qt::AlignHCenter);
     column->addSpacing(18);
@@ -218,8 +230,10 @@ void LoadingScreen::ApplyTheme() {
 #LoadingScreen QLabel { color: %1; }
 #LoadingScreen QLabel#game_title { font-family: "%4"; font-size: 34px; }
 #LoadingScreen QLabel#stage { font-family: "%5"; font-size: 15px; color: %2; }
+#LoadingScreen QLabel#stage[centred="true"] { font-size: 18px; color: %1; }
 #LoadingScreen QLabel#percent { font-family: "%4"; font-size: 22px; color: %3; }
 #LoadingScreen QLabel#value { font-family: "%5"; font-size: 13px; color: %2; }
+#LoadingScreen QLabel#tip { font-family: "%5"; font-size: 14px; color: %2; }
 #LoadingScreen QProgressBar { background: rgba(255, 255, 255, 18); border: none; border-radius: 5px; }
 #LoadingScreen QProgressBar::chunk { border-radius: 5px; background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 %6, stop:1 %7); }
 #LoadingScreen QPushButton#skip { font-family: "%5"; font-size: 14px; color: %1; background: rgba(255, 255, 255, 14); border: 1px solid %3; border-radius: 17px; padding: 7px 26px; }
@@ -228,6 +242,20 @@ void LoadingScreen::ApplyTheme() {
 )")
                       .arg(text.name(), muted.name(), accent.name(), display, body,
                            accent.darker(135).name(), accent.lighter(125).name()));
+}
+
+void LoadingScreen::NextTip() {
+    static const std::array tips{
+        QT_TR_NOOP("Tip: Ctrl + H brings you back to the home screen."),
+        QT_TR_NOOP("Tip: L + Plus + Minus on the controller closes the game."),
+        QT_TR_NOOP("Tip: F11 switches to full screen."),
+        QT_TR_NOOP("Tip: put your games in Documents\\Erable\\Jeux and they show up on the home "
+                   "screen."),
+        QT_TR_NOOP("Tip: Spring Maple and Winter Maple are in Configure > General > Interface."),
+        QT_TR_NOOP("Tip: Debug mode > Record my session saves a log to attach to a report."),
+    };
+    tip->setText(tr(tips[tip_index % tips.size()]));
+    ++tip_index;
 }
 
 void LoadingScreen::showEvent(QShowEvent* event) {
@@ -305,8 +333,24 @@ void LoadingScreen::OnLoadProgress(VideoCore::LoadCallbackStage stage, std::size
         QSizePolicy policy = ui->progress_bar->sizePolicy();
         policy.setRetainSizeWhenHidden(true);
         ui->progress_bar->setSizePolicy(policy);
-        ui->progress_bar->setVisible(stage != VideoCore::LoadCallbackStage::Prepare);
+        ui->progress_bar->setVisible(stage != VideoCore::LoadCallbackStage::Prepare &&
+                                     stage != VideoCore::LoadCallbackStage::Complete);
         skip_button->setVisible(stage == VideoCore::LoadCallbackStage::Warm);
+        // Loading the game or launching it: a centred line, a ring and a moving light, and tips
+        indeterminate = stage == VideoCore::LoadCallbackStage::Prepare ||
+                        stage == VideoCore::LoadCallbackStage::Complete;
+        ui->stage->setAlignment((indeterminate ? Qt::AlignHCenter : Qt::AlignLeft) | Qt::AlignBottom);
+        ui->stage->setProperty("centred", indeterminate);
+        ui->stage->style()->unpolish(ui->stage);
+        ui->stage->style()->polish(ui->stage);
+        percent->setVisible(!indeterminate);
+        tip->setVisible(stage == VideoCore::LoadCallbackStage::Prepare);
+        if (stage == VideoCore::LoadCallbackStage::Prepare) {
+            NextTip();
+            tip_timer.start();
+        } else {
+            tip_timer.stop();
+        }
         skip_button->setEnabled(true);
         const bool building = stage == VideoCore::LoadCallbackStage::Build ||
                               stage == VideoCore::LoadCallbackStage::Warm;
@@ -423,6 +467,45 @@ void LoadingScreen::paintEvent(QPaintEvent* event) {
         painter.translate(x, y);
         painter.rotate(t * (20 + 40 * r2) * (leaf % 2 == 0 ? 1 : -1) + 360 * r1);
         painter.fillPath(MapleLeaf(size), QColor(accent.red(), accent.green(), accent.blue(), alpha));
+        painter.restore();
+    }
+
+    if (indeterminate) {
+        // Faded with the rest of the contents when the game appears
+        const double shown = opacity_effect->opacity();
+        // A ring around the game's icon, an arc of the accent turning on it
+        if (game_icon->isVisible()) {
+            const QRectF icon{QRectF(game_icon->mapTo(this, QPoint(0, 0)), game_icon->size())};
+            const QRectF ring = icon.adjusted(-14, -14, 14, 14);
+            painter.setBrush(Qt::NoBrush);
+            painter.setPen(QPen{QColor(255, 255, 255, static_cast<int>(20 * shown)), 4});
+            painter.drawRoundedRect(ring, ring.width() * 0.24, ring.width() * 0.24);
+            QConicalGradient sweep{ring.center(), -t * 220.0};
+            sweep.setColorAt(0, QColor(accent.red(), accent.green(), accent.blue(),
+                                       static_cast<int>(255 * shown)));
+            sweep.setColorAt(0.35, QColor(accent.red(), accent.green(), accent.blue(), 0));
+            sweep.setColorAt(1, QColor(accent.red(), accent.green(), accent.blue(), 0));
+            painter.setPen(QPen{QBrush{sweep}, 4, Qt::SolidLine, Qt::RoundCap});
+            painter.drawRoundedRect(ring, ring.width() * 0.24, ring.width() * 0.24);
+        }
+        // Where the bar goes: a track and a light moving along it
+        const QRectF bar{QRectF(ui->progress_bar->mapTo(this, QPoint(0, 0)),
+                                ui->progress_bar->size())};
+        QPainterPath track;
+        track.addRoundedRect(bar, bar.height() / 2, bar.height() / 2);
+        painter.setPen(Qt::NoPen);
+        painter.fillPath(track, QColor(255, 255, 255, static_cast<int>(18 * shown)));
+        const double run = std::fmod(t * 0.55, 1.0) * (bar.width() + bar.width() * 0.35) -
+                           bar.width() * 0.35;
+        QLinearGradient light{QPointF(bar.left() + run, 0),
+                              QPointF(bar.left() + run + bar.width() * 0.35, 0)};
+        light.setColorAt(0, QColor(accent.red(), accent.green(), accent.blue(), 0));
+        light.setColorAt(0.5, QColor(accent.red(), accent.green(), accent.blue(),
+                                     static_cast<int>(230 * shown)));
+        light.setColorAt(1, QColor(accent.red(), accent.green(), accent.blue(), 0));
+        painter.save();
+        painter.setClipPath(track);
+        painter.fillRect(bar, light);
         painter.restore();
     }
 

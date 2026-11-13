@@ -81,6 +81,8 @@ signals:
 private:
     /// Colours and fonts from the current theme (Maple, Spring Maple or Winter Maple).
     void ApplyTheme();
+    /// Shows the next of Erable's tips under the bar while the game loads.
+    void NextTip();
 
 #ifndef ERABLE_QT_MOVIE_MISSING
     std::unique_ptr<QMovie> animation;
@@ -97,6 +99,11 @@ private:
     QLabel* game_icon = nullptr;
     QLabel* game_title = nullptr;
     QLabel* percent = nullptr;
+    QLabel* tip = nullptr;
+    QTimer tip_timer;
+    int tip_index = 0;
+    /// Loading the game or launching it: no count to show, a ring and a moving light instead.
+    bool indeterminate = true;
     QTimer ambient_timer;
     QElapsedTimer ambient_clock;
     std::unique_ptr<QPropertyAnimation> fadeout_animation;

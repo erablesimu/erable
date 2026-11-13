@@ -19,6 +19,8 @@ version. Les sections suivantes gardent l'historique.
 - Nouvel écran de chargement aux couleurs du thème choisi (Maple, Spring Maple ou Winter Maple) :
   icône et nom du jeu au centre, barre fine avec le pourcentage, feuilles d'érable qui tombent
   doucement en fond.
+- Pendant le chargement du jeu (avant les shaders) : un anneau tourne autour de l'icône du jeu,
+  une lumière parcourt la barre et des astuces d'Erable défilent.
 - Le petit jeu des feuilles est refait : une vallée d'érables au crépuscule, des feuilles
   nervurées, un panier en osier qui penche quand il bouge, des étincelles et des points qui
   s'envolent à chaque prise. Feuille dorée (x5), séries jusqu'à x5, goutte de sirop d'érable qui
