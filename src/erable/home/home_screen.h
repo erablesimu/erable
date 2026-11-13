@@ -3,7 +3,10 @@
 
 #pragma once
 
+#include <set>
 #include <vector>
+
+#include <QElapsedTimer>
 
 #include <QPixmap>
 #include <QString>
@@ -15,13 +18,12 @@
 
 class ControllerNavigation;
 class GameList;
-class GameTile;
+class CaseShelf;
 class HintBar;
 class PillButton;
-class QHBoxLayout;
+class QNetworkAccessManager;
 class QLabel;
 class QMenu;
-class QScrollArea;
 
 namespace Core {
 class System;
@@ -78,6 +80,8 @@ private:
 
     void CollectGames();
     void RebuildTiles();
+    /// Puts the downloaded covers on the cases, and fetches the missing ones.
+    void FetchCovers();
     void Select(int index);
     void UpdateSelection();
     void UpdateProfile();
@@ -98,7 +102,6 @@ private:
     ControllerNavigation* controller = nullptr;
 
     std::vector<Game> games;
-    std::vector<GameTile*> tiles;
     int selected = 0;
     bool active = false;
     bool profile_checked = false;
@@ -110,8 +113,7 @@ private:
     QLabel* clock = nullptr;
     QLabel* title = nullptr;
     QLabel* meta = nullptr;
-    QScrollArea* scroll = nullptr;
-    QHBoxLayout* row = nullptr;
+    CaseShelf* shelf = nullptr;
     PillButton* play_button = nullptr;
     PillButton* settings_button = nullptr;
     PillButton* favorite_button = nullptr;
@@ -119,5 +121,9 @@ private:
     HintBar* hints = nullptr;
     QTimer status_timer;
     QTimer refresh_timer;
+    QTimer ambient_timer;
+    QElapsedTimer ambient_clock;
+    QNetworkAccessManager* covers = nullptr;
+    std::set<u64> covers_requested;
     HomeMusic music;
 };

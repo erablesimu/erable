@@ -9,6 +9,14 @@ version. Les sections suivantes gardent l'historique.
 - La fenêtre de mise à jour ne montre plus que ce qui a changé depuis votre version, build par
   build, au lieu de tout l'historique depuis le build 24.
 
+**Accueil en boîtiers**
+- Les jeux sont présentés comme des boîtiers Erable en 3D : le jeu choisi au centre, ses voisins
+  tournés vers lui, avec leur reflet. Ils glissent d'un jeu à l'autre (flèches, manette, molette
+  ou clic), et le nom du jeu s'affiche en grand dessous.
+- Fond animé : vagues de lumière et particules qui montent doucement.
+- Quand une image communautaire existe pour un jeu, elle est téléchargée une fois et gardée dans
+  `%APPDATA%\erable\cache\covers` ; sinon le boîtier utilise l'icône du jeu.
+
 **Moins de saccades (Lichii)**
 - Après le chargement, Erable prépare en arrière-plan tous les shaders mis de côté au démarrage,
   les plus récents d'abord, sans retarder ceux dont le jeu a besoin tout de suite.

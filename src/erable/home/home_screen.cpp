@@ -5,6 +5,10 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
+#include <cmath>
+#include <filesystem>
+#include <fstream>
 #include <set>
 #include <string>
 #include <utility>
@@ -23,12 +27,13 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QMenu>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
-#include <QScrollArea>
-#include <QScrollBar>
 #include <QStandardItemModel>
 #include <QStandardPaths>
 #include <QUrl>
@@ -40,6 +45,7 @@
 #include "core/core.h"
 #include "core/hle/service/acc/profile_manager.h"
 #include "erable/game/game_list.h"
+#include "erable/home/case_shelf.h"
 #include "erable/util/controller_navigation.h"
 #include "frontend_common/play_time_manager.h"
 #include "hid_core/frontend/emulated_controller.h"
@@ -290,98 +296,6 @@ private:
 
 /// One game: its picture with rounded corners and its title, larger and ringed in maple when
 /// selected.
-class GameTile : public QAbstractButton {
-public:
-    GameTile(const QString& title, const QPixmap& cover, bool favorite, bool add, QWidget* parent)
-        : QAbstractButton{parent}, cover_{cover}, favorite_{favorite}, add_{add} {
-        setText(title);
-        setAccessibleName(title);
-        setFixedSize(Box, Box);
-        setCursor(Qt::PointingHandCursor);
-        setFocusPolicy(Qt::NoFocus);
-    }
-
-    void SetSelected(bool selected) {
-        selected_ = selected;
-        update();
-    }
-
-    static constexpr int TileSize = 196;
-    static constexpr int Box = 236; ///< Room for the selected tile's growth and ring
-
-protected:
-    void paintEvent(QPaintEvent*) override {
-        QPainter painter{this};
-        painter.setRenderHint(QPainter::Antialiasing);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform);
-        const double side = selected_ && !add_ ? TileSize * 1.08 : TileSize;
-        const QRectF tile{(Box - side) / 2, (Box - side) / 2, side, side};
-        const double radius = 22;
-        if (selected_) {
-            painter.setPen(QPen{Bg, 4});
-            painter.setBrush(Qt::NoBrush);
-            painter.drawRoundedRect(tile.adjusted(-4, -4, 4, 4), radius + 4, radius + 4);
-            painter.setPen(QPen{Maple, 4});
-            painter.drawRoundedRect(tile.adjusted(-8, -8, 8, 8), radius + 8, radius + 8);
-        }
-        QPainterPath shape;
-        shape.addRoundedRect(tile, radius, radius);
-        if (add_) {
-            painter.setPen(QPen{Line, 3, Qt::DashLine});
-            painter.setBrush(Qt::NoBrush);
-            painter.drawPath(shape);
-            painter.setPen(Muted);
-            painter.setFont(MakeFont(HomeFonts().display, 46));
-            painter.drawText(tile.adjusted(0, 0, 0, -40), Qt::AlignCenter, QStringLiteral("+"));
-            painter.setFont(MakeFont(HomeFonts().display, 16));
-            painter.drawText(tile.adjusted(14, 76, -14, 0), Qt::AlignCenter | Qt::TextWordWrap,
-                             text());
-            return;
-        }
-        // Soft shadow under the tile
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(QColor{0, 0, 0, 70});
-        painter.drawRoundedRect(tile.translated(0, 8), radius, radius);
-        painter.save();
-        painter.setClipPath(shape);
-        if (cover_.isNull()) {
-            QLinearGradient fill{tile.topLeft(), tile.bottomRight()};
-            fill.setColorAt(0, MapleHi);
-            fill.setColorAt(1, Maple.darker(260));
-            painter.fillRect(tile, fill);
-            painter.fillPath(MapleLeaf(tile.center() - QPointF{0, 14}, side * 0.36),
-                             QColor{255, 255, 255, 40});
-        } else {
-            painter.drawPixmap(tile.toRect(), cover_);
-        }
-        // The title on a shade that keeps it readable over any picture
-        QLinearGradient shade{QPointF{0, tile.bottom() - 84}, QPointF{0, tile.bottom()}};
-        shade.setColorAt(0, QColor{0, 0, 0, 0});
-        shade.setColorAt(1, QColor{0, 0, 0, 200});
-        painter.fillRect(QRectF(tile.left(), tile.bottom() - 84, tile.width(), 84), shade);
-        painter.setPen(Qt::white);
-        painter.setFont(MakeFont(HomeFonts().display, 15));
-        painter.drawText(tile.adjusted(12, 0, -12, -10),
-                         Qt::AlignLeft | Qt::AlignBottom | Qt::TextWordWrap, text());
-        painter.restore();
-        if (favorite_) {
-            const QRectF badge{tile.right() - 36, tile.top() + 10, 26, 26};
-            painter.setPen(Qt::NoPen);
-            painter.setBrush(QColor{0, 0, 0, 110});
-            painter.drawEllipse(badge);
-            painter.setPen(QColor{0xff, 0xd3, 0x6b});
-            painter.setFont(MakeFont(HomeFonts().body, 14));
-            painter.drawText(badge, Qt::AlignCenter, QStringLiteral("★"));
-        }
-    }
-
-private:
-    QPixmap cover_;
-    bool favorite_;
-    bool add_;
-    bool selected_ = false;
-};
-
 /// A round dock button: a line icon in a circle, its name below.
 class DockButton : public QAbstractButton {
 public:
@@ -556,14 +470,25 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     top->addWidget(clock);
     layout->addLayout(top);
 
-    // The selected game
-    layout->addSpacing(10);
+    // The games as a shelf of cases, the selected one's name under it
+    shelf = new CaseShelf(fonts.display, fonts.body, this);
+    connect(shelf, &CaseShelf::Clicked, this, [this](int index) {
+        if (index == selected) {
+            Launch();
+        } else {
+            Select(index);
+        }
+    });
+    connect(shelf, &CaseShelf::SelectionRequested, this, &HomeScreen::Select);
+    layout->addWidget(shelf, 1);
     title = new QLabel(this);
-    title->setFont(MakeFont(fonts.display, 36));
+    title->setFont(MakeFont(fonts.display, 40));
+    title->setAlignment(Qt::AlignHCenter);
     title->setWordWrap(true);
     meta = new QLabel(this);
     meta->setFont(MakeFont(fonts.body, 15, QFont::DemiBold));
     meta->setTextFormat(Qt::RichText);
+    meta->setAlignment(Qt::AlignHCenter);
     for (QLabel* label : {controller_label, clock, title, meta}) {
         QPalette palette = label->palette();
         palette.setColor(QPalette::WindowText, label == meta || label == controller_label ? Muted : Text);
@@ -571,23 +496,6 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     }
     layout->addWidget(title);
     layout->addWidget(meta);
-
-    // The row of tiles; the selected one is kept in view, without a scroll bar
-    scroll = new QScrollArea(this);
-    scroll->setWidgetResizable(true);
-    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scroll->setFixedHeight(GameTile::Box + 8);
-    scroll->setFocusPolicy(Qt::NoFocus);
-    scroll->setFrameShape(QFrame::NoFrame);
-    auto* row_widget = new QWidget(scroll);
-    row_widget->setAutoFillBackground(false);
-    row = new QHBoxLayout(row_widget);
-    row->setContentsMargins(0, 4, 0, 4);
-    row->setSpacing(0);
-    scroll->setWidget(row_widget);
-    scroll->viewport()->setAutoFillBackground(false);
-    layout->addWidget(scroll);
 
     // The selected game's actions, with their controller buttons
     auto* actions = new QHBoxLayout;
@@ -600,12 +508,13 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     connect(favorite_button, &QAbstractButton::clicked, this, &HomeScreen::ToggleFavorite);
     report_button = new PillButton(tr("Report a problem"), QStringLiteral("−"), false, this);
     connect(report_button, &QAbstractButton::clicked, this, &HomeScreen::ReportProblem);
+    actions->addStretch();
     for (PillButton* button : {play_button, settings_button, favorite_button, report_button}) {
         actions->addWidget(button);
     }
     actions->addStretch();
     layout->addLayout(actions);
-    layout->addStretch();
+    layout->addSpacing(8);
 
     // Dock of round buttons
     auto* dock = new QHBoxLayout;
@@ -671,6 +580,12 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     connect(model, &QStandardItemModel::modelReset, this, [this] { refresh_timer.start(); });
     connect(model, &QStandardItemModel::dataChanged, this, [this] { refresh_timer.start(); });
 
+    // The background drifts: slow waves of light and a few floating specks.
+    ambient_timer.setInterval(33);
+    connect(&ambient_timer, &QTimer::timeout, this, [this] { update(); });
+    ambient_clock.start();
+    covers = new QNetworkAccessManager(this);
+
     music_button->setChecked(UISettings::values.home_music.GetValue());
     UpdateMusic();
     UpdateProfile();
@@ -700,15 +615,120 @@ void HomeScreen::SetActive(bool active_) {
 
 void HomeScreen::StopMusic() {
     music.Stop();
+    ambient_timer.stop();
 }
 
 void HomeScreen::paintEvent(QPaintEvent*) {
     QPainter painter{this};
+    painter.setRenderHint(QPainter::Antialiasing);
     painter.fillRect(rect(), Bg);
-    QRadialGradient glow{QPointF(width() * 0.5, -height() * 0.1), width() * 0.75};
-    glow.setColorAt(0, BgGlow);
+    QRadialGradient glow{QPointF(width() * 0.5, height() * 0.42), width() * 0.7};
+    glow.setColorAt(0, QColor{0x4a, 0x24, 0x14});
+    glow.setColorAt(0.55, BgGlow);
     glow.setColorAt(1, Bg);
     painter.fillRect(rect(), glow);
+
+    // Slow waves of light across the room, and specks drifting up
+    const double t = ambient_clock.isValid() ? ambient_clock.elapsed() / 1000.0 : 0.0;
+    const double w = width();
+    const double h = height();
+    for (int wave = 0; wave < 5; ++wave) {
+        QPainterPath path;
+        const double base = h * (0.22 + wave * 0.13);
+        const double amplitude = h * (0.035 + 0.012 * wave);
+        const double speed = 0.12 + 0.05 * wave;
+        for (int step = 0; step <= 48; ++step) {
+            const double x = w * step / 48.0;
+            const double y = base + amplitude * std::sin(x / w * 6.283 * (0.8 + 0.25 * wave) +
+                                                         t * speed + wave * 1.7);
+            if (step == 0) {
+                path.moveTo(x, y);
+            } else {
+                path.lineTo(x, y);
+            }
+        }
+        QLinearGradient stroke{QPointF(0, 0), QPointF(w, 0)};
+        const int alpha = 44 - wave * 5;
+        stroke.setColorAt(0, QColor{MapleHi.red(), MapleHi.green(), MapleHi.blue(), 0});
+        stroke.setColorAt(0.5, QColor{MapleHi.red(), MapleHi.green(), MapleHi.blue(), alpha});
+        stroke.setColorAt(1, QColor{MapleHi.red(), MapleHi.green(), MapleHi.blue(), 0});
+        painter.setPen(QPen{QBrush{stroke}, 2.0 + wave * 0.6});
+        painter.setBrush(Qt::NoBrush);
+        painter.drawPath(path);
+    }
+    painter.setPen(Qt::NoPen);
+    for (int speck = 0; speck < 42; ++speck) {
+        // Fixed pseudo-random places, each rising at its own pace and wrapping round
+        const double seed = std::sin(speck * 12.9898) * 43758.5453;
+        const double r1 = seed - std::floor(seed);
+        const double r2 = std::fmod(r1 * 91.7, 1.0);
+        const double rise = std::fmod(r2 + t * (0.006 + 0.01 * r1), 1.0);
+        const double x = w * r1 + std::sin(t * 0.4 + speck) * 8;
+        const double y = h * (1.0 - rise);
+        const double radius = 1.0 + 1.6 * r2;
+        const int alpha = static_cast<int>(40 + 60 * std::sin(rise * 3.1416));
+        painter.setBrush(QColor{0xff, 0xd9, 0xb8, alpha});
+        painter.drawEllipse(QPointF(x, y), radius, radius);
+    }
+}
+
+void HomeScreen::FetchCovers() {
+    // Covers the community made for Erable-family emulators, by title ID; kept on disk once
+    // fetched. A game without one keeps the icon from its own files.
+    const auto dir = Common::FS::GetEdenPath(Common::FS::EdenPath::CacheDir) / "covers";
+    std::error_code ec;
+    std::filesystem::create_directories(dir, ec);
+    for (std::size_t i = 0; i < games.size(); ++i) {
+        const u64 id = games[i].program_id;
+        if (id == 0) {
+            continue;
+        }
+        const auto name = fmt::format("{:016X}", id);
+        const auto file = dir / (name + ".png");
+        if (std::filesystem::exists(file, ec)) {
+            QPixmap art;
+            if (art.load(QString::fromStdWString(file.wstring()))) {
+                games[i].cover = art;
+                shelf->SetArt(static_cast<int>(i), art);
+            }
+            continue;
+        }
+        // Asked once a session; a title without a cover is asked again a week later.
+        const auto missing = dir / (name + ".none");
+        const auto checked = std::filesystem::last_write_time(missing, ec);
+        if ((!ec && std::filesystem::file_time_type::clock::now() - checked < std::chrono::days{7}) ||
+            !covers_requested.insert(id).second) {
+            ec.clear();
+            continue;
+        }
+        QNetworkRequest request{QUrl{
+            QStringLiteral("https://raw.githubusercontent.com/mushymeow/eglantine-covers/main/%1.png")
+                .arg(QString::fromStdString(name))}};
+        request.setTransferTimeout(8000);
+        QNetworkReply* reply = covers->get(request);
+        connect(reply, &QNetworkReply::finished, this, [this, reply, id, file, missing] {
+            reply->deleteLater();
+            const int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+            if (status == 404) {
+                std::ofstream{missing};
+                return;
+            }
+            QPixmap art;
+            const QByteArray bytes = reply->readAll();
+            if (reply->error() != QNetworkReply::NoError || !art.loadFromData(bytes, "PNG")) {
+                return;
+            }
+            // Kept at a size the shelf can use, not the full download
+            art = art.scaled(512, 512, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            art.save(QString::fromStdWString(file.wstring()), "PNG");
+            for (std::size_t index = 0; index < games.size(); ++index) {
+                if (games[index].program_id == id) {
+                    games[index].cover = art;
+                    shelf->SetArt(static_cast<int>(index), art);
+                }
+            }
+        });
+    }
 }
 
 void HomeScreen::UpdateMusic() {
@@ -718,10 +738,16 @@ void HomeScreen::UpdateMusic() {
     music_button->updateGeometry();
     song_button->setText(QStringLiteral("%1/%2").arg(song + 1).arg(HomeMusic::SongCount));
     song_button->updateGeometry();
-    if (on && active && isVisible() && !system.IsPoweredOn()) {
+    const bool shown = active && isVisible() && !system.IsPoweredOn();
+    if (on && shown) {
         music.Play(song);
     } else {
         music.Stop();
+    }
+    if (shown) {
+        ambient_timer.start();
+    } else {
+        ambient_timer.stop();
     }
 }
 
@@ -788,53 +814,31 @@ void HomeScreen::RebuildTiles() {
     if (selected < static_cast<int>(games.size())) {
         selected_path = games[selected].path;
     }
-    for (GameTile* tile : tiles) {
-        tile->deleteLater();
-    }
-    tiles.clear();
-    while (QLayoutItem* item = row->takeAt(0)) {
-        delete item;
-    }
-    for (std::size_t i = 0; i < games.size(); ++i) {
-        auto* tile = new GameTile(games[i].title, games[i].cover, games[i].favorite, false, this);
-        connect(tile, &QAbstractButton::clicked, this, [this, i] {
-            if (selected == static_cast<int>(i)) {
-                Launch();
-            } else {
-                Select(static_cast<int>(i));
-            }
-        });
-        row->addWidget(tile);
-        tiles.push_back(tile);
-    }
-    auto* add = new GameTile(tr("Add games"), {}, false, true, this);
-    connect(add, &QAbstractButton::clicked, this, &HomeScreen::OpenGamesFolder);
-    row->addWidget(add);
-    tiles.push_back(add);
-    row->addStretch();
-
     selected = 0;
     for (std::size_t i = 0; i < games.size(); ++i) {
         if (games[i].path == selected_path) {
             selected = static_cast<int>(i);
         }
     }
+    std::vector<CaseShelf::Entry> entries;
+    entries.reserve(games.size() + 1);
+    for (const Game& game : games) {
+        entries.push_back({.title = game.title, .art = game.cover, .favorite = game.favorite});
+    }
+    entries.push_back({.title = tr("Add games"), .add = true});
+    shelf->SetEntries(std::move(entries), selected);
+    FetchCovers();
     UpdateSelection();
 }
 
 void HomeScreen::Select(int index) {
-    const int count = static_cast<int>(tiles.size());
+    const int count = static_cast<int>(games.size()) + 1;
     selected = std::clamp(index, 0, count - 1);
     UpdateSelection();
 }
 
 void HomeScreen::UpdateSelection() {
-    for (std::size_t i = 0; i < tiles.size(); ++i) {
-        tiles[i]->SetSelected(static_cast<int>(i) == selected);
-    }
-    if (selected < static_cast<int>(tiles.size())) {
-        scroll->ensureWidgetVisible(tiles[selected], GameTile::Box, 0);
-    }
+    shelf->SetSelected(selected);
     const bool is_game = selected < static_cast<int>(games.size());
     for (PillButton* button : {play_button, settings_button, favorite_button, report_button}) {
         button->setEnabled(is_game || button == report_button);

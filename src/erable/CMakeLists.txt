@@ -27,6 +27,8 @@ add_executable(erable
     compatibility_report.h
     debug_session.cpp
     debug_session.h
+    home/case_shelf.cpp
+    home/case_shelf.h
     home/home_music.cpp
     home/home_music.h
     home/home_screen.cpp
