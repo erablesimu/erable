@@ -61,6 +61,10 @@ version. Les sections suivantes gardent l'historique.
 - Quand une image communautaire existe pour un jeu, elle est téléchargée une fois et gardée dans
   `%APPDATA%\erable\cache\covers` ; sinon le boîtier utilise l'icône du jeu.
 
+**Chargements de zone**
+- Les blocs de mémoire vidéo libérés sont gardés 30 secondes et réutilisés au lieu d'être rendus au
+  pilote puis redemandés : les entrées de zone d'Ocarina en demandaient des centaines d'un coup.
+
 **Moins de saccades (Lichii)**
 - En entrant dans une zone, les petites textures d'un même dessin sont remplies ensemble sur
   plusieurs cœurs du processeur au lieu d'une par une (Ocarina en crée plus de 2 000 à

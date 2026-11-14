@@ -12,11 +12,13 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <mutex>
 #include <optional>
 #include <string_view>
 #include <thread>
 #include "common/container/unordered_map.h"
 #include "common/container/unordered_set.h"
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -456,6 +458,137 @@ u64 AllocatedUsage(VkDeviceSize driver_usage, const VmaBudget& vma_budget) {
 PFN_vkAllocateMemory g_vma_allocate_memory{};
 PFN_vkFreeMemory g_vma_free_memory{};
 
+/// Blocks VMA gives back are kept for a while and handed out again for the same request: a zone
+/// load in Ocarina of Time asked the driver for hundreds of 16 MiB blocks in one frame (0.9 s of
+/// a 16-minute session), many of them blocks the texture collector had just emptied. Only device
+/// memory no one maps (VMA would map a kept host-visible block a second time) and requests that
+/// carry nothing but flags or a priority; at most KeptPerType blocks a type, each for KeepSeconds.
+class KeptBlocks {
+public:
+    static constexpr std::size_t KeptPerType = 8;
+    static constexpr auto KeepSeconds = std::chrono::seconds{30};
+
+    void SetMemoryTypes(const VkPhysicalDeviceMemoryProperties& properties) {
+        std::scoped_lock lock{mutex};
+        for (u32 type = 0; type < properties.memoryTypeCount && type < VK_MAX_MEMORY_TYPES; ++type) {
+            keepable[type] = (properties.memoryTypes[type].propertyFlags &
+                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) == 0;
+        }
+    }
+
+    /// A kept block for the request, or VK_NULL_HANDLE.
+    VkDeviceMemory Take(VkDevice device, const VkMemoryAllocateInfo& info) {
+        const auto key = KeyOf(info);
+        if (!key) {
+            return VK_NULL_HANDLE;
+        }
+        std::scoped_lock lock{mutex};
+        Trim(device);
+        for (auto it = kept.begin(); it != kept.end(); ++it) {
+            if (it->key == *key) {
+                const VkDeviceMemory memory = it->memory;
+                kept.erase(it);
+                owned.emplace(memory, *key);
+                ++reused;
+                return memory;
+            }
+        }
+        return VK_NULL_HANDLE;
+    }
+
+    /// Remembers a block the driver gave, so that freeing it can keep it.
+    void Note(VkDeviceMemory memory, const VkMemoryAllocateInfo& info) {
+        if (const auto key = KeyOf(info)) {
+            std::scoped_lock lock{mutex};
+            owned.emplace(memory, *key);
+        }
+    }
+
+    /// True when the block is kept instead of freed.
+    bool Keep(VkDevice device, VkDeviceMemory memory) {
+        std::scoped_lock lock{mutex};
+        Trim(device);
+        const auto it = owned.find(memory);
+        if (it == owned.end()) {
+            return false;
+        }
+        const Key key = it->second;
+        owned.erase(it);
+        const auto same_type = std::ranges::count_if(
+            kept, [&](const Entry& entry) { return entry.key.type == key.type; });
+        if (static_cast<std::size_t>(same_type) >= KeptPerType) {
+            return false;
+        }
+        kept.push_back({key, memory, std::chrono::steady_clock::now()});
+        return true;
+    }
+
+    /// Gives every kept block back (the allocator is going away).
+    void Drain(VkDevice device) {
+        std::scoped_lock lock{mutex};
+        for (const Entry& entry : kept) {
+            g_vma_free_memory(device, entry.memory, nullptr);
+        }
+        if (reused != 0) {
+            LOG_INFO(Render_Vulkan, "Device memory blocks reused instead of allocated: {}", reused);
+        }
+        kept.clear();
+        owned.clear();
+    }
+
+private:
+    struct Key {
+        VkDeviceSize size;
+        u32 type;
+        VkMemoryAllocateFlags flags;
+        float priority;
+        bool operator==(const Key&) const = default;
+    };
+    struct Entry {
+        Key key;
+        VkDeviceMemory memory;
+        std::chrono::steady_clock::time_point since;
+    };
+
+    std::optional<Key> KeyOf(const VkMemoryAllocateInfo& info) const {
+        if (info.memoryTypeIndex >= VK_MAX_MEMORY_TYPES || !keepable[info.memoryTypeIndex] ||
+            info.allocationSize > 16u * 1024u * 1024u) {
+            return std::nullopt;
+        }
+        Key key{info.allocationSize, info.memoryTypeIndex, 0, -1.0f};
+        for (auto* next = static_cast<const VkBaseInStructure*>(info.pNext); next != nullptr;
+             next = next->pNext) {
+            if (next->sType == VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO) {
+                key.flags = reinterpret_cast<const VkMemoryAllocateFlagsInfo*>(next)->flags;
+            } else if (next->sType == VK_STRUCTURE_TYPE_MEMORY_PRIORITY_ALLOCATE_INFO_EXT) {
+                key.priority = reinterpret_cast<const VkMemoryPriorityAllocateInfoEXT*>(next)->priority;
+            } else {
+                return std::nullopt; // dedicated, exported or imported memory: never kept
+            }
+        }
+        return key;
+    }
+
+    void Trim(VkDevice device) {
+        const auto now = std::chrono::steady_clock::now();
+        std::erase_if(kept, [&](const Entry& entry) {
+            if (now - entry.since < KeepSeconds) {
+                return false;
+            }
+            g_vma_free_memory(device, entry.memory, nullptr);
+            return true;
+        });
+    }
+
+    std::mutex mutex;
+    std::array<bool, VK_MAX_MEMORY_TYPES> keepable{};
+    std::vector<Entry> kept;
+    std::unordered_map<VkDeviceMemory, Key> owned;
+    u64 reused = 0;
+};
+
+KeptBlocks g_kept_blocks;
+
 VKAPI_ATTR VkResult VKAPI_CALL TimedAllocateMemory(VkDevice device,
                                                    const VkMemoryAllocateInfo* allocate_info,
                                                    const VkAllocationCallbacks* allocator,
@@ -465,16 +598,27 @@ VKAPI_ATTR VkResult VKAPI_CALL TimedAllocateMemory(VkDevice device,
     // Blocks images and buffers share are 16 MiB at most; larger ones are memory of their own
     // (images over 8 MiB, big staging buffers): which of the two zone loads wait for.
     constexpr VkDeviceSize BlockSize = 16u * 1024u * 1024u;
+    if (const VkDeviceMemory kept = g_kept_blocks.Take(device, *allocate_info)) {
+        *memory = kept;
+        return VK_SUCCESS;
+    }
     std::optional<SiteScope> big_site;
     if (allocate_info->allocationSize > BlockSize) {
         big_site.emplace(Site::MemoryAllocateBig);
     }
-    return g_vma_allocate_memory(device, allocate_info, allocator, memory);
+    const VkResult result = g_vma_allocate_memory(device, allocate_info, allocator, memory);
+    if (result == VK_SUCCESS) {
+        g_kept_blocks.Note(*memory, *allocate_info);
+    }
+    return result;
 }
 
 VKAPI_ATTR void VKAPI_CALL TimedFreeMemory(VkDevice device, VkDeviceMemory memory,
                                            const VkAllocationCallbacks* allocator) {
     using namespace VideoCommon::StutterTrace;
+    if (g_kept_blocks.Keep(device, memory)) {
+        return;
+    }
     const SiteScope site{Site::MemoryFree};
     g_vma_free_memory(device, memory, allocator);
 }
@@ -959,6 +1103,7 @@ Device::Device(VkInstance instance_, vk::PhysicalDevice physical_, VkSurfaceKHR 
     VmaVulkanFunctions functions{};
     functions.vkGetInstanceProcAddr = dld.vkGetInstanceProcAddr;
     functions.vkGetDeviceProcAddr = dld.vkGetDeviceProcAddr;
+    g_kept_blocks.SetMemoryTypes(physical.GetMemoryProperties().memoryProperties);
     g_vma_allocate_memory = dld.vkAllocateMemory;
     g_vma_free_memory = dld.vkFreeMemory;
     functions.vkAllocateMemory = TimedAllocateMemory;
@@ -1028,6 +1173,7 @@ Device::~Device() {
         }
     }
     vmaDestroyAllocator(allocator);
+    g_kept_blocks.Drain(*logical);
 }
 
 VideoCommon::Fsr4PortDevice Device::Fsr4PortDevice() const {
