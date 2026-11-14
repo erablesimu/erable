@@ -388,6 +388,93 @@ private:
     Icon icon_;
 };
 
+/// Over the home while a game starts: the game's picture, its name and a turning ring, so the
+/// few seconds Erable spends opening the game, applying its settings and starting Vulkan (with
+/// the window unable to repaint) read as loading, not as a crash.
+class LaunchOverlay : public QWidget {
+public:
+    explicit LaunchOverlay(QWidget* parent) : QWidget{parent} {
+        setAttribute(Qt::WA_TransparentForMouseEvents, false);
+        hide();
+        timer.setInterval(16);
+        QObject::connect(&timer, &QTimer::timeout, this, [this] { update(); });
+    }
+
+    void Start(const QString& title, const QString& subtitle, const QPixmap& cover) {
+        title_ = title;
+        subtitle_ = subtitle;
+        cover_ = cover;
+        clock.start();
+        setGeometry(parentWidget()->rect());
+        raise();
+        show();
+        timer.start();
+        // Painted now: what comes next keeps the event loop busy for a while.
+        repaint();
+    }
+
+    void Stop() {
+        timer.stop();
+        hide();
+    }
+
+protected:
+    void paintEvent(QPaintEvent*) override {
+        QPainter painter{this};
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.fillRect(rect(), QColor(Bg.red(), Bg.green(), Bg.blue(), 215));
+        const QPointF centre = QRectF(rect()).center() - QPointF(0, height() * 0.06);
+        const double size = std::clamp(height() * 0.2, 90.0, 180.0);
+        const QRectF art{centre.x() - size / 2, centre.y() - size / 2, size, size};
+
+        // The picture (or a maple disc), with a ring turning around it
+        QPainterPath round;
+        round.addEllipse(art);
+        if (!cover_.isNull()) {
+            painter.save();
+            painter.setClipPath(round);
+            painter.setRenderHint(QPainter::SmoothPixmapTransform);
+            const QPixmap scaled = cover_.scaled(art.size().toSize(), Qt::KeepAspectRatioByExpanding,
+                                                 Qt::SmoothTransformation);
+            painter.drawPixmap(art.topLeft(), scaled,
+                               QRectF((scaled.width() - art.width()) / 2,
+                                      (scaled.height() - art.height()) / 2, art.width(),
+                                      art.height()));
+            painter.restore();
+        } else {
+            painter.fillPath(round, Surface);
+        }
+        const double seconds = static_cast<double>(clock.elapsed()) / 1000.0;
+        const QRectF ring = art.adjusted(-10, -10, 10, 10);
+        painter.setPen(QPen{QColor(Line.red(), Line.green(), Line.blue(), 160), 4.0});
+        painter.setBrush(Qt::NoBrush);
+        painter.drawEllipse(ring);
+        QConicalGradient sweep{ring.center(), -seconds * 300.0};
+        sweep.setColorAt(0.0, MapleHi);
+        sweep.setColorAt(0.35, Maple);
+        sweep.setColorAt(0.36, QColor(0, 0, 0, 0));
+        sweep.setColorAt(1.0, QColor(0, 0, 0, 0));
+        painter.setPen(QPen{QBrush{sweep}, 5.0, Qt::SolidLine, Qt::RoundCap});
+        painter.drawEllipse(ring);
+
+        // The name and what is happening
+        const QRectF text_area{0, ring.bottom() + 26, static_cast<double>(width()), 40};
+        painter.setPen(Text);
+        painter.setFont(MakeFont(HomeFonts().display, 28));
+        painter.drawText(text_area, Qt::AlignHCenter | Qt::AlignTop, title_);
+        painter.setPen(Muted);
+        painter.setFont(MakeFont(HomeFonts().body, 15));
+        painter.drawText(text_area.translated(0, 44), Qt::AlignHCenter | Qt::AlignTop, subtitle_);
+    }
+
+private:
+    QString title_;
+    QString subtitle_;
+    QPixmap cover_;
+    QElapsedTimer clock;
+    QTimer timer;
+};
+
 /// The maple leaf and the name, centred in the top bar.
 class BrandMark : public QWidget {
 public:
@@ -645,7 +732,14 @@ void HomeScreen::SetDebugMenu(QMenu* menu) {
     debug_menu = menu;
 }
 
+void HomeScreen::HideLaunching() {
+    if (launch_overlay != nullptr) {
+        launch_overlay->Stop();
+    }
+}
+
 void HomeScreen::SetActive(bool active_) {
+    HideLaunching();
     active = active_;
     setVisible(active);
     if (active) {
@@ -976,7 +1070,12 @@ void HomeScreen::UpdateSelection() {
 void HomeScreen::Launch() {
     if (selected < static_cast<int>(games.size())) {
         music.Stop();
-        emit LaunchGame(games[selected].path, games[selected].program_id);
+        const Game& game = games[selected];
+        if (launch_overlay == nullptr) {
+            launch_overlay = new LaunchOverlay(this);
+        }
+        launch_overlay->Start(game.title, tr("Starting the game..."), game.cover);
+        emit LaunchGame(game.path, game.program_id);
     } else {
         OpenGamesFolder();
     }

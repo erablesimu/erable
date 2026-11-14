@@ -21,6 +21,7 @@ class ControllerNavigation;
 class GameList;
 class CaseShelf;
 class PillButton;
+class LaunchOverlay;
 class QNetworkAccessManager;
 class QLabel;
 class QLineEdit;
@@ -53,6 +54,9 @@ public:
 
     /// Takes the colours of the theme just applied (the palette MainWindow set).
     void RefreshTheme();
+
+    /// Takes away the "Starting the game..." overlay a launch from the home put up.
+    void HideLaunching();
 
     /// Whether the window fills the screen: the full screen button says how to leave it.
     void SetFullscreen(bool fullscreen);
@@ -130,6 +134,7 @@ private:
     PillButton* style_button = nullptr;
     PillButton* theme_button = nullptr;
     PillButton* fullscreen_button = nullptr;
+    LaunchOverlay* launch_overlay = nullptr;
     QLabel* controller_label = nullptr;
     QLabel* clock = nullptr;
     QLabel* title = nullptr;

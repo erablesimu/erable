@@ -9,6 +9,9 @@ version. Les sections suivantes gardent l'historique.
 - Bouton « Plein écran » en haut à droite de l'accueil (ou touche F11) : l'accueil et la
   bibliothèque remplissent l'écran, sans menus. « Fenêtre » revient comme avant. Le choix est
   gardé ; pendant une partie, c'est le réglage plein écran du jeu qui décide.
+- Au lancement d'un jeu depuis l'accueil, son image et son nom s'affichent tout de suite avec un
+  anneau qui tourne (« Lancement du jeu… »), et le curseur d'attente de Windows pendant les
+  secondes où Erable ouvre le jeu et démarre Vulkan : on voit que ça charge, pas que ça a planté.
 
 **Zelda Ocarina of Time**
 - Avec le déblocage des FPS, le Chant de l'Épouvantail s'enregistre à la bonne durée et les

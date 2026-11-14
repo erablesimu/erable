@@ -2163,12 +2163,31 @@ void MainWindow::AllowOSSleep() {
 #endif
 }
 
+namespace {
+/// The wait cursor for a step that keeps the event loop busy (the window cannot repaint): the
+/// system animates it all the same, so the window reads as working. Never around a dialog.
+struct BusyCursor {
+    BusyCursor() {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+    }
+    ~BusyCursor() {
+        QApplication::restoreOverrideCursor();
+    }
+    BusyCursor(const BusyCursor&) = delete;
+    BusyCursor& operator=(const BusyCursor&) = delete;
+};
+} // namespace
+
 bool MainWindow::LoadROM(const QString& filename, Service::AM::FrontendAppletParameters params) {
     // Shutdown previous session if the emu thread is still active...
     if (QtCommon::emu_thread != nullptr)
         ShutdownGame();
 
-    if (!render_window->InitRenderTarget())
+    if (const bool ready = [&] {
+            const BusyCursor busy;
+            return render_window->InitRenderTarget();
+        }();
+        !ready)
         return false;
 
     QtCommon::system->SetFilesystem(QtCommon::vfs);
@@ -2197,8 +2216,10 @@ bool MainWindow::LoadROM(const QString& filename, Service::AM::FrontendAppletPar
         return false;
 
     /** Exec */
-    const Core::SystemResultStatus result{
-        QtCommon::system->Load(*render_window, filename.toStdString(), params)};
+    const Core::SystemResultStatus result = [&] {
+        const BusyCursor busy;
+        return QtCommon::system->Load(*render_window, filename.toStdString(), params);
+    }();
 
     if (result != Core::SystemResultStatus::Success) {
         switch (result) {
@@ -2339,6 +2360,9 @@ void MainWindow::BootGame(const QString& filename, Service::AM::FrontendAppletPa
     boot_timer.start();
     SCOPE_EXIT {
         boot_in_progress = false;
+        if (home_screen) {
+            home_screen->HideLaunching();
+        }
         LOG_INFO(Frontend, "Launch finished: elapsed_ms={} running={}", boot_timer.elapsed(),
                  emulation_running);
         if (!emulation_running && !close_pending) {
@@ -2369,6 +2393,10 @@ void MainWindow::BootGame(const QString& filename, Service::AM::FrontendAppletPa
         return;
     }
 
+    // From here to the shader precache nothing asks anything: opening the game and applying its
+    // settings keep the event loop busy for a moment.
+    std::optional<BusyCursor> busy{std::in_place};
+
     // Save configurations
     UpdateUISettings();
     game_list->SaveInterfaceLayout();
@@ -2396,6 +2424,8 @@ void MainWindow::BootGame(const QString& filename, Service::AM::FrontendAppletPa
         QtCommon::system->ApplySettings();
     }
 
+    // The precache may ask whether to build it now and show its own progress.
+    busy.reset();
     PrepareShaderPrecache(title_id, std::filesystem::path{filename.toStdU16String()});
     speed_limit_before_hotkeys.reset();
     Settings::LogSettings();

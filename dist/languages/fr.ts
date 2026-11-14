@@ -88,6 +88,10 @@ Ses sauvegardes restent sur le disque, mais plus aucun profil d&apos;Erable ne l
 <context>
     <name>HomeScreen</name>
     <message>
+        <source>Starting the game...</source>
+        <translation>Lancement du jeu…</translation>
+    </message>
+    <message>
         <source>Full screen</source>
         <translation>Plein écran</translation>
     </message>
