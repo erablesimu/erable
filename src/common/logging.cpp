@@ -261,17 +261,35 @@ struct FileBackend final : public Backend {
         };
         // If the log can't be moved, write this session to a second log (erable_log_2.txt) so that
         // the previous session is kept and this one still gets the full size limit. If that one
-        // can't be moved either, append to it.
+        // can't be moved either, another Erable still has it open (one that never finished
+        // exiting): this session gets a log of its own, erable_log_<process id>.txt. Appending to
+        // the open log lost a whole 26-minute debug session.
         auto path = filename;
         auto mode = FS::FileAccessMode::Write;
         if (!rotate(path)) {
             path = filename.parent_path() / filename.stem();
             path += "_2";
             path += filename.extension();
-            if (!rotate(path))
-                mode = FS::FileAccessMode::Append;
+            if (!rotate(path)) {
+#ifdef _WIN32
+                const unsigned long pid = GetCurrentProcessId();
+#else
+                const unsigned long pid = static_cast<unsigned long>(getpid());
+#endif
+                path = filename.parent_path() / filename.stem();
+                path += "_" + std::to_string(pid);
+                path += filename.extension();
+            }
         }
         file.emplace(path, mode, FS::FileType::TextFile);
+        if (!file->IsOpen()) {
+            // Not even that one: append to the second log, as before.
+            path = filename.parent_path() / filename.stem();
+            path += "_2";
+            path += filename.extension();
+            mode = FS::FileAccessMode::Append;
+            file.emplace(path, mode, FS::FileType::TextFile);
+        }
         file_path = path;
         // Count what is already there so the size limit still applies when appending.
         if (mode == FS::FileAccessMode::Append)

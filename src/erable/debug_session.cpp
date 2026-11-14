@@ -170,16 +170,23 @@ std::optional<fs::path> Zip(const fs::path& folder) {
     return zip;
 }
 
-/// The log the last run wrote, read before this run's log moves it aside.
+/// The log the last run wrote, read before this run's log moves it aside: the newest
+/// erable_log*.txt (erable_log.txt, erable_log_2.txt, or erable_log_<process id>.txt when both
+/// were busy), not a rotated .old.txt copy.
 fs::path LastLog() {
     fs::path newest;
     fs::file_time_type newest_time{};
-    for (const auto* name : {LOG_FILE, "erable_log_2.txt"}) {
-        const auto path = LogDir() / name;
-        std::error_code ec;
-        const auto time = fs::last_write_time(path, ec);
-        if (!ec && (newest.empty() || time > newest_time)) {
-            newest = path;
+    std::error_code ec;
+    for (const auto& entry : fs::directory_iterator(LogDir(), ec)) {
+        const std::string name = entry.path().filename().string();
+        if (!name.starts_with("erable_log") || !name.ends_with(".txt") ||
+            name.ends_with(".old.txt")) {
+            continue;
+        }
+        std::error_code time_ec;
+        const auto time = fs::last_write_time(entry.path(), time_ec);
+        if (!time_ec && (newest.empty() || time > newest_time)) {
+            newest = entry.path();
             newest_time = time;
         }
     }
