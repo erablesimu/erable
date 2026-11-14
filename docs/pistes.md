@@ -6,7 +6,7 @@
   de quelques pourcents ; peu d'effet sur les saccades de la première partie.
 - La CI sait déjà le produire : lancer `ci.yml` avec l'entrée `pgo` sur `both`. L'archive est
   `erable-windows-x86_64-pgo.zip`.
-- Jamais essayé chez nous. Points à vérifier avant de le donner à la famille :
+- Jamais essayé chez nous. Points à vérifier avant de le proposer aux utilisateurs :
   - le profil vient d'Eglantine, pas de notre code actuel, donc le gain peut être plus faible ;
   - il est compilé avec MinGW clang au lieu de MSVC : comparer le rendu sur Zelda ;
   - la mise à jour automatique n'est activée que dans le build MSVC.

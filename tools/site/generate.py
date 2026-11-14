@@ -90,7 +90,7 @@ features = [("bolt", "f1"), ("refresh", "f2"), ("gamepad", "f3"), ("globe", "f4"
 feature_cards = "\n".join(
     f"""      <div class="card feature reveal"><div class="icon">{ICONS[i]}</div><h3 data-i18n="home.{k}t"></h3><p data-i18n="home.{k}p"></p></div>"""
     for i, k in features)
-write("index.html", head("", "home.title", "Erable, the family's Nintendo Switch 2 emulator.") + f"""
+write("index.html", head("", "home.title", "Erable, a Nintendo Switch 2 emulator.") + f"""
 <section class="hero">
   <div class="leaves" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="wrap">
@@ -532,13 +532,13 @@ ocarina = {
 <li>Patientez quelques minutes : le jeu démarre tout seul à la fin.</li>
 </ol>
 <div class="note">Cette étape n'a lieu qu'une fois. Elle recommence seulement après une mise à jour du pilote de la carte graphique.</div>"""),
-        sec("cache", 7, "Reprendre le cache d'un autre PC", f"""<p>Si quelqu'un de la famille a déjà joué, son cache de shaders évite presque toutes les saccades sur un autre PC.</p>
+        sec("cache", 7, "Reprendre le cache d'un autre PC", f"""<p>Si vous avez déjà joué sur un autre PC, son cache de shaders évite presque toutes les saccades sur celui-ci.</p>
 <ol class="steps">
 <li>Sur le PC qui a déjà joué : clic droit sur le jeu → {m('Ouvrir le cache de pipelines transférable')}.</li>
 <li>Fermez Erable, puis copiez le dossier <code>0400486024dec000</code> sur une clé USB.</li>
 <li>Sur l'autre PC : ouvrez le même emplacement de la même façon, fermez Erable, puis collez-y le dossier en remplaçant celui qui existe.</li>
 </ol>
-<div class="warn">Gardez ce dossier dans la famille : il contient des éléments du jeu et ne doit pas être publié sur Internet.</div>"""),
+<div class="warn">Gardez ce dossier pour vous : il contient des éléments du jeu et ne doit pas être publié sur Internet.</div>"""),
         sec("ensuite", "✓", "Et ensuite ?", """<p>Lancez le jeu. Les premières minutes, et à chaque nouvelle zone, quelques saccades restent normales le temps que l'émulateur prépare les shaders ; elles disparaissent ensuite. Ne videz pas le cache de shaders entre deux parties.</p>
 <p>Un souci ? <a href="../signaler.html">Signalez-le ici</a>.</p>"""),
     ]),
@@ -584,13 +584,13 @@ ocarina = {
 <li>Wait a few minutes: the game starts by itself at the end.</li>
 </ol>
 <div class="note">This only happens once. It runs again only after a graphics driver update.</div>"""),
-        sec("cache", 7, "Reuse another PC's cache", f"""<p>If someone in the family has already played, their shader cache avoids almost all stutter on another PC.</p>
+        sec("cache", 7, "Reuse another PC's cache", f"""<p>If you have already played on another PC, its shader cache avoids almost all stutter on this one.</p>
 <ol class="steps">
 <li>On the PC that has played: right-click the game → {m('Ouvrir le cache de pipelines transférable')} (open transferable pipeline cache).</li>
 <li>Close Erable, then copy the <code>0400486024dec000</code> folder to a USB stick.</li>
 <li>On the other PC: open the same place the same way, close Erable, then paste the folder there, replacing the existing one.</li>
 </ol>
-<div class="warn">Keep this folder in the family: it contains parts of the game and must not be published online.</div>"""),
+<div class="warn">Keep this folder to yourself: it contains parts of the game and must not be published online.</div>"""),
         sec("ensuite", "✓", "What next?", """<p>Start the game. In the first minutes, and in each new area, a few stutters are normal while the emulator prepares shaders; they go away afterwards. Don't clear the shader cache between sessions.</p>
 <p>A problem? <a href="../signaler.html">Report it here</a>.</p>"""),
     ]),
@@ -636,13 +636,13 @@ ocarina = {
 <li>Warte ein paar Minuten: Am Ende startet das Spiel von selbst.</li>
 </ol>
 <div class="note">Das passiert nur einmal – erneut nur nach einem Update des Grafiktreibers.</div>"""),
-        sec("cache", 7, "Den Cache eines anderen PCs übernehmen", f"""<p>Hat jemand aus der Familie schon gespielt, vermeidet sein Shader-Cache auf einem anderen PC fast alle Ruckler.</p>
+        sec("cache", 7, "Den Cache eines anderen PCs übernehmen", f"""<p>Hast du schon auf einem anderen PC gespielt, vermeidet dessen Shader-Cache auf diesem fast alle Ruckler.</p>
 <ol class="steps">
 <li>Auf dem PC, auf dem schon gespielt wurde: Rechtsklick auf das Spiel → {m('Ouvrir le cache de pipelines transférable')} (übertragbaren Pipeline-Cache öffnen).</li>
 <li>Schließe Erable und kopiere den Ordner <code>0400486024dec000</code> auf einen USB-Stick.</li>
 <li>Auf dem anderen PC: Öffne denselben Ort auf dieselbe Weise, schließe Erable und füge den Ordner dort ein, wobei du den vorhandenen ersetzt.</li>
 </ol>
-<div class="warn">Behalte diesen Ordner in der Familie: Er enthält Teile des Spiels und darf nicht im Internet veröffentlicht werden.</div>"""),
+<div class="warn">Behalte diesen Ordner für dich: Er enthält Teile des Spiels und darf nicht im Internet veröffentlicht werden.</div>"""),
         sec("ensuite", "✓", "Und dann?", """<p>Starte das Spiel. In den ersten Minuten und in jedem neuen Gebiet sind ein paar Ruckler normal, während der Emulator Shader vorbereitet; danach verschwinden sie. Leere den Shader-Cache nicht zwischen zwei Runden.</p>
 <p>Ein Problem? <a href="../signaler.html">Hier melden</a>.</p>"""),
     ]),

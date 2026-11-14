@@ -5,7 +5,7 @@
 # SPDX-FileCopyrightText: 2018 yuzu Emulator Project
 # Erable
 
-Erable est l'émulateur Nintendo Switch 2 de la famille, en français, avec ses propres
+Erable est un émulateur Nintendo Switch 2 en français, avec ses propres
 réglages, son thème et ses optimisations pour nos jeux, en particulier The Legend of Zelda:
 Ocarina of Time.
 
@@ -54,7 +54,7 @@ les dernières modifications sont sur [le site d'Erable](https://erablesimu.gith
 
 ## Crédits et licence
 
-**Erable** est l'émulateur de la famille, maintenu par l'équipe Erable.
+**Erable** est maintenu par l'équipe Erable.
 
 Erable est construit sur [Lichii](https://github.com/zortos293/Lichii), lui-même issu
 d'Eglantine, Eden, yuzu et Sudachi. Leurs mentions de copyright et les licences des
