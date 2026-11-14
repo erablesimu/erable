@@ -766,7 +766,7 @@ private:
     };
     Common::LeastRecentlyUsedCache<LRUItemParams> lru_cache;
 
-    /// Cold sweep (from Fritchii's TC_COLD_FRAMES and EXP58): a single-level 2D render target
+    /// Cold sweep (from a Lichii fork): a single-level 2D render target
     /// that a newer image overlaps badly (the game drew the next frame's target a little further
     /// in memory) is watched; once untouched it is deleted without waiting for the collector.
     /// Ocarina's Castle Town held 7.8-10.5 GB of such images there, deleted in bursts that made

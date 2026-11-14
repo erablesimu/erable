@@ -3094,7 +3094,7 @@ void RasterizerVulkan::FlushCommands() {
     pending_native_work = false;
     // A fence with a download is submitted by InnerFence::Queue, and SignalFence then comes here
     // with nothing recorded since: ~4,600 empty submits a second in Ocarina of Time's Castle
-    // Town, each followed by a full rebind (from Fritchii c338269b92).
+    // Town, each followed by a full rebind (from a Lichii fork).
     if (!scheduler.RecordedSinceSubmit()) {
         Scheduler::CountSkippedFlush();
         return;

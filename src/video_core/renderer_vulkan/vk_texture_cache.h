@@ -75,7 +75,7 @@ struct ByteAddressedRange {
     return VkExtent2D{width / 2, height};
 }
 
-/// What a pooled VkImage was made with (image pool, from Fritchii's EXP42): the parts of its
+/// What a pooled VkImage was made with (image pool, from a Lichii fork): the parts of its
 /// VkImageCreateInfo that differ between texture cache images, and its view format list (a
 /// stable table entry, compared by address). valid is false for images the pool never takes.
 struct ImagePoolKey {
@@ -141,7 +141,7 @@ public:
         return memory_allocator.MemoryPressureEvents();
     }
 
-    /// Image pool (from Fritchii's EXP42): VkImages of deleted render targets, kept once the GPU
+    /// Image pool (from a Lichii fork): VkImages of deleted render targets, kept once the GPU
     /// is done with them for the next image made with the same create info. A null image when
     /// none is pooled (or EDEN_NX2_IMAGE_POOL=0).
     [[nodiscard]] vk::Image TakePooledImage(const ImagePoolKey& key);

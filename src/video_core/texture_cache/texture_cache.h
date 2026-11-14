@@ -455,7 +455,7 @@ void TextureCache<P>::SweepColdImages() {
     }
     // Untouched for this many frames: an image the game uploads from guest memory can come back
     // from there. A GPU-written one only goes once a target of another shape, touched since,
-    // covers its memory and it has been untouched for SupersededFrames (Fritchii's EXP58): the
+    // covers its memory and it has been untouched for SupersededFrames (as a Lichii fork does): the
     // game reused that memory for another layout, so its contents have no reader left.
     constexpr u64 ColdFrames = 4;
     constexpr u64 SupersededFrames = 60;
@@ -589,7 +589,7 @@ void TextureCache<P>::TickFrame() {
         while (!gpu_sentenced_images.empty() &&
                runtime.IsFree(gpu_sentenced_images.front().tick)) {
             // The GPU is done with it, so its VkImage may go to the runtime's image pool for the
-            // next image of its shape (from Fritchii's EXP42).
+            // next image of its shape (from a Lichii fork).
             if constexpr (requires(Image& image) { image.ReleaseToPool(); }) {
                 gpu_sentenced_images.front().image.ReleaseToPool();
             }
@@ -986,8 +986,8 @@ void TextureCache<P>::TickFrame() {
     TickAsyncUnswizzle();
     if (frame_tick % 600 == 0 && !uploaded_ranges.empty()) {
         // Only while the host is short of RAM: an image made again over that guest memory faults
-        // all of it back in during its upload (Fritchii's EXP8 bit 8: with the rest of EXP8,
-        // Hyrule Field 1% low 30.3 -> 35.1 fps). With RAM to spare the hint only costs.
+        // all of it back in during its upload (a Lichii fork measured, with its other upload
+        // savings, Hyrule Field 1% low 30.3 -> 35.1 fps). With RAM to spare the hint only costs.
         if (Common::IsHostLowOnMemory()) {
             for (const auto& [address, size] : uploaded_ranges) {
                 device_memory.HintCold(address, size);
@@ -3731,7 +3731,7 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
         // clear's own depth target, which follows IsFullClear as an existing one does (its
         // contents are dropped, the colour targets' sizes aside): Ocarina binds a 1920x1024 depth
         // buffer under 1280x720 colour, and this rule uploaded its 7.5 MiB from guest memory
-        // every frame (from Fritchii's EXP56, f93124a6b8: Castle Town 41.3 -> 43.8 fps).
+        // every frame (a Lichii fork measured Castle Town 41.3 -> 43.8 fps with this).
         const bool depth_follows_full_clear =
             regs.zeta_enable && regs.zeta.Address() == gpu_addr;
         for (u32 index = 0; index < regs.rt_control.count && index < NUM_RT; ++index) {
