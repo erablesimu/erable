@@ -469,8 +469,20 @@ void Start() {
 }
 
 void Stop() {
+    Flush();
+}
+
+void Flush() {
     if (logging_instance)
         logging_instance->ForEachBackend([](Backend& backend) { backend.Flush(); });
+}
+
+std::filesystem::path FilePath() {
+#ifndef __OPENORBIS__
+    if (logging_instance && logging_instance->file_backend)
+        return logging_instance->file_backend->file_path;
+#endif
+    return {};
 }
 
 void FmtCrashMessageImpl(const char* filename, unsigned int line_num, const char* function, fmt::string_view format, const fmt::format_args& args) noexcept {
@@ -494,21 +506,6 @@ void FmtCrashMessageImpl(const char* filename, unsigned int line_num, const char
     logging_instance->file_backend->Write(e);
     logging_instance->file_backend->Flush();
 #endif
-}
-
-void Flush() {
-#ifndef __OPENORBIS__
-    if (logging_instance && logging_instance->file_backend)
-        logging_instance->file_backend->Flush();
-#endif
-}
-
-std::filesystem::path GetFilePath() {
-#ifndef __OPENORBIS__
-    if (logging_instance && logging_instance->file_backend)
-        return logging_instance->file_backend->file_path;
-#endif
-    return {};
 }
 
 void SetGlobalFilter(const Filter& filter) {

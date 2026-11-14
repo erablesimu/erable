@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include <filesystem>
-
 #include <chrono>
+#include <filesystem>
 #include <algorithm>
 #include <string>
 #include <type_traits>
@@ -152,12 +151,12 @@ void Start();
 /// Explicitly stops the logger thread and flushes the buffers
 void Stop();
 
-/// Writes what the log file holds in memory to the disk.
+/// Writes buffered lines to the log file, so a copy of it is complete.
 void Flush();
 
-/// The file this session logs to (LOG_FILE, or its "_2" copy when the last one was still open),
-/// or an empty path without a log file.
-[[nodiscard]] std::filesystem::path GetFilePath();
+/// The file this session logs to (erable_log.txt, or erable_log_2.txt when that one was busy); empty
+/// without a file log. The previous session's log is this path plus ".old.txt".
+[[nodiscard]] std::filesystem::path FilePath();
 
 /// The global filter will prevent any messages from even being processed if they are filtered.
 void SetGlobalFilter(const Filter& filter);

@@ -20,6 +20,10 @@ namespace Core {
 class System;
 }
 
+namespace VideoCommon::GpuTrace {
+struct StateAccess;
+}
+
 namespace Tegra {
 class MemoryManager;
 class DmaPusher;
@@ -45,6 +49,8 @@ class RasterizerInterface;
 namespace Tegra::Engines {
 
 class Puller final {
+    friend struct ::VideoCommon::GpuTrace::StateAccess;
+
 public:
     struct MethodCall {
         u32 method{};

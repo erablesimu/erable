@@ -242,7 +242,7 @@ std::optional<fs::path> Finish() {
     Common::Log::Flush();
     recording = false;
     RemoveMarker();
-    const auto folder = Collect(Common::Log::GetFilePath(), started_at, "Recording stopped");
+    const auto folder = Collect(Common::Log::FilePath(), started_at, "Recording stopped");
     return folder ? Zip(*folder) : std::nullopt;
 }
 

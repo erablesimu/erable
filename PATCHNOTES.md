@@ -9,6 +9,23 @@ version. Les sections suivantes gardent l'historique.
 - La fenêtre de mise à jour ne montre plus que ce qui a changé depuis votre version, build par
   build, au lieu de tout l'historique depuis le build 24.
 
+**Zelda Ocarina of Time (Lichii)**
+- Plus de flashs blancs (raccourci sur certaines commandes GPU annulé).
+- Les ombres du feuillage s'affichent aussi sur les cartes sans mesh shaders.
+- Déblocage des FPS au-delà de 60 : plateformes mobiles, Gohma, son, ondulations de l'eau et
+  compteurs du jeu restent à la bonne vitesse.
+- DLSS : image d'entrée nettoyée (plus de pixels invalides) ; « No Sharpening » sur la 1.0.
+
+**Tous les jeux (Lichii)**
+- Fermer un jeu pendant le chargement des shaders ne bloque plus Erable.
+- Moins d'attente : recompilations de shaders de calcul en arrière-plan, état de dessin réutilisé,
+  préparation des shaders sur les autres cœurs pour de plus grandes tables de textures.
+- Yoshi (ralentissement et plantage), grandes textures ASTC, courtes coupures du son corrigés.
+- Jaquettes SteamGridDB avec votre propre clé API (Configurer > Général > Interface), et jaquettes ou noms
+  personnalisés gardés par jeu. Une jaquette verticale remplit la face du boîtier à l'accueil.
+- Aide > Signaler un bug (Ctrl + F12) : enregistre l'instant (journal, réglages, capture et une
+  image avec ses shaders) dans un zip à joindre à un rapport sur le site.
+
 **Thèmes**
 - Erable n'a plus que ses propres thèmes : **Maple** (le thème habituel, gris chauds et érable),
   **Spring Maple** (teinté de vert) et **Winter Maple** (bleu givré). Configurer > Général >

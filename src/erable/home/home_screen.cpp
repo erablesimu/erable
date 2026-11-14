@@ -680,8 +680,9 @@ void HomeScreen::FetchCovers() {
     std::filesystem::create_directories(dir, ec);
     for (std::size_t i = 0; i < games.size(); ++i) {
         const u64 id = games[i].program_id;
-        if (id == 0) {
-            continue;
+        const QPixmap& own = games[i].cover;
+        if (id == 0 || (!own.isNull() && own.height() > own.width() * 1.15)) {
+            continue; // a portrait cover of its own (SteamGridDB, custom artwork) stays
         }
         const auto name = fmt::format("{:016X}", id);
         const auto file = dir / (name + ".png");
