@@ -4,6 +4,7 @@
 #include "erable/home/case_shelf.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <iterator>
 #include <numeric>
@@ -87,9 +88,10 @@ QSize CaseShelf::minimumSizeHint() const {
 }
 
 void CaseShelf::RefreshTheme() {
+    // Pictures without a colour of note take the accent, which the theme just changed
     for (std::size_t i = 0; i < entries.size(); ++i) {
-        if (entries[i].art.isNull() && !entries[i].add) {
-            spine_colours[i] = SpineColour({});
+        if (!entries[i].add) {
+            spine_colours[i] = SpineColour(entries[i].art);
         }
     }
     ClearCache();
@@ -105,14 +107,42 @@ QColor CaseShelf::SpineColour(const QPixmap& art) {
     if (art.isNull()) {
         return Accent();
     }
-    const QImage pixel = art.toImage().scaled(1, 1, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    const QColor average = QColor::fromRgb(pixel.pixel(0, 0));
-    float h, s, v;
-    average.getHsvF(&h, &s, &v);
-    if (h < 0) {
-        h = 0.05f; // grey pictures get a warm spine
+    // The picture's main colour: its pixels sorted into 24 hues, each weighed by how colourful
+    // and bright it is (an average of all of them is a muddy brown); the heaviest hue wins, and
+    // the colour is the mean of its pixels. A picture with no colour of note keeps the accent.
+    const QImage small = art.toImage().convertToFormat(QImage::Format_RGB32).scaled(
+        32, 32, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    constexpr int Hues = 24;
+    std::array<double, Hues> weight{};
+    std::array<std::array<double, 3>, Hues> sum{};
+    for (int y = 0; y < small.height(); ++y) {
+        for (int x = 0; x < small.width(); ++x) {
+            const QColor colour = QColor::fromRgb(small.pixel(x, y));
+            float h, s, v;
+            colour.getHsvF(&h, &s, &v);
+            if (h < 0 || s < 0.2f || v < 0.18f) {
+                continue; // greys, near black
+            }
+            const int hue = std::min(Hues - 1, static_cast<int>(h * Hues));
+            const double w = s * s * v;
+            weight[hue] += w;
+            sum[hue][0] += colour.redF() * w;
+            sum[hue][1] += colour.greenF() * w;
+            sum[hue][2] += colour.blueF() * w;
+        }
     }
-    return QColor::fromHsvF(h, std::clamp(s * 1.3f, 0.45f, 0.85f), std::clamp(v, 0.42f, 0.66f));
+    const auto best = std::ranges::max_element(weight);
+    if (*best < 1.0) {
+        return Accent();
+    }
+    const auto& rgb = sum[static_cast<std::size_t>(best - weight.begin())];
+    const QColor main = QColor::fromRgbF(static_cast<float>(rgb[0] / *best),
+                                         static_cast<float>(rgb[1] / *best),
+                                         static_cast<float>(rgb[2] / *best));
+    float h, s, v;
+    main.getHsvF(&h, &s, &v);
+    // Deep enough for white text, colourful enough to tell the games apart
+    return QColor::fromHsvF(h, std::clamp(s, 0.5f, 0.9f), std::clamp(v, 0.45f, 0.72f));
 }
 
 void CaseShelf::SetEntries(std::vector<Entry> entries_, int selected_) {
@@ -274,7 +304,8 @@ std::vector<CaseShelf::Placement> CaseShelf::Layout() const {
     return placements;
 }
 
-void CaseShelf::DrawCase(QPainter& painter, const Entry& entry, const QRectF& box) const {
+void CaseShelf::DrawCase(QPainter& painter, const Entry& entry, const QRectF& box,
+                         const QColor& colour) const {
     const double w = box.width();
     const double h = box.height();
     const double radius = w * 0.035;
@@ -304,9 +335,9 @@ void CaseShelf::DrawCase(QPainter& painter, const Entry& entry, const QRectF& bo
     const double spine = w * 0.085;
     const QRectF spine_box{box.left(), box.top(), spine, h};
     QLinearGradient spine_fill{spine_box.topLeft(), spine_box.topRight()};
-    spine_fill.setColorAt(0, Accent().darker(155));
-    spine_fill.setColorAt(0.45, Accent());
-    spine_fill.setColorAt(1, Accent().darker(155));
+    spine_fill.setColorAt(0, colour.darker(155));
+    spine_fill.setColorAt(0.45, colour);
+    spine_fill.setColorAt(1, colour.darker(155));
     painter.fillRect(spine_box, spine_fill);
     painter.fillPath(MapleLeaf({spine_box.center().x(), box.top() + spine * 0.9}, spine * 0.62),
                      QColor{255, 255, 255, 220});
@@ -325,7 +356,7 @@ void CaseShelf::DrawCase(QPainter& painter, const Entry& entry, const QRectF& bo
     const QRectF front{box.left() + spine, box.top(), w - spine, h};
     const double band = h * 0.075;
     const QRectF band_box{front.left(), front.top(), front.width(), band};
-    painter.fillRect(band_box, Accent());
+    painter.fillRect(band_box, colour);
     painter.fillPath(MapleLeaf({band_box.left() + band * 0.75, band_box.center().y()}, band * 0.62),
                      Qt::white);
     painter.setPen(Qt::white);
@@ -413,7 +444,8 @@ const QImage& CaseShelf::CaseImage(int index) {
         painter.setRenderHint(QPainter::Antialiasing);
         painter.setRenderHint(QPainter::SmoothPixmapTransform);
         painter.setRenderHint(QPainter::TextAntialiasing);
-        DrawCase(painter, entries[index], QRectF(QPointF(0, 0), size));
+        // The spine and band in the game's main colour, as its spine in the crate
+        DrawCase(painter, entries[index], QRectF(QPointF(0, 0), size), spine_colours[index]);
     }
     return image;
 }

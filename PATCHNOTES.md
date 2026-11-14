@@ -52,6 +52,8 @@ version. Les sections suivantes gardent l'historique.
   tranche sur une étagère, chaque tranche teintée de la couleur de son jeu, et le jeu choisi sort
   de la pile en pivotant pour se montrer de face. « Étagère » revient aux boîtiers empilés. Le
   choix est gardé.
+- Le bandeau et la tranche de chaque boîtier prennent la couleur principale de l'image du jeu
+  (sa teinte dominante, pas une moyenne terne), à l'étagère comme dans la pile.
 - Un bouton en haut à droite change de thème depuis l'accueil (Maple, Spring Maple, Winter
   Maple). L'accueil et ses boîtiers prennent maintenant les couleurs du thème choisi.
 - Les jeux sont présentés comme des boîtiers Erable en 3D : le jeu choisi au centre, ses voisins

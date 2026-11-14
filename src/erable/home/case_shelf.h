@@ -86,7 +86,8 @@ private:
     const QImage& CaseImage(int index);
     const QImage& Reflection(int index);
     const QImage& SpineImage(int index);
-    void DrawCase(QPainter& painter, const Entry& entry, const QRectF& box) const;
+    void DrawCase(QPainter& painter, const Entry& entry, const QRectF& box,
+                  const QColor& colour) const;
     void Step();
     void ClearCache();
 
