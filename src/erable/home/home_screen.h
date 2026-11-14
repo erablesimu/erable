@@ -54,6 +54,9 @@ public:
     /// Takes the colours of the theme just applied (the palette MainWindow set).
     void RefreshTheme();
 
+    /// Whether the window fills the screen: the full screen button says how to leave it.
+    void SetFullscreen(bool fullscreen);
+
     /// The folder Erable reads the player's games from first (Documents\Erable\Jeux).
     [[nodiscard]] static QString GamesFolder();
 
@@ -69,6 +72,8 @@ signals:
     void HomeSettingsChanged();
     /// The theme button picked the next theme (in UISettings): MainWindow applies it.
     void ThemeChangeRequested();
+    /// The full screen button (or F11): MainWindow switches the window.
+    void FullscreenRequested();
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
@@ -124,6 +129,7 @@ private:
     PillButton* song_button = nullptr;
     PillButton* style_button = nullptr;
     PillButton* theme_button = nullptr;
+    PillButton* fullscreen_button = nullptr;
     QLabel* controller_label = nullptr;
     QLabel* clock = nullptr;
     QLabel* title = nullptr;

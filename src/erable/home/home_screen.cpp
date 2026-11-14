@@ -499,6 +499,10 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         emit HomeSettingsChanged();
     });
     right->addWidget(theme_button);
+    fullscreen_button = new PillButton(tr("Full screen"), {}, false, this);
+    fullscreen_button->setToolTip(tr("Fill the screen (F11)"));
+    connect(fullscreen_button, &QAbstractButton::clicked, this, [this] { emit FullscreenRequested(); });
+    right->addWidget(fullscreen_button);
     right->addSpacing(10);
     controller_label = new QLabel(this);
     controller_label->setFont(MakeFont(fonts.body, 14));
@@ -1025,7 +1029,19 @@ bool HomeScreen::eventFilter(QObject* watched, QEvent* event) {
     return QWidget::eventFilter(watched, event);
 }
 
+void HomeScreen::SetFullscreen(bool fullscreen) {
+    fullscreen_button->setText(fullscreen ? tr("Window") : tr("Full screen"));
+    fullscreen_button->setToolTip(fullscreen ? tr("Back to a window (F11)")
+                                             : tr("Fill the screen (F11)"));
+    fullscreen_button->updateGeometry();
+}
+
 void HomeScreen::keyPressEvent(QKeyEvent* event) {
+    if (event->key() == Qt::Key_F11) {
+        emit FullscreenRequested();
+        event->accept();
+        return;
+    }
     if (event->matches(QKeySequence::Find)) {
         search->setFocus();
         search->selectAll();

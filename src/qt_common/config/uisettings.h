@@ -116,6 +116,8 @@ struct Values {
     Setting<u32, true> home_song{linkage, 0, 0, 2, "home_song", Category::Ui};
     /// How the home shows the games: 0 the half-stacked shelf, 1 the crate of spines
     Setting<u32, true> home_style{linkage, 0, 0, 1, "home_style", Category::Ui};
+    /// The home (with the library) fills the screen, while no game runs.
+    Setting<bool> home_fullscreen{linkage, false, "home_fullscreen", Category::Ui};
     Setting<bool> show_low_ram_warning{linkage, true, "show_low_ram_warning", Category::Ui};
     Setting<bool> pause_when_in_background{linkage,
                                            false,

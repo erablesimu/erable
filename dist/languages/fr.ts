@@ -88,6 +88,22 @@ Ses sauvegardes restent sur le disque, mais plus aucun profil d&apos;Erable ne l
 <context>
     <name>HomeScreen</name>
     <message>
+        <source>Full screen</source>
+        <translation>Plein écran</translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation>Fenêtre</translation>
+    </message>
+    <message>
+        <source>Fill the screen (F11)</source>
+        <translation>Passer en plein écran (F11)</translation>
+    </message>
+    <message>
+        <source>Back to a window (F11)</source>
+        <translation>Revenir en fenêtre (F11)</translation>
+    </message>
+    <message>
         <source>Theme: Maple, Spring Maple or Winter Maple</source>
         <translation>Thème : Maple, Spring Maple ou Winter Maple</translation>
     </message>

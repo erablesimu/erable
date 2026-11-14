@@ -569,6 +569,9 @@ private:
 
     GameListPlaceholder* game_list_placeholder = nullptr;
     HomeScreen* home_screen = nullptr;
+    /// The window's geometry before the home went full screen, and whether it is now.
+    QByteArray home_window_geometry;
+    bool home_fullscreen = false;
     QMenu* debug_mode_menu = nullptr; ///< Debug mode > Record my session, also opened from the home
     bool home_active = true; ///< The home is shown rather than the library when no game runs
 
@@ -617,6 +620,8 @@ private:
 
     void SetupDebugMenu();
     /// Shows the home screen, or the library (game list) when `home` is false.
+    /// Full screen for the home, as UISettings asks, while the home shows and no game runs.
+    void UpdateHomeFullscreen();
     void ShowHome(bool home);
     /// Creates the Games folder (HomeScreen::GamesFolder) and adds it to the game folders.
     void EnsureGamesFolder();

@@ -5,6 +5,25 @@ version. Les sections suivantes gardent l'historique.
 
 ## Nouveautés de cette version
 
+**Accueil**
+- Bouton « Plein écran » en haut à droite de l'accueil (ou touche F11) : l'accueil et la
+  bibliothèque remplissent l'écran, sans menus. « Fenêtre » revient comme avant. Le choix est
+  gardé ; pendant une partie, c'est le réglage plein écran du jeu qui décide.
+
+**Zelda Ocarina of Time**
+- Avec le déblocage des FPS, le Chant de l'Épouvantail s'enregistre à la bonne durée et les
+  cinématiques vidéo restent synchronisées.
+
+**Mario Kart World**
+- Mode 60 FPS partout à vitesse normale (Configurer > jeu), avec un repli automatique à 30 FPS
+  quand le PC ne suit pas.
+
+**Stabilité et compatibilité**
+- Un jeu qui refuse de s'arrêter ne bloque plus Erable : il est fermé proprement, et les réglages
+  et le temps de jeu sont enregistrés sans risque de fichier abîmé.
+- Fichiers NSZ et NCZ « solides » lisibles.
+- Corrections du GPU émulé (copies DMA, synchronisation) et des pilotes Intel et AMD (RADV).
+
 **Mises à jour**
 - Fenêtres de mise à jour redessinées aux couleurs d'Erable et entièrement en français : notes
   plus lisibles, téléchargement avec Mo, vitesse et temps restant, boutons explicites.

@@ -998,6 +998,11 @@ void MainWindow::InitializeWidgets() {
     connect(home_screen, &HomeScreen::OpenSettings, this, &MainWindow::OnConfigure);
     connect(home_screen, &HomeScreen::HomeSettingsChanged, this, &MainWindow::OnSaveConfig);
     connect(home_screen, &HomeScreen::ThemeChangeRequested, this, &MainWindow::UpdateUITheme);
+    connect(home_screen, &HomeScreen::FullscreenRequested, this, [this] {
+        UISettings::values.home_fullscreen = !UISettings::values.home_fullscreen.GetValue();
+        UpdateHomeFullscreen();
+        OnSaveConfig();
+    });
     connect(home_screen, &HomeScreen::OpenWhatsNew, this, &MainWindow::OnWhatsNew);
     connect(home_screen, &HomeScreen::OpenCaptures, this, [] {
         const auto path = QString::fromStdString(
@@ -2637,6 +2642,8 @@ void MainWindow::BootGame(const QString& filename, Service::AM::FrontendAppletPa
     loading_screen->show();
 
     emulation_running = true;
+    // A game starts from the window the player had: its own full screen setting decides then.
+    UpdateHomeFullscreen();
     if (ui->action_Fullscreen->isChecked()) {
         ShowFullscreen();
     } else if (!(ui->action_Single_Window_Mode->isChecked() ? isMaximized()
@@ -3456,6 +3463,28 @@ void MainWindow::ShowHome(bool home) {
     game_list_placeholder->setVisible(!home && game_list->IsEmpty());
     if (!home) {
         game_list->SetFilterFocus();
+    }
+    UpdateHomeFullscreen();
+}
+
+void MainWindow::UpdateHomeFullscreen() {
+    // The library keeps the home's full screen: both are what Erable shows between games.
+    const bool want = UISettings::values.home_fullscreen.GetValue() && !emulation_running;
+    if (want && !home_fullscreen) {
+        home_window_geometry = saveGeometry();
+        ui->menubar->hide();
+        statusBar()->hide();
+        showFullScreen();
+        home_fullscreen = true;
+    } else if (!want && home_fullscreen) {
+        showNormal();
+        restoreGeometry(home_window_geometry);
+        ui->menubar->show();
+        statusBar()->setVisible(ui->action_Show_Status_Bar->isChecked());
+        home_fullscreen = false;
+    }
+    if (home_screen) {
+        home_screen->SetFullscreen(home_fullscreen);
     }
 }
 
@@ -5898,7 +5927,8 @@ void MainWindow::UpdateStatusButtons() {
 // TODO(crueter): Use this for game list stuff
 void MainWindow::UpdateUISettings() {
     if (!ui->action_Fullscreen->isChecked()) {
-        UISettings::values.geometry = saveGeometry();
+        // The home's full screen is not the window's size: keep the one it had before
+        UISettings::values.geometry = home_fullscreen ? home_window_geometry : saveGeometry();
         UISettings::values.renderwindow_geometry = render_window->saveGeometry();
     }
     UISettings::values.state = saveState();
