@@ -29,6 +29,7 @@
 #include <iterator>
 #include <string>
 #include "erable/leaf_catcher.h"
+#include "qt_common/qt_common.h"
 #include "common/container/unordered_map.h"
 #include "core/frontend/framebuffer_layout.h"
 #include "core/loader/loader.h"
@@ -166,6 +167,7 @@ LoadingScreen::LoadingScreen(QWidget* parent)
                                "on a later launch."));
     skip_button->hide();
     leaf_catcher = new LeafCatcher(this);
+    leaf_catcher->SetControllers(&QtCommon::system->HIDCore());
     leaf_catcher->hide();
 
     QVBoxLayout* column = ui->verticalLayout;

@@ -11,6 +11,11 @@
 
 #include <QApplication>
 #include <QKeyEvent>
+
+#include "common/settings_input.h"
+#include "hid_core/frontend/emulated_controller.h"
+#include "hid_core/hid_core.h"
+#include "hid_core/hid_types.h"
 #include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
@@ -178,10 +183,36 @@ void LeafCatcher::Catch(const Leaf& leaf) {
     }
 }
 
+double LeafCatcher::ControllerAxis() const {
+    if (hid_core == nullptr) {
+        return 0;
+    }
+    for (const auto id : {Core::HID::NpadIdType::Player1, Core::HID::NpadIdType::Handheld}) {
+        const auto* controller = hid_core->GetEmulatedController(id);
+        if (controller == nullptr || !controller->IsConnected()) {
+            continue;
+        }
+        const auto buttons = controller->GetButtonsValues();
+        const double pad = (buttons[Settings::NativeButton::DRight].value ? 1.0 : 0.0) -
+                           (buttons[Settings::NativeButton::DLeft].value ? 1.0 : 0.0);
+        if (pad != 0) {
+            return pad;
+        }
+        // The left stick, with a small dead zone and a gentle start
+        const double stick = controller->GetSticksValues()[Settings::NativeAnalog::LStick].x.value;
+        if (std::abs(stick) > 0.18) {
+            const double amount = (std::abs(stick) - 0.18) / 0.82;
+            return std::copysign(std::min(1.0, amount * 1.25), stick);
+        }
+    }
+    return 0;
+}
+
 void LeafCatcher::Advance(double dt) {
     elapsed += dt;
-    // The basket follows the arrows, or eases towards the mouse
-    target = std::clamp(target + direction * BasketSpeed * dt, 0.0, 1.0);
+    // The basket follows the arrows or a controller, or eases towards the mouse
+    const double axis = std::clamp(direction + ControllerAxis(), -1.0, 1.0);
+    target = std::clamp(target + axis * BasketSpeed * dt, 0.0, 1.0);
     const double half = BasketWidth() / 2;
     const double before_x = basket;
     basket = std::clamp(basket + (target - basket) * (1.0 - std::exp(-dt * 16.0)), half, 1 - half);

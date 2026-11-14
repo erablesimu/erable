@@ -40,6 +40,7 @@ version. Les sections suivantes gardent l'historique.
   nervurées, un panier en osier qui penche quand il bouge, des étincelles et des points qui
   s'envolent à chaque prise. Feuille dorée (x5), séries jusqu'à x5, goutte de sirop d'érable qui
   élargit le panier, coups de vent qui poussent les feuilles. Aux couleurs du thème.
+- Le petit jeu se joue aussi à la manette (croix ou stick gauche), pendant tout le chargement.
 
 **Accueil en boîtiers**
 - Le nom de votre profil s'affiche bien à chaque démarrage (il montrait parfois « Eden »).

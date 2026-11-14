@@ -11,11 +11,15 @@
 #include <QTimer>
 #include <QWidget>
 
-/// A small game for the shader loading screen: move the wicker basket (mouse, or the left and
-/// right arrows) to catch the maple leaves that fall in a little autumn valley. A golden leaf is
-/// worth five, catches in a row multiply the points, a drop of maple syrup widens the basket for a
-/// while, and gusts of wind push the leaves aside. Nothing is lost by missing one, so it can be
-/// left alone at any time. Drawn in the theme's colours.
+namespace Core::HID {
+class HIDCore;
+}
+
+/// A small game for the shader loading screen: move the wicker basket (mouse, the left and
+/// right arrows, or a controller's D-pad or left stick) to catch the maple leaves that fall in a
+/// little autumn valley. A golden leaf is worth five, catches in a row multiply the points, a
+/// drop of maple syrup widens the basket for a while, and gusts of wind push the leaves aside.
+/// Nothing is lost by missing one, so it can be left alone at any time. In the theme's colours.
 class LeafCatcher : public QWidget {
     Q_OBJECT
 
@@ -27,6 +31,11 @@ public:
 
     /// Advances the game by `seconds` (what the frame timer does; also used to render previews).
     void Advance(double seconds);
+
+    /// Controllers move the basket too: the D-pad or the left stick of player 1 (or handheld).
+    void SetControllers(Core::HID::HIDCore* hid_core_) {
+        hid_core = hid_core_;
+    }
 
     QSize sizeHint() const override;
 
@@ -64,6 +73,8 @@ private:
 
     void Step();
     void Drop();
+    /// -1..1 from the D-pad or the left stick, 0 without a controller.
+    [[nodiscard]] double ControllerAxis() const;
     void Catch(const Leaf& leaf);
     [[nodiscard]] double BasketWidth() const;
 
@@ -72,6 +83,7 @@ private:
     void PaintBasket(QPainter& painter, const QRectF& field) const;
     void PaintHud(QPainter& painter, const QRectF& field) const;
 
+    Core::HID::HIDCore* hid_core = nullptr;
     QTimer frame_timer;
     QElapsedTimer clock;
     std::vector<Leaf> leaves;
