@@ -9,22 +9,20 @@ version. Les sections suivantes gardent l'historique.
 - La fenêtre de mise à jour ne montre plus que ce qui a changé depuis votre version, build par
   build, au lieu de tout l'historique depuis le build 24.
 
-**Zelda Ocarina of Time (Lichii)**
+**Zelda Ocarina of Time**
 - Plus de flashs blancs (raccourci sur certaines commandes GPU annulé).
 - Les ombres du feuillage s'affichent aussi sur les cartes sans mesh shaders.
 - Déblocage des FPS au-delà de 60 : plateformes mobiles, Gohma, son, ondulations de l'eau et
   compteurs du jeu restent à la bonne vitesse.
 - DLSS : image d'entrée nettoyée (plus de pixels invalides) ; « No Sharpening » sur la 1.0.
 
-**Tous les jeux (Lichii)**
+**Tous les jeux**
 - Fermer un jeu pendant le chargement des shaders ne bloque plus Erable.
 - Moins d'attente : recompilations de shaders de calcul en arrière-plan, état de dessin réutilisé,
   préparation des shaders sur les autres cœurs pour de plus grandes tables de textures.
 - Yoshi (ralentissement et plantage), grandes textures ASTC, courtes coupures du son corrigés.
 - Jaquettes SteamGridDB avec votre propre clé API (Configurer > Général > Interface), et jaquettes ou noms
   personnalisés gardés par jeu. Une jaquette verticale remplit la face du boîtier à l'accueil.
-- Aide > Signaler un bug (Ctrl + F12) : enregistre l'instant (journal, réglages, capture et une
-  image avec ses shaders) dans un zip à joindre à un rapport sur le site.
 
 **Thèmes**
 - Erable n'a plus que ses propres thèmes : **Maple** (le thème habituel, gris chauds et érable),
@@ -71,7 +69,7 @@ version. Les sections suivantes gardent l'historique.
 - Les blocs de mémoire vidéo libérés sont gardés 30 secondes et réutilisés au lieu d'être rendus au
   pilote puis redemandés : les entrées de zone d'Ocarina en demandaient des centaines d'un coup.
 
-**Moins de saccades (Lichii)**
+**Moins de saccades**
 - En entrant dans une zone, les petites textures d'un même dessin sont remplies ensemble sur
   plusieurs cœurs du processeur au lieu d'une par une (Ocarina en crée plus de 2 000 à
   l'arrivée dans le monde).
@@ -79,16 +77,15 @@ version. Les sections suivantes gardent l'historique.
   les plus récents d'abord, sans retarder ceux dont le jeu a besoin tout de suite.
 - Le cache des effets précompilés est reconstruit quand ses réglages ou le jeu changent.
 
-**Moins de travail pour le processeur (Eglantine)**
+**Moins de travail pour le processeur**
 - Les pages de mémoire que le jeu réécrit à chaque image ne sont plus protégées puis débloquées
-  en boucle (Ocarina : environ 70 % d'appels système en moins, image 25,9 → 24,7 ms mesurée par
-  Eglantine). `EDEN_NX2_HOT_PAGES=0` revient à l'ancien comportement.
+  en boucle (Ocarina : environ 70 % d'appels système en moins, image de 25,9 à 24,7 ms). `EDEN_NX2_HOT_PAGES=0` revient à l'ancien comportement.
 - Les adresses de la carte graphique les plus consultées sont gardées en cache.
 
 **Divers**
 - Couper la musique de l'accueil (ou en changer) est enregistré tout de suite, même si Erable
   est fermé de force ensuite.
-- Génération d'images Lossless Scaling sur les cartes graphiques sans calcul 16 bits (Lichii).
+- Génération d'images Lossless Scaling sur les cartes graphiques sans calcul 16 bits.
 - FSR 3.1 mis à jour (3.1.6).
 - Les programmes Windows portent leur nom et leur version (Propriétés > Détails), ce qui rassure
   certains antivirus.
@@ -127,13 +124,12 @@ version. Les sections suivantes gardent l'historique.
 - Les arbres ne flottent plus en l'air dans la plaine d'Hyrule et ailleurs. Pendant qu'un shader
   se prépare, Erable ne saute plus que les dessins refaits à chaque image : un dessin fait une
   seule fois pour une zone attend son shader.
-- Arbres volants corrigés aussi sur les cartes GeForce GTX 10xx (Pascal), d'après Eglantine.
-- La qualité DLSS choisie change bien la résolution de rendu (Lichii).
+- Arbres volants corrigés aussi sur les cartes GeForce GTX 10xx (Pascal).
+- La qualité DLSS choisie change bien la résolution de rendu.
 
 **Tous les jeux (suite)**
-- Arrêter un jeu ne peut plus rester bloqué sur certaines attentes du GPU (Lichii).
-- Cartes Intel sous Windows : un plantage au chargement du cache de shaders est évité (d'après
-  Eglantine).
+- Arrêter un jeu ne peut plus rester bloqué sur certaines attentes du GPU.
+- Cartes Intel sous Windows : un plantage au chargement du cache de shaders est évité.
 
 ## build-25
 
