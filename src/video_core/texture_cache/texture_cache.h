@@ -976,8 +976,13 @@ void TextureCache<P>::TickFrame() {
     TickAsyncDecode();
     TickAsyncUnswizzle();
     if (frame_tick % 600 == 0 && !uploaded_ranges.empty()) {
-        for (const auto& [address, size] : uploaded_ranges) {
-            device_memory.HintCold(address, size);
+        // Only while the host is short of RAM: an image made again over that guest memory faults
+        // all of it back in during its upload (Fritchii's EXP8 bit 8: with the rest of EXP8,
+        // Hyrule Field 1% low 30.3 -> 35.1 fps). With RAM to spare the hint only costs.
+        if (Common::IsHostLowOnMemory()) {
+            for (const auto& [address, size] : uploaded_ranges) {
+                device_memory.HintCold(address, size);
+            }
         }
         uploaded_ranges.clear();
     }
@@ -3713,10 +3718,17 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
         if (!ClearCovers(width, height)) {
             return false;
         }
-        // The clear covers the framebuffer's render area, the smallest bound target.
+        // The clear covers the framebuffer's render area, the smallest bound target. Not for the
+        // clear's own depth target, which follows IsFullClear as an existing one does (its
+        // contents are dropped, the colour targets' sizes aside): Ocarina binds a 1920x1024 depth
+        // buffer under 1280x720 colour, and this rule uploaded its 7.5 MiB from guest memory
+        // every frame (from Fritchii's EXP56, f93124a6b8: Castle Town 41.3 -> 43.8 fps).
+        const bool depth_follows_full_clear =
+            regs.zeta_enable && regs.zeta.Address() == gpu_addr;
         for (u32 index = 0; index < regs.rt_control.count && index < NUM_RT; ++index) {
             const auto& rt = regs.rt[index];
-            if (rt.Address() != 0 && rt.format != Tegra::RenderTargetFormat::NONE &&
+            if (!depth_follows_full_clear && rt.Address() != 0 &&
+                rt.format != Tegra::RenderTargetFormat::NONE &&
                 (rt.width < width || rt.height < height)) {
                 return false;
             }

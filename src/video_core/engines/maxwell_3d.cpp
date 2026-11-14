@@ -1619,6 +1619,16 @@ void Maxwell3D::FrontWrite(VideoCommon::GpuSplit& split, FrontState& fs, u32 met
     } else if (fs.control == Regs::ShadowRamControl::Replay) {
         value = fs.shadow[method];
     }
+    // An unchanged state register (6.6M of Ocarina's 11.4M macro writes a second) goes first,
+    // before any other check, as the same-value skip below would (from Fritchii's EXP14).
+    if (!execution_mask[method] && fs.regs[method] == value && shadow_kept && fs.skip_same)
+        [[likely]] {
+        if (Profile::Enabled()) [[unlikely]] {
+            Profile::Add(Profile::Counter::MethodWrites, 1);
+            Profile::Add(Profile::Counter::SameValueWrites, 1);
+        }
+        return;
+    }
     if (Profile::Enabled()) [[unlikely]] {
         Profile::Add(Profile::Counter::MethodWrites, 1);
     }
