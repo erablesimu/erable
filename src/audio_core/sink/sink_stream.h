@@ -84,9 +84,9 @@ public:
         return false;
     }
 
-    void MarkFaulted() {
-        failed = true;
-    }
+    /// The host stream reported an error and stopped calling back: wakes the renderer so that it
+    /// does not wait for space that never frees, and asks for the stream to be opened again.
+    void MarkFaulted();
 
     virtual bool TryAppendOutputBlock(SinkBuffer& buffer, std::span<s16> samples);
 
@@ -261,6 +261,12 @@ protected:
     void SignalPause();
 
 protected:
+    /// Opens the host stream again after a fault (and starts it again if it was playing).
+    /// Returns whether it plays again. Called from the renderer's thread, never from a callback.
+    virtual bool Reopen() {
+        return false;
+    }
+
     /// Core system
     Core::System& system;
     /// Type of this stream
@@ -298,6 +304,9 @@ private:
     u64 level_max_missing_frames{};
     /// Number of buffers waiting to be played
     std::atomic<u32> queued_buffers{};
+    /// When the renderer last tried to reopen a faulted stream, and how many times in a row.
+    std::chrono::steady_clock::time_point last_reopen{};
+    u32 reopen_attempts{};
     /// Largest number of frames the host device has asked for in one callback (sysmix streams)
     std::atomic<u64> largest_request_frames{};
     /// The ring size for audio out buffers (usually 4, rarely 2 or 8)

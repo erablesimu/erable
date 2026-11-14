@@ -347,11 +347,42 @@ u64 SinkStream::GetExpectedPlayedSampleCount() {
     return std::min<u64>(exp_played_sample_count, max_played_sample_count) + TargetSampleCount * 5;
 }
 
+void SinkStream::MarkFaulted() {
+    {
+        std::scoped_lock lk{release_mutex};
+        failed = true;
+    }
+    release_cv.notify_one();
+}
+
 void SinkStream::WaitFreeSpace(std::stop_token stop_token) {
+    if (failed && type != StreamType::In) {
+        // The host stream died (device unplugged or switched, driver error): its callback no
+        // longer drains the queue. Reopen it, at most twice a second; meanwhile drop what is
+        // queued so that the game keeps running, silent, instead of waiting here for ever.
+        const auto now = std::chrono::steady_clock::now();
+        if (now - last_reopen >= std::chrono::milliseconds{500}) {
+            last_reopen = now;
+            ++reopen_attempts;
+            if (Reopen()) {
+                LOG_WARNING(Audio_Sink, "Audio stream {} reopened after an error (attempt {})",
+                            name, reopen_attempts);
+                reopen_attempts = 0;
+            } else if (reopen_attempts == 1 || reopen_attempts % 20 == 0) {
+                LOG_ERROR(Audio_Sink, "Audio stream {} could not be reopened yet (attempt {})",
+                          name, reopen_attempts);
+            }
+        }
+        if (failed) {
+            ClearQueue();
+            return;
+        }
+    }
+
     std::unique_lock lk{release_mutex};
 
     auto can_continue = [this]() {
-        return paused || queued_buffers < max_queue_size;
+        return paused || failed || queued_buffers < max_queue_size;
     };
 
     release_cv.wait_for(lk, std::chrono::milliseconds(7), can_continue);

@@ -52,55 +52,7 @@ public:
         if (!ctx) {
             return;
         }
-
-        cubeb_stream_params params{};
-        params.rate = TargetSampleRate;
-        params.channels = device_channels;
-        params.format = CUBEB_SAMPLE_S16LE;
-        params.prefs = CUBEB_STREAM_PREF_NONE;
-        switch (params.channels) {
-        case 1:
-            params.layout = CUBEB_LAYOUT_MONO;
-            break;
-        case 2:
-            params.layout = CUBEB_LAYOUT_STEREO;
-            break;
-        case 6:
-            params.layout = CUBEB_LAYOUT_3F2_LFE;
-            break;
-        }
-
-        u32 minimum_latency{0};
-        const auto latency_error = cubeb_get_min_latency(ctx, &params, &minimum_latency);
-        if (latency_error != CUBEB_OK) {
-            LOG_CRITICAL(Audio_Sink, "Error getting minimum latency, error: {}", latency_error);
-            minimum_latency = TargetSampleCount * 2;
-        }
-
-        minimum_latency = (std::max)(minimum_latency, TargetSampleCount * 2);
-
-        LOG_INFO(Service_Audio,
-                 "Opening cubeb stream {} type {} with: rate {} channels {} (system channels {}) "
-                 "latency {}",
-                 name, type, params.rate, params.channels, system_channels, minimum_latency);
-
-        auto init_error{0};
-        if (type == StreamType::In) {
-            init_error = cubeb_stream_init(ctx, &stream_backend, name.c_str(), input_device,
-                                           &params, output_device, nullptr, minimum_latency,
-                                           &CubebSinkStream::DataCallback,
-                                           &CubebSinkStream::StateCallback, this);
-        } else {
-            init_error = cubeb_stream_init(ctx, &stream_backend, name.c_str(), input_device,
-                                           nullptr, output_device, &params, minimum_latency,
-                                           &CubebSinkStream::DataCallback,
-                                           &CubebSinkStream::StateCallback, this);
-        }
-
-        if (init_error != CUBEB_OK) {
-            LOG_CRITICAL(Audio_Sink, "Error initializing cubeb stream, error: {}", init_error);
-            return;
-        }
+        Open(output_device, input_device);
     }
 
     /**
@@ -170,7 +122,88 @@ public:
         }
     }
 
+protected:
+    bool Reopen() override {
+        if (!ctx) {
+            return false;
+        }
+#ifdef _WIN32
+        // This runs on the renderer's thread, which cubeb's WASAPI backend needs in COM too.
+        thread_local const HRESULT com_result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+        (void)com_result;
+#endif
+        // Destroying joins cubeb's thread, so no callback runs while the stream is replaced.
+        if (stream_backend) {
+            cubeb_stream_stop(stream_backend);
+            cubeb_stream_destroy(stream_backend);
+            stream_backend = nullptr;
+        }
+        failed = false;
+        // The device it played on may be gone: the system's default takes over.
+        if (!Open(nullptr, nullptr)) {
+            failed = true;
+            return false;
+        }
+        paused = true;
+        Start();
+        return IsReady() && !paused;
+    }
+
 private:
+    /// Opens the cubeb stream on these devices (null: the system's default).
+    bool Open(cubeb_devid output_device, cubeb_devid input_device) {
+        cubeb_stream_params params{};
+        params.rate = TargetSampleRate;
+        params.channels = device_channels;
+        params.format = CUBEB_SAMPLE_S16LE;
+        params.prefs = CUBEB_STREAM_PREF_NONE;
+        switch (params.channels) {
+        case 1:
+            params.layout = CUBEB_LAYOUT_MONO;
+            break;
+        case 2:
+            params.layout = CUBEB_LAYOUT_STEREO;
+            break;
+        case 6:
+            params.layout = CUBEB_LAYOUT_3F2_LFE;
+            break;
+        }
+
+        u32 minimum_latency{0};
+        const auto latency_error = cubeb_get_min_latency(ctx, &params, &minimum_latency);
+        if (latency_error != CUBEB_OK) {
+            LOG_CRITICAL(Audio_Sink, "Error getting minimum latency, error: {}", latency_error);
+            minimum_latency = TargetSampleCount * 2;
+        }
+
+        minimum_latency = (std::max)(minimum_latency, TargetSampleCount * 2);
+
+        LOG_INFO(Service_Audio,
+                 "Opening cubeb stream {} type {} with: rate {} channels {} (system channels {}) "
+                 "latency {}",
+                 name, type, params.rate, params.channels, system_channels, minimum_latency);
+
+        auto init_error{0};
+        if (type == StreamType::In) {
+            init_error = cubeb_stream_init(ctx, &stream_backend, name.c_str(), input_device,
+                                           &params, output_device, nullptr, minimum_latency,
+                                           &CubebSinkStream::DataCallback,
+                                           &CubebSinkStream::StateCallback, this);
+        } else {
+            init_error = cubeb_stream_init(ctx, &stream_backend, name.c_str(), input_device,
+                                           nullptr, output_device, &params, minimum_latency,
+                                           &CubebSinkStream::DataCallback,
+                                           &CubebSinkStream::StateCallback, this);
+        }
+
+        if (init_error != CUBEB_OK) {
+            stream_backend = nullptr;
+            LOG_CRITICAL(Audio_Sink, "Error initializing cubeb stream, error: {}", init_error);
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Main callback from Cubeb. Either expects samples from us (audio render/audio out), or will
      * provide samples to be copied (audio in).
@@ -214,7 +247,10 @@ private:
      */
     static void StateCallback(cubeb_stream*, void* user_data, cubeb_state state) {
         if (state == CUBEB_STATE_ERROR) {
-            static_cast<CubebSinkStream*>(user_data)->MarkFaulted();
+            auto* impl = static_cast<CubebSinkStream*>(user_data);
+            LOG_ERROR(Audio_Sink, "Audio stream {} stopped on a device error, reopening it",
+                      impl->name);
+            impl->MarkFaulted();
         }
     }
 

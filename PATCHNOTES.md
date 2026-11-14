@@ -21,6 +21,9 @@ version. Les sections suivantes gardent l'historique.
 - Moins d'attente : recompilations de shaders de calcul en arrière-plan, état de dessin réutilisé,
   préparation des shaders sur les autres cœurs pour de plus grandes tables de textures.
 - Yoshi (ralentissement et plantage), grandes textures ASTC, courtes coupures du son corrigés.
+- Le son ne s'arrête plus pour de bon quand le périphérique audio a une erreur (casque débranché,
+  Bluetooth qui se reconnecte, pilote) : Erable rouvre le flux, et le jeu ne se fige plus à la
+  fermeture.
 - Jaquettes SteamGridDB avec votre propre clé API (Configurer > Général > Interface), et jaquettes ou noms
   personnalisés gardés par jeu. Une jaquette verticale remplit la face du boîtier à l'accueil.
 
