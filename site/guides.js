@@ -1,7 +1,7 @@
 // The tutorials, by section (emulator, games) and game. Add an entry here for each new tutorial.
 const TUTORIALS = [
   {
-    section: "emu", href: "tuto/installer.html", image: "tuto/img/game-list.png", steps: 5,
+    section: "emu", href: "guides/install.html", image: "guides/img/game-list.png", steps: 5,
     title: { fr: "Installer Erable", en: "Install Erable", de: "Erable installieren" },
     summary: {
       fr: "Télécharger, ajouter firmware et clés, régler la langue et la manette, puis lancer votre premier jeu.",
@@ -10,7 +10,7 @@ const TUTORIALS = [
     },
   },
   {
-    section: "emu", href: "tuto/installer.html#console", image: "tuto/img/tools-menu.png",
+    section: "emu", href: "guides/install.html#console", image: "guides/img/tools-menu.png",
     title: { fr: "Firmware et clés", en: "Firmware and keys", de: "Firmware und Schlüssel" },
     summary: {
       fr: "Installer le système et les clés tirés de votre propre Switch.",
@@ -19,7 +19,7 @@ const TUTORIALS = [
     },
   },
   {
-    section: "emu", href: "tuto/installer.html#langue", image: "tuto/img/system-language.png",
+    section: "emu", href: "guides/install.html#language", image: "guides/img/system-language.png",
     title: { fr: "Jeux en français", en: "Game language", de: "Spielsprache" },
     summary: {
       fr: "Choisir la langue et la région des jeux.",
@@ -28,7 +28,7 @@ const TUTORIALS = [
     },
   },
   {
-    section: "emu", href: "tuto/installer.html#manette", image: "tuto/img/controls.png",
+    section: "emu", href: "guides/install.html#controller", image: "guides/img/controls.png",
     title: { fr: "Configurer une manette", en: "Set up a controller", de: "Controller einrichten" },
     summary: {
       fr: "Associer chaque bouton, et que faire si la manette n'apparaît pas.",
@@ -37,7 +37,7 @@ const TUTORIALS = [
     },
   },
   {
-    section: "games", game: "ocarina", href: "tuto/zelda-ocarina.html", image: "tuto/img/ocarina-graphics.png", steps: 7,
+    section: "games", game: "ocarina", href: "guides/zelda-ocarina.html", image: "guides/img/ocarina-graphics.png", steps: 7,
     title: { fr: "Optimiser Ocarina of Time", en: "Optimise Ocarina of Time", de: "Ocarina of Time optimieren" },
     summary: {
       fr: "Mod de shaders, mémoire, Vulkan, DLSS, précompilation et partage du cache entre PC.",

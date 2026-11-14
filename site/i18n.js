@@ -21,6 +21,8 @@ const I18N = {
     "home.h1": "L'émulateur Switch&nbsp;2 <span class=\"accent\">aux couleurs de l'érable</span>",
     "home.lead": "En français, réglé pour nos PC et nos jeux, avec des mises à jour qui arrivent toutes seules.",
     "home.download": "Télécharger pour Windows",
+    "home.ctaTitle": "Prêt à jouer ?",
+    "home.ctaSub": "Téléchargez Erable, suivez le guide d'installation, et lancez votre premier jeu en quelques minutes.",
     "home.tutorials": "Bien démarrer",
     "home.note": "Extrayez tout le zip, puis lancez erable.exe.",
     "home.featuresEyebrow": "Pourquoi Erable",
@@ -171,6 +173,8 @@ const I18N = {
     "home.h1": "The <span class=\"accent\">maple-coloured</span> Switch&nbsp;2 emulator",
     "home.lead": "Tuned for our PCs and our games, with updates that install themselves.",
     "home.download": "Download for Windows",
+    "home.ctaTitle": "Ready to play?",
+    "home.ctaSub": "Download Erable, follow the install guide, and start your first game in a few minutes.",
     "home.tutorials": "Get started",
     "home.note": "Extract the whole zip, then run erable.exe.",
     "home.featuresEyebrow": "Why Erable",
@@ -321,6 +325,8 @@ const I18N = {
     "home.h1": "Der Switch-2-Emulator <span class=\"accent\">in Ahornfarben</span>",
     "home.lead": "Abgestimmt auf unsere PCs und Spiele, mit Updates, die sich selbst installieren.",
     "home.download": "Für Windows herunterladen",
+    "home.ctaTitle": "Bereit zum Spielen?",
+    "home.ctaSub": "Lade Erable herunter, folge der Installationsanleitung und starte dein erstes Spiel in wenigen Minuten.",
     "home.tutorials": "Los geht's",
     "home.note": "Entpacke die ganze ZIP-Datei und starte dann erable.exe.",
     "home.featuresEyebrow": "Warum Erable",
@@ -529,6 +535,12 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", () => setLang(button.dataset.setLang));
   }
   applyI18n();
+  // Content is shown even if the observer never fires (print, a full-page capture, old browsers)
+  setTimeout(() => {
+    for (const node of document.querySelectorAll(".reveal:not(.shown)")) {
+      node.classList.add("shown");
+    }
+  }, 1500);
   const observer = "IntersectionObserver" in window ? new IntersectionObserver((entries) => {
     for (const entry of entries) {
       if (entry.isIntersecting) {

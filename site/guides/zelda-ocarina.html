@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Erable</title>
+<meta name="i18n-title" content="tuto.ocarinaTitle">
+<meta name="description" content="Zelda: Ocarina of Time">
+<meta name="theme-color" content="#d2501f">
+<link rel="icon" href="../erable.png">
+<link rel="stylesheet" href="../style.css">
+<script src="../i18n.js"></script>
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href=".././"><img src="../erable.png" alt="">Erable</a>
+    <nav aria-label="Navigation">
+      <a href=".././" data-i18n="nav.home">Accueil</a>
+      <a href="../guides.html" aria-current="page" data-i18n="nav.tutorials">Tutoriels</a>
+      <a href="../changelog.html" data-i18n="nav.changes">Changements</a>
+      <a href="../bugs.html" data-i18n="nav.bugs">Bugs</a>
+      <a href="../report.html" data-i18n="nav.report">Signaler</a>
+    </nav>
+    <div class="lang" role="group" data-i18n-attr="aria-label:nav.language">
+      <button type="button" data-set-lang="fr" lang="fr" title="Français">FR</button>
+      <button type="button" data-set-lang="en" lang="en" title="English">EN</button>
+      <button type="button" data-set-lang="de" lang="de" title="Deutsch">DE</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="tuto-hero">
+    <div class="wrap">
+      <a class="back" href="../guides.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg><span data-i18n="tutos.back"></span></a>
+      <p class="eyebrow"><span data-i18n="tutos.gamesTitle"></span> · Zelda: Ocarina of Time</p>
+      <h1 data-lang="fr">Zelda : Ocarina of Time</h1>
+      <p class="lead" data-lang="fr">Moins de saccades et une image plus nette : les bons réglages, étape par étape.</p>
+      <h1 data-lang="en">Zelda: Ocarina of Time</h1>
+      <p class="lead" data-lang="en">Less stutter and a sharper image: the right settings, step by step.</p>
+      <h1 data-lang="de">Zelda: Ocarina of Time</h1>
+      <p class="lead" data-lang="de">Weniger Ruckler und ein schärferes Bild: die richtigen Einstellungen, Schritt für Schritt.</p>
+    </div>
+  </section>
+  <div class="wrap tuto-layout">
+    <aside>
+      <nav class="toc" data-lang="fr"><strong data-i18n="tutos.toc"></strong><ol><li><a href="#ready">Jeu prêt</a></li><li><a href="#shaders">Mod de shaders</a></li><li><a href="#memory">Mémoire émulée</a></li><li><a href="#gpu">Vulkan et carte</a></li><li><a href="#dlss">DLSS</a></li><li><a href="#precompile">Précompiler</a></li><li><a href="#cache">Cache d'un autre PC</a></li></ol></nav>
+      <nav class="toc" data-lang="en"><strong data-i18n="tutos.toc"></strong><ol><li><a href="#ready">Game ready</a></li><li><a href="#shaders">Shader mod</a></li><li><a href="#memory">Emulated memory</a></li><li><a href="#gpu">Vulkan and card</a></li><li><a href="#dlss">DLSS</a></li><li><a href="#precompile">Precompile</a></li><li><a href="#cache">Another PC's cache</a></li></ol></nav>
+      <nav class="toc" data-lang="de"><strong data-i18n="tutos.toc"></strong><ol><li><a href="#ready">Spiel bereit</a></li><li><a href="#shaders">Shader-Mod</a></li><li><a href="#memory">Emulierter Speicher</a></li><li><a href="#gpu">Vulkan und Karte</a></li><li><a href="#dlss">DLSS</a></li><li><a href="#precompile">Vorkompilieren</a></li><li><a href="#cache">Cache eines anderen PCs</a></li></ol></nav>
+    </aside>
+    <div class="tuto-body">
+      <article data-lang="fr">
+<section class="card tuto-step" id="ready"><h2><span class="num">1</span>Vérifier que le jeu est prêt</h2>
+<ol class="steps">
+<li>Ocarina of Time apparaît dans la liste des jeux d'Erable (voir <a href="install.html#games">Ajouter vos jeux</a>).</li>
+<li>Faites un clic droit sur le jeu → <span class="menu">Configure Game</span>.</li>
+</ol>
+<div class="note">Tous les réglages ci-dessous se font dans cette fenêtre, et ne concernent qu'Ocarina of Time : vos autres jeux gardent leurs réglages. Le jeu doit être fermé.</div>
+</section>
+<section class="card tuto-step" id="shaders"><h2><span class="num">2</span>Installer le mod de shaders</h2>
+<p>Le mod <code>ootrshaders</code> limite les saccades : moins de shaders à préparer pendant que vous jouez.</p>
+<ol class="steps">
+<li>Onglet <span class="menu">Add-Ons</span> → <span class="menu">Import Mod from ZIP</span>.</li>
+<li>Choisissez <code>ootrshaders.zip</code>, puis le type <span class="menu">RomFS</span>.</li>
+<li>Vérifiez que <strong>ootrshaders</strong> est coché, puis <span class="menu">Apply</span>.</li>
+</ol>
+<figure><img src="img/ocarina-addons.png" alt="Onglet Add-Ons avec ootrshaders, Max Resolution et Dynamic FPS cochés" loading="lazy"><figcaption>Les trois add-ons cochés : <em>ootrshaders</em> (LayeredFS), et les deux intégrés à Erable, <em>Max Resolution</em> et <em>Dynamic FPS by Dark</em>.</figcaption></figure>
+<div class="note"><strong>Max Resolution</strong> et <strong>Dynamic FPS</strong> sont déjà inclus dans Erable : laissez-les cochés.</div>
+<div class="warn">Ne prenez ce zip qu'auprès d'une personne de confiance, et analysez-le avec Microsoft Defender avant de l'importer. Un mod de shaders ne contient jamais de <code>.exe</code>.</div>
+</section>
+<section class="card tuto-step" id="memory"><h2><span class="num">3</span>Augmenter la mémoire émulée</h2>
+<ol class="steps">
+<li>Onglet <span class="menu">System</span>, partie <strong>Core</strong>.</li>
+<li><strong>Memory Layout</strong> : <code>6GB DRAM</code> ou <code>8GB DRAM</code>.</li>
+<li><span class="menu">Apply</span>.</li>
+</ol>
+<figure><img src="img/ocarina-memory.png" alt="Onglet System, Memory Layout réglé sur 8GB DRAM" loading="lazy"><figcaption>Onglet <em>System</em> : <em>Memory Layout</em> sur <em>8GB DRAM</em>.</figcaption></figure>
+<div class="warn">Choisissez <strong>8GB</strong> seulement si votre PC a au moins <strong>16 Go</strong> de mémoire vive, et <strong>6GB</strong> s'il en a 12 Go. Sinon, laissez <em>4GB DRAM (Default)</em> : le PC ralentirait au lieu d'accélérer. Pour connaître votre mémoire : <span class="menu">Ctrl + Maj + Échap → Performance → Mémoire</span>.</div>
+</section>
+<section class="card tuto-step" id="gpu"><h2><span class="num">4</span>Choisir Vulkan et votre carte graphique</h2>
+<ol class="steps">
+<li>Onglet <span class="menu">Graphics</span>.</li>
+<li><strong>API</strong> : <code>Vulkan</code>.</li>
+<li><strong>Device</strong> : votre carte graphique (NVIDIA GeForce ou AMD Radeon), pas la puce graphique intégrée au processeur.</li>
+<li><strong>Resolution</strong> : <code>1X (720p/1080p)</code>.</li>
+</ol>
+</section>
+<section class="card tuto-step" id="dlss"><h2><span class="num">5</span>Activer le DLSS</h2>
+<p>Ocarina of Time agrandit son image avec son propre réseau « DLSS ». Selon votre carte :</p>
+<ol class="steps">
+<li><strong>Carte NVIDIA (GeForce RTX)</strong> : cochez <span class="menu">Use NVIDIA DLSS in place of a game's DLSS</span>. La ligne <em>Ready</em> doit apparaître en vert ; sinon, ouvrez l'application NVIDIA pour qu'elle télécharge les fichiers DLSS, puis rouvrez cette fenêtre.</li>
+<li><strong>Autre carte (AMD, Intel)</strong> : cochez <span class="menu">Use the game's own DLSS</span>.</li>
+<li><span class="menu">Apply</span>, puis <span class="menu">OK</span>.</li>
+</ol>
+<figure><img src="img/ocarina-graphics.png" alt="Onglet Graphics avec Vulkan, une carte RTX et le DLSS NVIDIA prêt" loading="lazy"><figcaption>Onglet <em>Graphics</em> sur une carte NVIDIA : Vulkan, résolution 1X et DLSS NVIDIA « Ready ».</figcaption></figure>
+<div class="note">Le DLSS NVIDIA remplace celui du jeu <strong>uniquement en résolution 1X</strong> : gardez <em>Resolution</em> sur <em>1X</em>, le DLSS se charge d'agrandir l'image.</div>
+</section>
+<section class="card tuto-step" id="precompile"><h2><span class="num">6</span>Précompiler les shaders</h2>
+<p>Au premier lancement du jeu, Erable propose de préparer les shaders avant de jouer, ce qui évite la plupart des saccades de la première partie.</p>
+<ol class="steps">
+<li>Lancez le jeu, puis choisissez <span class="menu">Précompiler maintenant</span>.</li>
+<li>Patientez quelques minutes : le jeu démarre tout seul à la fin.</li>
+</ol>
+<div class="note">Cette étape n'a lieu qu'une fois. Elle recommence seulement après une mise à jour du pilote de la carte graphique.</div>
+</section>
+<section class="card tuto-step" id="cache"><h2><span class="num">7</span>Reprendre le cache d'un autre PC</h2>
+<p>Si vous avez déjà joué sur un autre PC, son cache de shaders évite presque toutes les saccades sur celui-ci.</p>
+<ol class="steps">
+<li>Sur le PC qui a déjà joué : clic droit sur le jeu → <span class="menu">Ouvrir le cache de pipelines transférable</span>.</li>
+<li>Fermez Erable, puis copiez le dossier <code>0400486024dec000</code> sur une clé USB.</li>
+<li>Sur l'autre PC : ouvrez le même emplacement de la même façon, fermez Erable, puis collez-y le dossier en remplaçant celui qui existe.</li>
+</ol>
+<div class="warn">Gardez ce dossier pour vous : il contient des éléments du jeu et ne doit pas être publié sur Internet.</div>
+</section>
+<section class="card tuto-step" id="next"><h2><span class="num">✓</span>Et ensuite ?</h2>
+<p>Lancez le jeu. Les premières minutes, et à chaque nouvelle zone, quelques saccades restent normales le temps que l'émulateur prépare les shaders ; elles disparaissent ensuite. Ne videz pas le cache de shaders entre deux parties.</p>
+<p>Un souci ? <a href="../report.html">Signalez-le ici</a>.</p>
+</section>
+      </article>
+      <article data-lang="en">
+<section class="card tuto-step" id="ready"><h2><span class="num">1</span>Check the game is ready</h2>
+<ol class="steps">
+<li>Ocarina of Time shows up in Erable's game list (see <a href="install.html#games">Add your games</a>).</li>
+<li>Right-click the game → <span class="menu">Configure Game</span>.</li>
+</ol>
+<div class="note">All the settings below are made in this window and only apply to Ocarina of Time: your other games keep their settings. The game must be closed.</div>
+</section>
+<section class="card tuto-step" id="shaders"><h2><span class="num">2</span>Install the shader mod</h2>
+<p>The <code>ootrshaders</code> mod cuts stutter: fewer shaders to prepare while you play.</p>
+<ol class="steps">
+<li><span class="menu">Add-Ons</span> tab → <span class="menu">Import Mod from ZIP</span>.</li>
+<li>Pick <code>ootrshaders.zip</code>, then the <span class="menu">RomFS</span> type.</li>
+<li>Check that <strong>ootrshaders</strong> is ticked, then <span class="menu">Apply</span>.</li>
+</ol>
+<figure><img src="img/ocarina-addons.png" alt="Add-Ons tab with ootrshaders, Max Resolution and Dynamic FPS ticked" loading="lazy"><figcaption>The three add-ons ticked: <em>ootrshaders</em> (LayeredFS), and the two built into Erable, <em>Max Resolution</em> and <em>Dynamic FPS by Dark</em>.</figcaption></figure>
+<div class="note"><strong>Max Resolution</strong> and <strong>Dynamic FPS</strong> already come with Erable: leave them ticked.</div>
+<div class="warn">Only take this zip from someone you trust, and scan it with Microsoft Defender before importing it. A shader mod never contains an <code>.exe</code>.</div>
+</section>
+<section class="card tuto-step" id="memory"><h2><span class="num">3</span>Raise the emulated memory</h2>
+<ol class="steps">
+<li><span class="menu">System</span> tab, <strong>Core</strong> section.</li>
+<li><strong>Memory Layout</strong>: <code>6GB DRAM</code> or <code>8GB DRAM</code>.</li>
+<li><span class="menu">Apply</span>.</li>
+</ol>
+<figure><img src="img/ocarina-memory.png" alt="System tab with Memory Layout set to 8GB DRAM" loading="lazy"><figcaption>The <em>System</em> tab: <em>Memory Layout</em> on <em>8GB DRAM</em>.</figcaption></figure>
+<div class="warn">Choose <strong>8GB</strong> only if your PC has at least <strong>16 GB</strong> of RAM, and <strong>6GB</strong> if it has 12 GB. Otherwise leave <em>4GB DRAM (Default)</em>: the PC would slow down instead of speeding up. To see your memory: <span class="menu">Ctrl + Shift + Esc → Performance → Memory</span>.</div>
+</section>
+<section class="card tuto-step" id="gpu"><h2><span class="num">4</span>Choose Vulkan and your graphics card</h2>
+<ol class="steps">
+<li><span class="menu">Graphics</span> tab.</li>
+<li><strong>API</strong>: <code>Vulkan</code>.</li>
+<li><strong>Device</strong>: your graphics card (NVIDIA GeForce or AMD Radeon), not the graphics built into the processor.</li>
+<li><strong>Resolution</strong>: <code>1X (720p/1080p)</code>.</li>
+</ol>
+</section>
+<section class="card tuto-step" id="dlss"><h2><span class="num">5</span>Turn on DLSS</h2>
+<p>Ocarina of Time upscales its image with its own "DLSS" network. Depending on your card:</p>
+<ol class="steps">
+<li><strong>NVIDIA card (GeForce RTX)</strong>: tick <span class="menu">Use NVIDIA DLSS in place of a game's DLSS</span>. The <em>Ready</em> line should appear in green; if not, open the NVIDIA app so it downloads the DLSS files, then reopen this window.</li>
+<li><strong>Other card (AMD, Intel)</strong>: tick <span class="menu">Use the game's own DLSS</span>.</li>
+<li><span class="menu">Apply</span>, then <span class="menu">OK</span>.</li>
+</ol>
+<figure><img src="img/ocarina-graphics.png" alt="Graphics tab with Vulkan, an RTX card and NVIDIA DLSS ready" loading="lazy"><figcaption>The <em>Graphics</em> tab on an NVIDIA card: Vulkan, 1X resolution and NVIDIA DLSS "Ready".</figcaption></figure>
+<div class="note">NVIDIA DLSS replaces the game's <strong>only at 1X resolution</strong>: keep <em>Resolution</em> on <em>1X</em> and let DLSS upscale the image.</div>
+</section>
+<section class="card tuto-step" id="precompile"><h2><span class="num">6</span>Precompile the shaders</h2>
+<p>The first time you start the game, Erable offers to prepare the shaders before you play, which avoids most of the first session's stutter.</p>
+<ol class="steps">
+<li>Start the game, then choose <span class="menu">Précompiler maintenant</span> (precompile now).</li>
+<li>Wait a few minutes: the game starts by itself at the end.</li>
+</ol>
+<div class="note">This only happens once. It runs again only after a graphics driver update.</div>
+</section>
+<section class="card tuto-step" id="cache"><h2><span class="num">7</span>Reuse another PC's cache</h2>
+<p>If you have already played on another PC, its shader cache avoids almost all stutter on this one.</p>
+<ol class="steps">
+<li>On the PC that has played: right-click the game → <span class="menu">Ouvrir le cache de pipelines transférable</span> (open transferable pipeline cache).</li>
+<li>Close Erable, then copy the <code>0400486024dec000</code> folder to a USB stick.</li>
+<li>On the other PC: open the same place the same way, close Erable, then paste the folder there, replacing the existing one.</li>
+</ol>
+<div class="warn">Keep this folder to yourself: it contains parts of the game and must not be published online.</div>
+</section>
+<section class="card tuto-step" id="next"><h2><span class="num">✓</span>What next?</h2>
+<p>Start the game. In the first minutes, and in each new area, a few stutters are normal while the emulator prepares shaders; they go away afterwards. Don't clear the shader cache between sessions.</p>
+<p>A problem? <a href="../report.html">Report it here</a>.</p>
+</section>
+      </article>
+      <article data-lang="de">
+<section class="card tuto-step" id="ready"><h2><span class="num">1</span>Prüfen, ob das Spiel bereit ist</h2>
+<ol class="steps">
+<li>Ocarina of Time erscheint in der Spieleliste von Erable (siehe <a href="install.html#games">Spiele hinzufügen</a>).</li>
+<li>Rechtsklick auf das Spiel → <span class="menu">Configure Game</span>.</li>
+</ol>
+<div class="note">Alle folgenden Einstellungen nimmst du in diesem Fenster vor, und sie gelten nur für Ocarina of Time: Deine anderen Spiele behalten ihre Einstellungen. Das Spiel muss geschlossen sein.</div>
+</section>
+<section class="card tuto-step" id="shaders"><h2><span class="num">2</span>Den Shader-Mod installieren</h2>
+<p>Der Mod <code>ootrshaders</code> verringert Ruckler: weniger Shader, die während des Spielens vorbereitet werden müssen.</p>
+<ol class="steps">
+<li>Reiter <span class="menu">Add-Ons</span> → <span class="menu">Import Mod from ZIP</span>.</li>
+<li>Wähle <code>ootrshaders.zip</code> und dann den Typ <span class="menu">RomFS</span>.</li>
+<li>Prüfe, dass <strong>ootrshaders</strong> angehakt ist, dann <span class="menu">Apply</span>.</li>
+</ol>
+<figure><img src="img/ocarina-addons.png" alt="Reiter Add-Ons mit ootrshaders, Max Resolution und Dynamic FPS angehakt" loading="lazy"><figcaption>Die drei angehakten Add-ons: <em>ootrshaders</em> (LayeredFS) sowie die beiden in Erable enthaltenen, <em>Max Resolution</em> und <em>Dynamic FPS by Dark</em>.</figcaption></figure>
+<div class="note"><strong>Max Resolution</strong> und <strong>Dynamic FPS</strong> sind bereits in Erable enthalten: Lass sie angehakt.</div>
+<div class="warn">Nimm diese ZIP-Datei nur von einer Person, der du vertraust, und prüfe sie vor dem Import mit Microsoft Defender. Ein Shader-Mod enthält nie eine <code>.exe</code>.</div>
+</section>
+<section class="card tuto-step" id="memory"><h2><span class="num">3</span>Emulierten Speicher erhöhen</h2>
+<ol class="steps">
+<li>Reiter <span class="menu">System</span>, Bereich <strong>Core</strong>.</li>
+<li><strong>Memory Layout</strong>: <code>6GB DRAM</code> oder <code>8GB DRAM</code>.</li>
+<li><span class="menu">Apply</span>.</li>
+</ol>
+<figure><img src="img/ocarina-memory.png" alt="Reiter System, Memory Layout auf 8GB DRAM" loading="lazy"><figcaption>Reiter <em>System</em>: <em>Memory Layout</em> auf <em>8GB DRAM</em>.</figcaption></figure>
+<div class="warn">Wähle <strong>8GB</strong> nur, wenn dein PC mindestens <strong>16 GB</strong> Arbeitsspeicher hat, und <strong>6GB</strong> bei 12 GB. Sonst lass <em>4GB DRAM (Default)</em>: Der PC würde langsamer statt schneller. Deinen Speicher siehst du unter <span class="menu">Strg + Umschalt + Esc → Leistung → Arbeitsspeicher</span>.</div>
+</section>
+<section class="card tuto-step" id="gpu"><h2><span class="num">4</span>Vulkan und deine Grafikkarte wählen</h2>
+<ol class="steps">
+<li>Reiter <span class="menu">Graphics</span>.</li>
+<li><strong>API</strong>: <code>Vulkan</code>.</li>
+<li><strong>Device</strong>: deine Grafikkarte (NVIDIA GeForce oder AMD Radeon), nicht die im Prozessor eingebaute Grafik.</li>
+<li><strong>Resolution</strong>: <code>1X (720p/1080p)</code>.</li>
+</ol>
+</section>
+<section class="card tuto-step" id="dlss"><h2><span class="num">5</span>DLSS einschalten</h2>
+<p>Ocarina of Time skaliert sein Bild mit einem eigenen „DLSS“-Netz hoch. Je nach Karte:</p>
+<ol class="steps">
+<li><strong>NVIDIA-Karte (GeForce RTX)</strong>: Hake <span class="menu">Use NVIDIA DLSS in place of a game's DLSS</span> an. Die Zeile <em>Ready</em> sollte grün erscheinen; falls nicht, öffne die NVIDIA-App, damit sie die DLSS-Dateien lädt, und öffne dieses Fenster erneut.</li>
+<li><strong>Andere Karte (AMD, Intel)</strong>: Hake <span class="menu">Use the game's own DLSS</span> an.</li>
+<li><span class="menu">Apply</span>, dann <span class="menu">OK</span>.</li>
+</ol>
+<figure><img src="img/ocarina-graphics.png" alt="Reiter Graphics mit Vulkan, einer RTX-Karte und NVIDIA DLSS bereit" loading="lazy"><figcaption>Reiter <em>Graphics</em> mit einer NVIDIA-Karte: Vulkan, Auflösung 1X und NVIDIA DLSS „Ready“.</figcaption></figure>
+<div class="note">NVIDIA DLSS ersetzt das des Spiels <strong>nur bei Auflösung 1X</strong>: Lass <em>Resolution</em> auf <em>1X</em>, DLSS übernimmt das Hochskalieren.</div>
+</section>
+<section class="card tuto-step" id="precompile"><h2><span class="num">6</span>Shader vorkompilieren</h2>
+<p>Beim ersten Start des Spiels bietet Erable an, die Shader vor dem Spielen vorzubereiten. Das vermeidet die meisten Ruckler der ersten Runde.</p>
+<ol class="steps">
+<li>Starte das Spiel und wähle <span class="menu">Précompiler maintenant</span> (jetzt vorkompilieren).</li>
+<li>Warte ein paar Minuten: Am Ende startet das Spiel von selbst.</li>
+</ol>
+<div class="note">Das passiert nur einmal – erneut nur nach einem Update des Grafiktreibers.</div>
+</section>
+<section class="card tuto-step" id="cache"><h2><span class="num">7</span>Den Cache eines anderen PCs übernehmen</h2>
+<p>Hast du schon auf einem anderen PC gespielt, vermeidet dessen Shader-Cache auf diesem fast alle Ruckler.</p>
+<ol class="steps">
+<li>Auf dem PC, auf dem schon gespielt wurde: Rechtsklick auf das Spiel → <span class="menu">Ouvrir le cache de pipelines transférable</span> (übertragbaren Pipeline-Cache öffnen).</li>
+<li>Schließe Erable und kopiere den Ordner <code>0400486024dec000</code> auf einen USB-Stick.</li>
+<li>Auf dem anderen PC: Öffne denselben Ort auf dieselbe Weise, schließe Erable und füge den Ordner dort ein, wobei du den vorhandenen ersetzt.</li>
+</ol>
+<div class="warn">Behalte diesen Ordner für dich: Er enthält Teile des Spiels und darf nicht im Internet veröffentlicht werden.</div>
+</section>
+<section class="card tuto-step" id="next"><h2><span class="num">✓</span>Und dann?</h2>
+<p>Starte das Spiel. In den ersten Minuten und in jedem neuen Gebiet sind ein paar Ruckler normal, während der Emulator Shader vorbereitet; danach verschwinden sie. Leere den Shader-Cache nicht zwischen zwei Runden.</p>
+<p>Ein Problem? <a href="../report.html">Hier melden</a>.</p>
+</section>
+      </article>
+    </div>
+  </div>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <a class="brand" href=".././"><img src="../erable.png" alt="">Erable</a>
+    <p data-i18n-html="footer.text"></p>
+    <a class="btn secondary small" href="https://github.com/erablesimu/erable"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg><span data-i18n="footer.source">Code source</span></a>
+  </div>
+</footer>
+
+</body>
+</html>

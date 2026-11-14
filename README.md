@@ -21,9 +21,9 @@ proposées automatiquement au démarrage, avec leurs notes de version en frança
 
 ## Tutoriels
 
-- [Installer Erable](https://erablesimu.github.io/erable/tuto/installer.html?lang=fr) : installation, firmware et clés de votre
+- [Installer Erable](https://erablesimu.github.io/erable/guides/install.html?lang=fr) : installation, firmware et clés de votre
   console, jeux en français, manette.
-- [Optimiser Zelda Ocarina of Time](https://erablesimu.github.io/erable/tuto/zelda-ocarina.html?lang=fr) : réglages, DLSS,
+- [Optimiser Zelda Ocarina of Time](https://erablesimu.github.io/erable/guides/zelda-ocarina.html?lang=fr) : réglages, DLSS,
   précompilation des shaders et partage du cache entre PC.
 - [Raccourcis](raccourcis.md) : dossiers utiles, lanceur de diagnostic et menus.
 
@@ -48,9 +48,9 @@ performances dans [docs/pistes.md](docs/pistes.md).
 ## Signaler un problème
 
 Clic droit sur le jeu, puis **Rapport de compatibilité…**, ou remplissez le formulaire du
-[site d'Erable](https://erablesimu.github.io/erable/signaler.html?lang=fr) en joignant `erable_log.txt`
+[site d'Erable](https://erablesimu.github.io/erable/report.html?lang=fr) en joignant `erable_log.txt`
 (dossier `%APPDATA%\erable\log`, une fois l'émulateur fermé). Les notes de chaque version et
-les dernières modifications sont sur [le site d'Erable](https://erablesimu.github.io/erable/changements.html?lang=fr).
+les dernières modifications sont sur [le site d'Erable](https://erablesimu.github.io/erable/changelog.html?lang=fr).
 
 ## Crédits et licence
 

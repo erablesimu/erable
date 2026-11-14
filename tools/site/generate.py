@@ -1,4 +1,4 @@
-"""Writes the Erable site's pages (site/*.html, site/tuto/*.html). The texts the pages show
+"""Writes the Erable site's pages (site/*.html, site/guides/*.html). The texts the pages show
 come from site/i18n.js; the tutorials' French, English and German bodies are here.
 
     python3 tools/site/generate.py [site directory]
@@ -41,10 +41,10 @@ def head(prefix, title_key, description):
     <a class="brand" href="{prefix}./"><img src="{prefix}erable.png" alt="">Erable</a>
     <nav aria-label="Navigation">
       <a href="{prefix}./"{cur('home')} data-i18n="nav.home">Accueil</a>
-      <a href="{prefix}tutoriels.html"{cur('tutos')} data-i18n="nav.tutorials">Tutoriels</a>
-      <a href="{prefix}changements.html"{cur('changes')} data-i18n="nav.changes">Changements</a>
+      <a href="{prefix}guides.html"{cur('tutos')} data-i18n="nav.tutorials">Tutoriels</a>
+      <a href="{prefix}changelog.html"{cur('changes')} data-i18n="nav.changes">Changements</a>
       <a href="{prefix}bugs.html"{cur('bugs')} data-i18n="nav.bugs">Bugs</a>
-      <a href="{prefix}signaler.html"{cur('report')} data-i18n="nav.report">Signaler</a>
+      <a href="{prefix}report.html"{cur('report')} data-i18n="nav.report">Signaler</a>
     </nav>
     <div class="lang" role="group" data-i18n-attr="aria-label:nav.language">
       <button type="button" data-set-lang="fr" lang="fr" title="Français">FR</button>
@@ -95,16 +95,29 @@ write("index.html", head("", "home.title", "Erable, a Nintendo Switch 2 emulator
   <div class="leaves" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="wrap">
     <div>
-      <a class="pill" id="version-pill" href="changements.html"><span class="dot"></span><span id="version-text" data-i18n="home.pill">Dernière version</span></a>
+      <a class="pill" id="version-pill" href="changelog.html"><span class="dot"></span><span id="version-text" data-i18n="home.pill">Dernière version</span></a>
       <h1 data-i18n-html="home.h1"></h1>
       <p class="lead" data-i18n="home.lead"></p>
       <div class="actions">
         <a class="btn" id="download" href="https://github.com/erablesimu/erable/releases/latest">{ICONS['download']}<span data-i18n="home.download"></span></a>
-        <a class="btn secondary" href="tutoriels.html"><span data-i18n="home.tutorials"></span>{ICONS['arrow']}</a>
+        <a class="btn secondary" href="guides.html"><span data-i18n="home.tutorials"></span>{ICONS['arrow']}</a>
       </div>
       <p class="hero-note" data-i18n="home.note"></p>
     </div>
-    <div class="hero-art"><img src="erable.png" alt="Erable"></div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="app-mock">
+        <div class="app-bar"><span class="app-dots"><i></i><i></i><i></i></span><span class="app-brand"><img src="erable.png" alt="">Erable</span><span class="app-search"></span></div>
+        <div class="app-shelf">
+          <div class="case c1"><span class="spine"></span><span class="cover"></span></div>
+          <div class="case c2"><span class="spine"></span><span class="cover"></span></div>
+          <div class="case c3 front"><span class="spine"></span><span class="cover"><img src="erable.png" alt=""></span></div>
+          <div class="case c4"><span class="spine"></span><span class="cover"></span></div>
+          <div class="case c5"><span class="spine"></span><span class="cover"></span></div>
+        </div>
+        <div class="app-title"><span></span><span></span></div>
+        <div class="app-pills"><span class="on"></span><span></span><span></span><span></span></div>
+      </div>
+    </div>
   </div>
 </section>
 <main>
@@ -129,7 +142,7 @@ write("index.html", head("", "home.title", "Erable, a Nintendo Switch 2 emulator
       <div class="card step reveal"><h3 data-i18n="home.s2t"></h3><p data-i18n="home.s2p"></p></div>
       <div class="card step reveal"><h3 data-i18n="home.s3t"></h3><p data-i18n="home.s3p"></p></div>
     </div>
-    <p class="reveal"><a class="more" href="tuto/installer.html"><span data-i18n="home.stepsMore"></span>{ICONS['arrow']}</a></p>
+    <p class="reveal"><a class="more" href="guides/install.html"><span data-i18n="home.stepsMore"></span>{ICONS['arrow']}</a></p>
   </section>
 
   <section class="section wrap">
@@ -139,9 +152,22 @@ write("index.html", head("", "home.title", "Erable, a Nintendo Switch 2 emulator
         <h2 data-i18n="home.latestTitle"></h2>
         <p class="meta" data-i18n="home.latestSub"></p>
         <p class="meta" id="latest-date"></p>
-        <a class="more" href="changements.html"><span data-i18n="home.latestMore"></span>{ICONS['arrow']}</a>
+        <a class="more" href="changelog.html"><span data-i18n="home.latestMore"></span>{ICONS['arrow']}</a>
       </div>
       <div id="latest-notes" class="notes"><p class="status" data-i18n="home.latestLoading"></p></div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="cta reveal">
+      <div>
+        <h2 data-i18n="home.ctaTitle"></h2>
+        <p data-i18n="home.ctaSub"></p>
+      </div>
+      <div class="actions">
+        <a class="btn light" href="https://github.com/erablesimu/erable/releases/latest">{ICONS['download']}<span data-i18n="home.download"></span></a>
+        <a class="btn ghost" href="guides.html"><span data-i18n="home.tutorials"></span>{ICONS['arrow']}</a>
+      </div>
     </div>
   </section>
 </main>
@@ -151,7 +177,7 @@ write("index.html", head("", "home.title", "Erable, a Nintendo Switch 2 emulator
 
 # ---------------------------------------------------------------- changes
 CURRENT = "changes"
-write("changements.html", head("", "changes.title", "Erable's release notes and code changes.") + """
+write("changelog.html", head("", "changes.title", "Erable's release notes and code changes.") + """
 <main>
   <div class="wrap">
     <div class="page-head">
@@ -173,7 +199,7 @@ write("changements.html", head("", "changes.title", "Erable's release notes and 
 </main>
 """ + foot("", ["https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js",
                 "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js",
-                "site.js", "changements.js"]))
+                "site.js", "changelog.js"]))
 
 # ---------------------------------------------------------------- bugs
 CURRENT = "bugs"
@@ -197,7 +223,7 @@ write("bugs.html", head("", "bugs.title", "Known problems reported for Erable.")
     </div>
     <div id="bug-list"><div class="skeleton"></div><div class="skeleton"></div></div>
     <p class="meta" id="bug-updated"></p>
-    <div class="actions"><a class="btn" href="signaler.html">{ICONS['flag']}<span data-i18n="bugs.report"></span></a></div>
+    <div class="actions"><a class="btn" href="report.html">{ICONS['flag']}<span data-i18n="bugs.report"></span></a></div>
   </div>
 </main>
 """ + foot("", ["https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js", "site.js", "bugs.js"]))
@@ -210,7 +236,7 @@ kinds = "\n".join(
 games = ["The Legend of Zelda: Ocarina of Time", "Hyrule Warriors: Age of Imprisonment", "Mario Kart World",
          "Donkey Kong Bananza", "Kirby Air Riders", "Pokémon Pokopia", "Super Mario Bros. Wonder"]
 game_options = "\n".join(f"            <option>{g}</option>" for g in games)
-write("signaler.html", head("", "report.title", "Report a problem with Erable.") + f"""
+write("report.html", head("", "report.title", "Report a problem with Erable.") + f"""
 <main>
   <div class="wrap">
     <div class="page-head">
@@ -271,11 +297,11 @@ write("signaler.html", head("", "report.title", "Report a problem with Erable.")
     </div>
   </div>
 </main>
-""" + foot("", ["site.js", "signaler.js"]))
+""" + foot("", ["site.js", "report.js"]))
 
 # ---------------------------------------------------------------- tutorials hub
 CURRENT = "tutos"
-write("tutoriels.html", head("", "tutos.title", "Erable guides: emulator and games.") + """
+write("guides.html", head("", "tutos.title", "Erable guides: emulator and games.") + """
 <main>
   <div class="wrap">
     <div class="page-head">
@@ -301,7 +327,7 @@ write("tutoriels.html", head("", "tutos.title", "Erable guides: emulator and gam
     </section>
   </div>
 </main>
-""" + foot("", ["site.js", "tutos.js"]))
+""" + foot("", ["site.js", "guides.js"]))
 
 
 # ---------------------------------------------------------------- tutorial pages
@@ -322,7 +348,7 @@ def tutorial(path, title_key, kind_key, game, toc, bodies, heads, leads):
 <main>
   <section class="tuto-hero">
     <div class="wrap">
-      <a class="back" href="../tutoriels.html">{ICONS['back']}<span data-i18n="tutos.back"></span></a>
+      <a class="back" href="../guides.html">{ICONS['back']}<span data-i18n="tutos.back"></span></a>
       <p class="eyebrow">{eyebrow}</p>
 {head_html}
     </div>
@@ -353,7 +379,7 @@ DOWNLOAD = '<a class="btn" href="https://github.com/erablesimu/erable/releases/l
 
 install = {
     "fr": "\n".join([
-        sec("installer", 1, "Installer Erable", f"""<ol class="steps">
+        sec("install", 1, "Installer Erable", f"""<ol class="steps">
 <li>Téléchargez <code>erable-windows-x86_64.zip</code> depuis la dernière version :<br>{DOWNLOAD.format('Télécharger Erable')}</li>
 <li>Faites un clic droit sur le zip → {m('Extraire tout…')}</li>
 <li>Dans le dossier obtenu, lancez <code>erable.exe</code>.</li>
@@ -368,14 +394,14 @@ install = {
 </ol>
 {fig('tools-menu', "Menu Tools d'Erable avec Install Decryption Keys et Install Firmware", "Le menu <em>Tools</em> : <em>Install Decryption Keys</em> et <em>Install Firmware</em>.")}
 <div class="warn">Ne téléchargez jamais de clés ou de firmware sur Internet : ces fichiers circulent surtout sur des sites qui diffusent aussi des virus.</div>"""),
-        sec("langue", 3, "Jeux en français", f"""<ol class="steps">
+        sec("language", 3, "Jeux en français", f"""<ol class="steps">
 <li>En haut à gauche : {m('Emulation → Configure')}, puis {m('System')}.</li>
 <li><strong>Language</strong> : <code>French (français)</code>.</li>
 <li><strong>Region</strong> : <code>Europe</code>.</li>
 <li>Validez avec {m('OK')}.</li>
 </ol>
 {fig('system-language', 'Onglet System de la configuration, langue French (français)', 'Onglet <em>System</em> : la langue des jeux.')}"""),
-        sec("manette", 4, "Jouer avec une manette", f"""<ol class="steps">
+        sec("controller", 4, "Jouer avec une manette", f"""<ol class="steps">
 <li>Branchez votre manette, puis allez dans {m('Emulation → Configure → Controls')}.</li>
 <li><strong>Input Device</strong> : choisissez votre manette (en général la dernière de la liste).</li>
 <li>Cliquez sur chaque case (A, B, X, Y, sticks, gâchettes…), puis appuyez sur la touche correspondante de la manette.</li>
@@ -383,7 +409,7 @@ install = {
 </ol>
 {fig('controls', 'Onglet Controls avec une manette connectée et les touches configurées', "Onglet <em>Controls</em> : la case bleue <em>[waiting]</em> attend que vous appuyiez sur une touche.")}
 <div class="note">Si la manette n'apparaît pas : fermez Steam (il capture les manettes), essayez un autre câble USB, puis relancez Erable.</div>"""),
-        sec("jeux", 5, "Ajouter vos jeux et jouer", f"""<ol class="steps">
+        sec("games", 5, "Ajouter vos jeux et jouer", f"""<ol class="steps">
 <li>Rangez vos jeux (extraits de vos cartouches ou de vos achats) dans un dossier <code>Jeux Switch 2</code>, un sous-dossier par jeu.</li>
 <li>Dans la liste des jeux, cliquez sur {m('+ Add New Game Directory')}.</li>
 <li>Sélectionnez le dossier du jeu, puis {m('Sélectionner un dossier')}.</li>
@@ -391,10 +417,10 @@ install = {
 </ol>
 {fig('game-folder', "Fenêtre de sélection du dossier d'un jeu", "Choisir le dossier d'un jeu.")}
 {fig('game-list', 'Liste des jeux avec Zelda Ocarina of Time et Pokémon Pokopia', 'Les jeux apparaissent dans la liste, avec leur temps de jeu et leurs add-ons.')}
-<div class="note">La première fois, un jeu peut saccader quelques minutes : l'émulateur prépare ses shaders, puis tout devient plus fluide. Un souci ? <a href="../signaler.html">Signalez-le ici</a>.</div>"""),
+<div class="note">La première fois, un jeu peut saccader quelques minutes : l'émulateur prépare ses shaders, puis tout devient plus fluide. Un souci ? <a href="../report.html">Signalez-le ici</a>.</div>"""),
     ]),
     "en": "\n".join([
-        sec("installer", 1, "Install Erable", f"""<ol class="steps">
+        sec("install", 1, "Install Erable", f"""<ol class="steps">
 <li>Download <code>erable-windows-x86_64.zip</code> from the latest version:<br>{DOWNLOAD.format('Download Erable')}</li>
 <li>Right-click the zip → {m('Extract All…')}</li>
 <li>In the folder you get, run <code>erable.exe</code>.</li>
@@ -409,14 +435,14 @@ install = {
 </ol>
 {fig('tools-menu', "Erable's Tools menu with Install Decryption Keys and Install Firmware", 'The <em>Tools</em> menu: <em>Install Decryption Keys</em> and <em>Install Firmware</em>.')}
 <div class="warn">Never download keys or firmware from the Internet: these files mostly circulate on sites that also spread viruses.</div>"""),
-        sec("langue", 3, "Games in your language", f"""<ol class="steps">
+        sec("language", 3, "Games in your language", f"""<ol class="steps">
 <li>Top left: {m('Emulation → Configure')}, then {m('System')}.</li>
 <li><strong>Language</strong>: your language, e.g. <code>British English</code>.</li>
 <li><strong>Region</strong>: <code>Europe</code> (or <code>USA</code>).</li>
 <li>Confirm with {m('OK')}.</li>
 </ol>
 {fig('system-language', 'System tab of the configuration with the game language', "The <em>System</em> tab: the games' language.")}"""),
-        sec("manette", 4, "Play with a controller", f"""<ol class="steps">
+        sec("controller", 4, "Play with a controller", f"""<ol class="steps">
 <li>Plug in your controller, then go to {m('Emulation → Configure → Controls')}.</li>
 <li><strong>Input Device</strong>: pick your controller (usually the last one in the list).</li>
 <li>Click each box (A, B, X, Y, sticks, triggers…), then press the matching button on the controller.</li>
@@ -424,7 +450,7 @@ install = {
 </ol>
 {fig('controls', 'Controls tab with a connected controller and its buttons mapped', 'The <em>Controls</em> tab: the blue <em>[waiting]</em> box waits for you to press a button.')}
 <div class="note">If the controller doesn't show up: close Steam (it captures controllers), try another USB cable, then restart Erable.</div>"""),
-        sec("jeux", 5, "Add your games and play", f"""<ol class="steps">
+        sec("games", 5, "Add your games and play", f"""<ol class="steps">
 <li>Keep your games (dumped from your cartridges or purchases) in a <code>Switch 2 Games</code> folder, one subfolder per game.</li>
 <li>In the game list, click {m('+ Add New Game Directory')}.</li>
 <li>Select the game's folder, then {m('Select Folder')}.</li>
@@ -432,10 +458,10 @@ install = {
 </ol>
 {fig('game-folder', "Window for picking a game's folder", "Picking a game's folder.")}
 {fig('game-list', 'Game list with Zelda Ocarina of Time and Pokémon Pokopia', 'Games show up in the list with their play time and add-ons.')}
-<div class="note">The first time, a game may stutter for a few minutes while the emulator prepares its shaders; then it all gets smoother. A problem? <a href="../signaler.html">Report it here</a>.</div>"""),
+<div class="note">The first time, a game may stutter for a few minutes while the emulator prepares its shaders; then it all gets smoother. A problem? <a href="../report.html">Report it here</a>.</div>"""),
     ]),
     "de": "\n".join([
-        sec("installer", 1, "Erable installieren", f"""<ol class="steps">
+        sec("install", 1, "Erable installieren", f"""<ol class="steps">
 <li>Lade <code>erable-windows-x86_64.zip</code> aus der neuesten Version herunter:<br>{DOWNLOAD.format('Erable herunterladen')}</li>
 <li>Rechtsklick auf die ZIP-Datei → {m('Alle extrahieren…')}</li>
 <li>Starte im entpackten Ordner <code>erable.exe</code>.</li>
@@ -450,14 +476,14 @@ install = {
 </ol>
 {fig('tools-menu', 'Tools-Menü von Erable mit Install Decryption Keys und Install Firmware', 'Das Menü <em>Tools</em>: <em>Install Decryption Keys</em> und <em>Install Firmware</em>.')}
 <div class="warn">Lade nie Schlüssel oder Firmware aus dem Internet herunter: Diese Dateien kursieren vor allem auf Seiten, die auch Viren verbreiten.</div>"""),
-        sec("langue", 3, "Spiele auf Deutsch", f"""<ol class="steps">
+        sec("language", 3, "Spiele auf Deutsch", f"""<ol class="steps">
 <li>Oben links: {m('Emulation → Configure')}, dann {m('System')}.</li>
 <li><strong>Language</strong>: <code>German (Deutsch)</code>.</li>
 <li><strong>Region</strong>: <code>Europe</code>.</li>
 <li>Mit {m('OK')} bestätigen.</li>
 </ol>
 {fig('system-language', 'Reiter System der Einstellungen mit der Spielsprache', 'Reiter <em>System</em>: die Sprache der Spiele.')}"""),
-        sec("manette", 4, "Mit einem Controller spielen", f"""<ol class="steps">
+        sec("controller", 4, "Mit einem Controller spielen", f"""<ol class="steps">
 <li>Schließe deinen Controller an und öffne {m('Emulation → Configure → Controls')}.</li>
 <li><strong>Input Device</strong>: Wähle deinen Controller (meist der letzte in der Liste).</li>
 <li>Klicke auf jedes Feld (A, B, X, Y, Sticks, Trigger …) und drücke dann die passende Taste am Controller.</li>
@@ -465,7 +491,7 @@ install = {
 </ol>
 {fig('controls', 'Reiter Controls mit verbundenem Controller und belegten Tasten', 'Reiter <em>Controls</em>: Das blaue Feld <em>[waiting]</em> wartet auf einen Tastendruck.')}
 <div class="note">Taucht der Controller nicht auf: Schließe Steam (es fängt Controller ab), probiere ein anderes USB-Kabel und starte Erable neu.</div>"""),
-        sec("jeux", 5, "Spiele hinzufügen und spielen", f"""<ol class="steps">
+        sec("games", 5, "Spiele hinzufügen und spielen", f"""<ol class="steps">
 <li>Lege deine Spiele (aus deinen Modulen oder Käufen ausgelesen) in einen Ordner <code>Switch-2-Spiele</code>, einen Unterordner pro Spiel.</li>
 <li>Klicke in der Spieleliste auf {m('+ Add New Game Directory')}.</li>
 <li>Wähle den Ordner des Spiels und dann {m('Ordner auswählen')}.</li>
@@ -473,17 +499,17 @@ install = {
 </ol>
 {fig('game-folder', 'Fenster zur Auswahl des Spielordners', 'Den Ordner eines Spiels auswählen.')}
 {fig('game-list', 'Spieleliste mit Zelda Ocarina of Time und Pokémon Pokopia', 'Die Spiele erscheinen in der Liste, mit Spielzeit und Add-ons.')}
-<div class="note">Beim ersten Mal kann ein Spiel ein paar Minuten ruckeln, während der Emulator seine Shader vorbereitet; danach läuft alles flüssiger. Ein Problem? <a href="../signaler.html">Hier melden</a>.</div>"""),
+<div class="note">Beim ersten Mal kann ein Spiel ein paar Minuten ruckeln, während der Emulator seine Shader vorbereitet; danach läuft alles flüssiger. Ein Problem? <a href="../report.html">Hier melden</a>.</div>"""),
     ]),
 }
 
 install_toc = {
-    "ids": ["installer", "console", "langue", "manette", "jeux"],
+    "ids": ["install", "console", "language", "controller", "games"],
     "fr": ["Installer Erable", "Firmware et clés", "Jeux en français", "Manette", "Ajouter vos jeux"],
     "en": ["Install Erable", "Firmware and keys", "Game language", "Controller", "Add your games"],
     "de": ["Erable installieren", "Firmware und Schlüssel", "Spielsprache", "Controller", "Spiele hinzufügen"],
 }
-tutorial("tuto/installer.html", "tuto.installTitle", "tutos.emuTitle", None, install_toc, install,
+tutorial("guides/install.html", "tuto.installTitle", "tutos.emuTitle", None, install_toc, install,
          {"fr": "Installer Erable", "en": "Install Erable", "de": "Erable installieren"},
          {"fr": "De zéro à votre premier jeu, pas à pas.",
           "en": "From nothing to your first game, step by step.",
@@ -491,8 +517,8 @@ tutorial("tuto/installer.html", "tuto.installTitle", "tutos.emuTitle", None, ins
 
 ocarina = {
     "fr": "\n".join([
-        sec("pret", 1, "Vérifier que le jeu est prêt", f"""<ol class="steps">
-<li>Ocarina of Time apparaît dans la liste des jeux d'Erable (voir <a href="installer.html#jeux">Ajouter vos jeux</a>).</li>
+        sec("ready", 1, "Vérifier que le jeu est prêt", f"""<ol class="steps">
+<li>Ocarina of Time apparaît dans la liste des jeux d'Erable (voir <a href="install.html#games">Ajouter vos jeux</a>).</li>
 <li>Faites un clic droit sur le jeu → {m('Configure Game')}.</li>
 </ol>
 <div class="note">Tous les réglages ci-dessous se font dans cette fenêtre, et ne concernent qu'Ocarina of Time : vos autres jeux gardent leurs réglages. Le jeu doit être fermé.</div>"""),
@@ -505,14 +531,14 @@ ocarina = {
 {fig('ocarina-addons', 'Onglet Add-Ons avec ootrshaders, Max Resolution et Dynamic FPS cochés', "Les trois add-ons cochés : <em>ootrshaders</em> (LayeredFS), et les deux intégrés à Erable, <em>Max Resolution</em> et <em>Dynamic FPS by Dark</em>.")}
 <div class="note"><strong>Max Resolution</strong> et <strong>Dynamic FPS</strong> sont déjà inclus dans Erable : laissez-les cochés.</div>
 <div class="warn">Ne prenez ce zip qu'auprès d'une personne de confiance, et analysez-le avec Microsoft Defender avant de l'importer. Un mod de shaders ne contient jamais de <code>.exe</code>.</div>"""),
-        sec("memoire", 3, "Augmenter la mémoire émulée", f"""<ol class="steps">
+        sec("memory", 3, "Augmenter la mémoire émulée", f"""<ol class="steps">
 <li>Onglet {m('System')}, partie <strong>Core</strong>.</li>
 <li><strong>Memory Layout</strong> : <code>6GB DRAM</code> ou <code>8GB DRAM</code>.</li>
 <li>{m('Apply')}.</li>
 </ol>
 {fig('ocarina-memory', 'Onglet System, Memory Layout réglé sur 8GB DRAM', 'Onglet <em>System</em> : <em>Memory Layout</em> sur <em>8GB DRAM</em>.')}
 <div class="warn">Choisissez <strong>8GB</strong> seulement si votre PC a au moins <strong>16 Go</strong> de mémoire vive, et <strong>6GB</strong> s'il en a 12 Go. Sinon, laissez <em>4GB DRAM (Default)</em> : le PC ralentirait au lieu d'accélérer. Pour connaître votre mémoire : {m('Ctrl + Maj + Échap → Performance → Mémoire')}.</div>"""),
-        sec("carte", 4, "Choisir Vulkan et votre carte graphique", """<ol class="steps">
+        sec("gpu", 4, "Choisir Vulkan et votre carte graphique", """<ol class="steps">
 <li>Onglet <span class="menu">Graphics</span>.</li>
 <li><strong>API</strong> : <code>Vulkan</code>.</li>
 <li><strong>Device</strong> : votre carte graphique (NVIDIA GeForce ou AMD Radeon), pas la puce graphique intégrée au processeur.</li>
@@ -526,7 +552,7 @@ ocarina = {
 </ol>
 {fig('ocarina-graphics', 'Onglet Graphics avec Vulkan, une carte RTX et le DLSS NVIDIA prêt', 'Onglet <em>Graphics</em> sur une carte NVIDIA : Vulkan, résolution 1X et DLSS NVIDIA « Ready ».')}
 <div class="note">Le DLSS NVIDIA remplace celui du jeu <strong>uniquement en résolution 1X</strong> : gardez <em>Resolution</em> sur <em>1X</em>, le DLSS se charge d'agrandir l'image.</div>"""),
-        sec("precompiler", 6, "Précompiler les shaders", f"""<p>Au premier lancement du jeu, Erable propose de préparer les shaders avant de jouer, ce qui évite la plupart des saccades de la première partie.</p>
+        sec("precompile", 6, "Précompiler les shaders", f"""<p>Au premier lancement du jeu, Erable propose de préparer les shaders avant de jouer, ce qui évite la plupart des saccades de la première partie.</p>
 <ol class="steps">
 <li>Lancez le jeu, puis choisissez {m('Précompiler maintenant')}.</li>
 <li>Patientez quelques minutes : le jeu démarre tout seul à la fin.</li>
@@ -539,12 +565,12 @@ ocarina = {
 <li>Sur l'autre PC : ouvrez le même emplacement de la même façon, fermez Erable, puis collez-y le dossier en remplaçant celui qui existe.</li>
 </ol>
 <div class="warn">Gardez ce dossier pour vous : il contient des éléments du jeu et ne doit pas être publié sur Internet.</div>"""),
-        sec("ensuite", "✓", "Et ensuite ?", """<p>Lancez le jeu. Les premières minutes, et à chaque nouvelle zone, quelques saccades restent normales le temps que l'émulateur prépare les shaders ; elles disparaissent ensuite. Ne videz pas le cache de shaders entre deux parties.</p>
-<p>Un souci ? <a href="../signaler.html">Signalez-le ici</a>.</p>"""),
+        sec("next", "✓", "Et ensuite ?", """<p>Lancez le jeu. Les premières minutes, et à chaque nouvelle zone, quelques saccades restent normales le temps que l'émulateur prépare les shaders ; elles disparaissent ensuite. Ne videz pas le cache de shaders entre deux parties.</p>
+<p>Un souci ? <a href="../report.html">Signalez-le ici</a>.</p>"""),
     ]),
     "en": "\n".join([
-        sec("pret", 1, "Check the game is ready", f"""<ol class="steps">
-<li>Ocarina of Time shows up in Erable's game list (see <a href="installer.html#jeux">Add your games</a>).</li>
+        sec("ready", 1, "Check the game is ready", f"""<ol class="steps">
+<li>Ocarina of Time shows up in Erable's game list (see <a href="install.html#games">Add your games</a>).</li>
 <li>Right-click the game → {m('Configure Game')}.</li>
 </ol>
 <div class="note">All the settings below are made in this window and only apply to Ocarina of Time: your other games keep their settings. The game must be closed.</div>"""),
@@ -557,14 +583,14 @@ ocarina = {
 {fig('ocarina-addons', 'Add-Ons tab with ootrshaders, Max Resolution and Dynamic FPS ticked', 'The three add-ons ticked: <em>ootrshaders</em> (LayeredFS), and the two built into Erable, <em>Max Resolution</em> and <em>Dynamic FPS by Dark</em>.')}
 <div class="note"><strong>Max Resolution</strong> and <strong>Dynamic FPS</strong> already come with Erable: leave them ticked.</div>
 <div class="warn">Only take this zip from someone you trust, and scan it with Microsoft Defender before importing it. A shader mod never contains an <code>.exe</code>.</div>"""),
-        sec("memoire", 3, "Raise the emulated memory", f"""<ol class="steps">
+        sec("memory", 3, "Raise the emulated memory", f"""<ol class="steps">
 <li>{m('System')} tab, <strong>Core</strong> section.</li>
 <li><strong>Memory Layout</strong>: <code>6GB DRAM</code> or <code>8GB DRAM</code>.</li>
 <li>{m('Apply')}.</li>
 </ol>
 {fig('ocarina-memory', 'System tab with Memory Layout set to 8GB DRAM', 'The <em>System</em> tab: <em>Memory Layout</em> on <em>8GB DRAM</em>.')}
 <div class="warn">Choose <strong>8GB</strong> only if your PC has at least <strong>16 GB</strong> of RAM, and <strong>6GB</strong> if it has 12 GB. Otherwise leave <em>4GB DRAM (Default)</em>: the PC would slow down instead of speeding up. To see your memory: {m('Ctrl + Shift + Esc → Performance → Memory')}.</div>"""),
-        sec("carte", 4, "Choose Vulkan and your graphics card", """<ol class="steps">
+        sec("gpu", 4, "Choose Vulkan and your graphics card", """<ol class="steps">
 <li><span class="menu">Graphics</span> tab.</li>
 <li><strong>API</strong>: <code>Vulkan</code>.</li>
 <li><strong>Device</strong>: your graphics card (NVIDIA GeForce or AMD Radeon), not the graphics built into the processor.</li>
@@ -578,7 +604,7 @@ ocarina = {
 </ol>
 {fig('ocarina-graphics', 'Graphics tab with Vulkan, an RTX card and NVIDIA DLSS ready', 'The <em>Graphics</em> tab on an NVIDIA card: Vulkan, 1X resolution and NVIDIA DLSS "Ready".')}
 <div class="note">NVIDIA DLSS replaces the game's <strong>only at 1X resolution</strong>: keep <em>Resolution</em> on <em>1X</em> and let DLSS upscale the image.</div>"""),
-        sec("precompiler", 6, "Precompile the shaders", f"""<p>The first time you start the game, Erable offers to prepare the shaders before you play, which avoids most of the first session's stutter.</p>
+        sec("precompile", 6, "Precompile the shaders", f"""<p>The first time you start the game, Erable offers to prepare the shaders before you play, which avoids most of the first session's stutter.</p>
 <ol class="steps">
 <li>Start the game, then choose {m('Précompiler maintenant')} (precompile now).</li>
 <li>Wait a few minutes: the game starts by itself at the end.</li>
@@ -591,12 +617,12 @@ ocarina = {
 <li>On the other PC: open the same place the same way, close Erable, then paste the folder there, replacing the existing one.</li>
 </ol>
 <div class="warn">Keep this folder to yourself: it contains parts of the game and must not be published online.</div>"""),
-        sec("ensuite", "✓", "What next?", """<p>Start the game. In the first minutes, and in each new area, a few stutters are normal while the emulator prepares shaders; they go away afterwards. Don't clear the shader cache between sessions.</p>
-<p>A problem? <a href="../signaler.html">Report it here</a>.</p>"""),
+        sec("next", "✓", "What next?", """<p>Start the game. In the first minutes, and in each new area, a few stutters are normal while the emulator prepares shaders; they go away afterwards. Don't clear the shader cache between sessions.</p>
+<p>A problem? <a href="../report.html">Report it here</a>.</p>"""),
     ]),
     "de": "\n".join([
-        sec("pret", 1, "Prüfen, ob das Spiel bereit ist", f"""<ol class="steps">
-<li>Ocarina of Time erscheint in der Spieleliste von Erable (siehe <a href="installer.html#jeux">Spiele hinzufügen</a>).</li>
+        sec("ready", 1, "Prüfen, ob das Spiel bereit ist", f"""<ol class="steps">
+<li>Ocarina of Time erscheint in der Spieleliste von Erable (siehe <a href="install.html#games">Spiele hinzufügen</a>).</li>
 <li>Rechtsklick auf das Spiel → {m('Configure Game')}.</li>
 </ol>
 <div class="note">Alle folgenden Einstellungen nimmst du in diesem Fenster vor, und sie gelten nur für Ocarina of Time: Deine anderen Spiele behalten ihre Einstellungen. Das Spiel muss geschlossen sein.</div>"""),
@@ -609,14 +635,14 @@ ocarina = {
 {fig('ocarina-addons', 'Reiter Add-Ons mit ootrshaders, Max Resolution und Dynamic FPS angehakt', 'Die drei angehakten Add-ons: <em>ootrshaders</em> (LayeredFS) sowie die beiden in Erable enthaltenen, <em>Max Resolution</em> und <em>Dynamic FPS by Dark</em>.')}
 <div class="note"><strong>Max Resolution</strong> und <strong>Dynamic FPS</strong> sind bereits in Erable enthalten: Lass sie angehakt.</div>
 <div class="warn">Nimm diese ZIP-Datei nur von einer Person, der du vertraust, und prüfe sie vor dem Import mit Microsoft Defender. Ein Shader-Mod enthält nie eine <code>.exe</code>.</div>"""),
-        sec("memoire", 3, "Emulierten Speicher erhöhen", f"""<ol class="steps">
+        sec("memory", 3, "Emulierten Speicher erhöhen", f"""<ol class="steps">
 <li>Reiter {m('System')}, Bereich <strong>Core</strong>.</li>
 <li><strong>Memory Layout</strong>: <code>6GB DRAM</code> oder <code>8GB DRAM</code>.</li>
 <li>{m('Apply')}.</li>
 </ol>
 {fig('ocarina-memory', 'Reiter System, Memory Layout auf 8GB DRAM', 'Reiter <em>System</em>: <em>Memory Layout</em> auf <em>8GB DRAM</em>.')}
 <div class="warn">Wähle <strong>8GB</strong> nur, wenn dein PC mindestens <strong>16 GB</strong> Arbeitsspeicher hat, und <strong>6GB</strong> bei 12 GB. Sonst lass <em>4GB DRAM (Default)</em>: Der PC würde langsamer statt schneller. Deinen Speicher siehst du unter {m('Strg + Umschalt + Esc → Leistung → Arbeitsspeicher')}.</div>"""),
-        sec("carte", 4, "Vulkan und deine Grafikkarte wählen", """<ol class="steps">
+        sec("gpu", 4, "Vulkan und deine Grafikkarte wählen", """<ol class="steps">
 <li>Reiter <span class="menu">Graphics</span>.</li>
 <li><strong>API</strong>: <code>Vulkan</code>.</li>
 <li><strong>Device</strong>: deine Grafikkarte (NVIDIA GeForce oder AMD Radeon), nicht die im Prozessor eingebaute Grafik.</li>
@@ -630,7 +656,7 @@ ocarina = {
 </ol>
 {fig('ocarina-graphics', 'Reiter Graphics mit Vulkan, einer RTX-Karte und NVIDIA DLSS bereit', 'Reiter <em>Graphics</em> mit einer NVIDIA-Karte: Vulkan, Auflösung 1X und NVIDIA DLSS „Ready“.')}
 <div class="note">NVIDIA DLSS ersetzt das des Spiels <strong>nur bei Auflösung 1X</strong>: Lass <em>Resolution</em> auf <em>1X</em>, DLSS übernimmt das Hochskalieren.</div>"""),
-        sec("precompiler", 6, "Shader vorkompilieren", f"""<p>Beim ersten Start des Spiels bietet Erable an, die Shader vor dem Spielen vorzubereiten. Das vermeidet die meisten Ruckler der ersten Runde.</p>
+        sec("precompile", 6, "Shader vorkompilieren", f"""<p>Beim ersten Start des Spiels bietet Erable an, die Shader vor dem Spielen vorzubereiten. Das vermeidet die meisten Ruckler der ersten Runde.</p>
 <ol class="steps">
 <li>Starte das Spiel und wähle {m('Précompiler maintenant')} (jetzt vorkompilieren).</li>
 <li>Warte ein paar Minuten: Am Ende startet das Spiel von selbst.</li>
@@ -643,19 +669,53 @@ ocarina = {
 <li>Auf dem anderen PC: Öffne denselben Ort auf dieselbe Weise, schließe Erable und füge den Ordner dort ein, wobei du den vorhandenen ersetzt.</li>
 </ol>
 <div class="warn">Behalte diesen Ordner für dich: Er enthält Teile des Spiels und darf nicht im Internet veröffentlicht werden.</div>"""),
-        sec("ensuite", "✓", "Und dann?", """<p>Starte das Spiel. In den ersten Minuten und in jedem neuen Gebiet sind ein paar Ruckler normal, während der Emulator Shader vorbereitet; danach verschwinden sie. Leere den Shader-Cache nicht zwischen zwei Runden.</p>
-<p>Ein Problem? <a href="../signaler.html">Hier melden</a>.</p>"""),
+        sec("next", "✓", "Und dann?", """<p>Starte das Spiel. In den ersten Minuten und in jedem neuen Gebiet sind ein paar Ruckler normal, während der Emulator Shader vorbereitet; danach verschwinden sie. Leere den Shader-Cache nicht zwischen zwei Runden.</p>
+<p>Ein Problem? <a href="../report.html">Hier melden</a>.</p>"""),
     ]),
 }
 ocarina_toc = {
-    "ids": ["pret", "shaders", "memoire", "carte", "dlss", "precompiler", "cache"],
+    "ids": ["ready", "shaders", "memory", "gpu", "dlss", "precompile", "cache"],
     "fr": ["Jeu prêt", "Mod de shaders", "Mémoire émulée", "Vulkan et carte", "DLSS", "Précompiler", "Cache d'un autre PC"],
     "en": ["Game ready", "Shader mod", "Emulated memory", "Vulkan and card", "DLSS", "Precompile", "Another PC's cache"],
     "de": ["Spiel bereit", "Shader-Mod", "Emulierter Speicher", "Vulkan und Karte", "DLSS", "Vorkompilieren", "Cache eines anderen PCs"],
 }
-tutorial("tuto/zelda-ocarina.html", "tuto.ocarinaTitle", "tutos.gamesTitle", "Zelda: Ocarina of Time", ocarina_toc, ocarina,
+tutorial("guides/zelda-ocarina.html", "tuto.ocarinaTitle", "tutos.gamesTitle", "Zelda: Ocarina of Time", ocarina_toc, ocarina,
          {"fr": "Zelda : Ocarina of Time", "en": "Zelda: Ocarina of Time", "de": "Zelda: Ocarina of Time"},
          {"fr": "Moins de saccades et une image plus nette : les bons réglages, étape par étape.",
           "en": "Less stutter and a sharper image: the right settings, step by step.",
           "de": "Weniger Ruckler und ein schärferes Bild: die richtigen Einstellungen, Schritt für Schritt."})
 print("ok")
+
+
+# ---------------------------------------------------------------- former addresses
+# The pages had French names until build 33; builds out there still open report.html's old name.
+def redirect(path, target, anchors=None):
+    mapping = "".join(f'"#{a}":"#{b}",' for a, b in (anchors or {}).items())
+    write(path, f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="{target}">
+<meta http-equiv="refresh" content="0; url={target}">
+<title>Erable</title>
+<script>
+(function () {{
+  var anchors = {{{mapping}}};
+  var hash = anchors[location.hash] || location.hash;
+  location.replace("{target}" + location.search + hash);
+}})();
+</script>
+</head>
+<body><p><a href="{target}">{target}</a></p></body>
+</html>
+""")
+
+
+redirect("tutoriels.html", "guides.html")
+redirect("changements.html", "changelog.html")
+redirect("signaler.html", "report.html")
+redirect("tuto/installer.html", "../guides/install.html",
+         {"installer": "install", "langue": "language", "manette": "controller", "jeux": "games"})
+redirect("tuto/zelda-ocarina.html", "../guides/zelda-ocarina.html",
+         {"pret": "ready", "memoire": "memory", "carte": "gpu", "precompiler": "precompile", "ensuite": "next"})

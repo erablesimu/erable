@@ -1001,7 +1001,7 @@ void MainWindow::InitializeWidgets() {
         QDesktopServices::openUrl(QUrl::fromLocalFile(path));
     });
     connect(home_screen, &HomeScreen::ReportProblem, this, [this] {
-        OpenURL(QUrl(QStringLiteral("https://erablesimu.github.io/erable/signaler.html?lang=") +
+        OpenURL(QUrl(QStringLiteral("https://erablesimu.github.io/erable/report.html?lang=") +
                      tr("en", "Language code of the Erable site's pages")));
     });
 
@@ -1896,7 +1896,7 @@ void MainWindow::SetupDebugMenu() {
         QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdWString(folder.wstring())));
     });
     connect(menu->addAction(tr("Report a problem...")), &QAction::triggered, this, [this] {
-        OpenURL(QUrl(QStringLiteral("https://erablesimu.github.io/erable/signaler.html?lang=") +
+        OpenURL(QUrl(QStringLiteral("https://erablesimu.github.io/erable/report.html?lang=") +
                      tr("en", "Language code of the Erable site's pages")));
     });
 
@@ -1990,7 +1990,7 @@ void MainWindow::ShowSavedSession(const std::filesystem::path& zip, bool interru
 #endif
     }
     if (box.clickedButton() == report) {
-        OpenURL(QUrl(QStringLiteral("https://erablesimu.github.io/erable/signaler.html?lang=") +
+        OpenURL(QUrl(QStringLiteral("https://erablesimu.github.io/erable/report.html?lang=") +
                      tr("en", "Language code of the Erable site's pages")));
     }
 }

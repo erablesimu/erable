@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Erable</title>
+<meta name="i18n-title" content="report.title">
+<meta name="description" content="Report a problem with Erable.">
+<meta name="theme-color" content="#d2501f">
+<link rel="icon" href="erable.png">
+<link rel="stylesheet" href="style.css">
+<script src="i18n.js"></script>
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="erable.png" alt="">Erable</a>
+    <nav aria-label="Navigation">
+      <a href="./" data-i18n="nav.home">Accueil</a>
+      <a href="guides.html" data-i18n="nav.tutorials">Tutoriels</a>
+      <a href="changelog.html" data-i18n="nav.changes">Changements</a>
+      <a href="bugs.html" data-i18n="nav.bugs">Bugs</a>
+      <a href="report.html" aria-current="page" data-i18n="nav.report">Signaler</a>
+    </nav>
+    <div class="lang" role="group" data-i18n-attr="aria-label:nav.language">
+      <button type="button" data-set-lang="fr" lang="fr" title="Français">FR</button>
+      <button type="button" data-set-lang="en" lang="en" title="English">EN</button>
+      <button type="button" data-set-lang="de" lang="de" title="Deutsch">DE</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="page-head">
+      <h1 data-i18n="report.h1"></h1>
+      <p class="lead" data-i18n="report.lead"></p>
+    </div>
+    <div class="report-layout">
+      <aside class="card">
+        <h2 class="small-title" data-i18n="report.howTitle"></h2>
+        <ol class="howto">
+          <li data-i18n-html="report.how1"></li>
+          <li data-i18n-html="report.how2"></li>
+          <li data-i18n-html="report.how3"></li>
+        </ol>
+        <p class="meta" data-i18n-html="report.account"></p>
+      </aside>
+      <form id="report" class="card">
+        <div class="field">
+          <label for="title" data-i18n="report.summary"></label>
+          <input id="title" name="title" required maxlength="120" data-i18n-attr="placeholder:report.summaryPh">
+        </div>
+        <div class="field">
+          <span class="label" data-i18n="report.kind"></span>
+          <div class="chips">
+            <input type="radio" name="kind" id="k1" value="1" checked><label for="k1" data-i18n="report.k1"></label>
+            <input type="radio" name="kind" id="k2" value="2"><label for="k2" data-i18n="report.k2"></label>
+            <input type="radio" name="kind" id="k3" value="3"><label for="k3" data-i18n="report.k3"></label>
+            <input type="radio" name="kind" id="k4" value="4"><label for="k4" data-i18n="report.k4"></label>
+            <input type="radio" name="kind" id="k5" value="5"><label for="k5" data-i18n="report.k5"></label>
+            <input type="radio" name="kind" id="k6" value="6"><label for="k6" data-i18n="report.k6"></label>
+            <input type="radio" name="kind" id="k7" value="7"><label for="k7" data-i18n="report.k7"></label>
+            <input type="radio" name="kind" id="k8" value="8"><label for="k8" data-i18n="report.k8"></label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="game" data-i18n="report.game"></label>
+            <select id="game" name="game">
+              <option value="" data-i18n="report.gameNone"></option>
+            <option>The Legend of Zelda: Ocarina of Time</option>
+            <option>Hyrule Warriors: Age of Imprisonment</option>
+            <option>Mario Kart World</option>
+            <option>Donkey Kong Bananza</option>
+            <option>Kirby Air Riders</option>
+            <option>Pokémon Pokopia</option>
+            <option>Super Mario Bros. Wonder</option>
+              <option value="other" data-i18n="report.gameOther"></option>
+            </select>
+            <input id="game-other" name="game-other" data-i18n-attr="placeholder:report.gameOtherPh" hidden>
+          </div>
+          <div class="field">
+            <label for="version"><span data-i18n="report.version"></span> <span class="hint" data-i18n="report.versionHint"></span></label>
+            <input id="version" name="version" data-i18n-attr="placeholder:report.versionPh">
+          </div>
+        </div>
+        <div class="field">
+          <label for="pc"><span data-i18n="report.pc"></span> <span class="hint" data-i18n="report.optional"></span></label>
+          <input id="pc" name="pc" data-i18n-attr="placeholder:report.pcPh">
+        </div>
+        <div class="field">
+          <label for="what" data-i18n="report.what"></label>
+          <textarea id="what" name="what" required data-i18n-attr="placeholder:report.whatPh"></textarea>
+        </div>
+        <div class="field">
+          <label for="where"><span data-i18n="report.where"></span> <span class="hint" data-i18n="report.optional"></span></label>
+          <textarea id="where" name="where" data-i18n-attr="placeholder:report.wherePh"></textarea>
+        </div>
+        <p class="notice" data-i18n="report.public"></p>
+        <button class="btn" type="submit"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg><span data-i18n="report.submit"></span></button>
+      </form>
+    </div>
+  </div>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <a class="brand" href="./"><img src="erable.png" alt="">Erable</a>
+    <p data-i18n-html="footer.text"></p>
+    <a class="btn secondary small" href="https://github.com/erablesimu/erable"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg><span data-i18n="footer.source">Code source</span></a>
+  </div>
+</footer>
+<script src="site.js"></script>
+<script src="report.js"></script>
+</body>
+</html>

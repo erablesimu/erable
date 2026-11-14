@@ -17,10 +17,10 @@
     <a class="brand" href="./"><img src="erable.png" alt="">Erable</a>
     <nav aria-label="Navigation">
       <a href="./" aria-current="page" data-i18n="nav.home">Accueil</a>
-      <a href="tutoriels.html" data-i18n="nav.tutorials">Tutoriels</a>
-      <a href="changements.html" data-i18n="nav.changes">Changements</a>
+      <a href="guides.html" data-i18n="nav.tutorials">Tutoriels</a>
+      <a href="changelog.html" data-i18n="nav.changes">Changements</a>
       <a href="bugs.html" data-i18n="nav.bugs">Bugs</a>
-      <a href="signaler.html" data-i18n="nav.report">Signaler</a>
+      <a href="report.html" data-i18n="nav.report">Signaler</a>
     </nav>
     <div class="lang" role="group" data-i18n-attr="aria-label:nav.language">
       <button type="button" data-set-lang="fr" lang="fr" title="Français">FR</button>
@@ -34,16 +34,29 @@
   <div class="leaves" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="wrap">
     <div>
-      <a class="pill" id="version-pill" href="changements.html"><span class="dot"></span><span id="version-text" data-i18n="home.pill">Dernière version</span></a>
+      <a class="pill" id="version-pill" href="changelog.html"><span class="dot"></span><span id="version-text" data-i18n="home.pill">Dernière version</span></a>
       <h1 data-i18n-html="home.h1"></h1>
       <p class="lead" data-i18n="home.lead"></p>
       <div class="actions">
         <a class="btn" id="download" href="https://github.com/erablesimu/erable/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span data-i18n="home.download"></span></a>
-        <a class="btn secondary" href="tutoriels.html"><span data-i18n="home.tutorials"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
+        <a class="btn secondary" href="guides.html"><span data-i18n="home.tutorials"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
       </div>
       <p class="hero-note" data-i18n="home.note"></p>
     </div>
-    <div class="hero-art"><img src="erable.png" alt="Erable"></div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="app-mock">
+        <div class="app-bar"><span class="app-dots"><i></i><i></i><i></i></span><span class="app-brand"><img src="erable.png" alt="">Erable</span><span class="app-search"></span></div>
+        <div class="app-shelf">
+          <div class="case c1"><span class="spine"></span><span class="cover"></span></div>
+          <div class="case c2"><span class="spine"></span><span class="cover"></span></div>
+          <div class="case c3 front"><span class="spine"></span><span class="cover"><img src="erable.png" alt=""></span></div>
+          <div class="case c4"><span class="spine"></span><span class="cover"></span></div>
+          <div class="case c5"><span class="spine"></span><span class="cover"></span></div>
+        </div>
+        <div class="app-title"><span></span><span></span></div>
+        <div class="app-pills"><span class="on"></span><span></span><span></span><span></span></div>
+      </div>
+    </div>
   </div>
 </section>
 <main>
@@ -73,7 +86,7 @@
       <div class="card step reveal"><h3 data-i18n="home.s2t"></h3><p data-i18n="home.s2p"></p></div>
       <div class="card step reveal"><h3 data-i18n="home.s3t"></h3><p data-i18n="home.s3p"></p></div>
     </div>
-    <p class="reveal"><a class="more" href="tuto/installer.html"><span data-i18n="home.stepsMore"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a></p>
+    <p class="reveal"><a class="more" href="guides/install.html"><span data-i18n="home.stepsMore"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a></p>
   </section>
 
   <section class="section wrap">
@@ -83,9 +96,22 @@
         <h2 data-i18n="home.latestTitle"></h2>
         <p class="meta" data-i18n="home.latestSub"></p>
         <p class="meta" id="latest-date"></p>
-        <a class="more" href="changements.html"><span data-i18n="home.latestMore"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
+        <a class="more" href="changelog.html"><span data-i18n="home.latestMore"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
       </div>
       <div id="latest-notes" class="notes"><p class="status" data-i18n="home.latestLoading"></p></div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="cta reveal">
+      <div>
+        <h2 data-i18n="home.ctaTitle"></h2>
+        <p data-i18n="home.ctaSub"></p>
+      </div>
+      <div class="actions">
+        <a class="btn light" href="https://github.com/erablesimu/erable/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span data-i18n="home.download"></span></a>
+        <a class="btn ghost" href="guides.html"><span data-i18n="home.tutorials"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
+      </div>
     </div>
   </section>
 </main>

@@ -2,67 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="guides.html">
+<meta http-equiv="refresh" content="0; url=guides.html">
 <title>Erable</title>
-<meta name="i18n-title" content="tutos.title">
-<meta name="description" content="Erable guides: emulator and games.">
-<meta name="theme-color" content="#d2501f">
-<link rel="icon" href="erable.png">
-<link rel="stylesheet" href="style.css">
-<script src="i18n.js"></script>
+<script>
+(function () {
+  var anchors = {};
+  var hash = anchors[location.hash] || location.hash;
+  location.replace("guides.html" + location.search + hash);
+})();
+</script>
 </head>
-<body>
-<header class="site">
-  <div class="wrap">
-    <a class="brand" href="./"><img src="erable.png" alt="">Erable</a>
-    <nav aria-label="Navigation">
-      <a href="./" data-i18n="nav.home">Accueil</a>
-      <a href="tutoriels.html" aria-current="page" data-i18n="nav.tutorials">Tutoriels</a>
-      <a href="changements.html" data-i18n="nav.changes">Changements</a>
-      <a href="bugs.html" data-i18n="nav.bugs">Bugs</a>
-      <a href="signaler.html" data-i18n="nav.report">Signaler</a>
-    </nav>
-    <div class="lang" role="group" data-i18n-attr="aria-label:nav.language">
-      <button type="button" data-set-lang="fr" lang="fr" title="Français">FR</button>
-      <button type="button" data-set-lang="en" lang="en" title="English">EN</button>
-      <button type="button" data-set-lang="de" lang="de" title="Deutsch">DE</button>
-    </div>
-  </div>
-</header>
-
-<main>
-  <div class="wrap">
-    <div class="page-head">
-      <h1 data-i18n="tutos.h1"></h1>
-      <p class="lead" data-i18n="tutos.lead"></p>
-    </div>
-    <section class="tuto-section">
-      <div class="section-head">
-        <p class="eyebrow">01</p>
-        <h2 data-i18n="tutos.emuTitle"></h2>
-        <p data-i18n="tutos.emuSub"></p>
-      </div>
-      <div class="tuto-grid" id="emu-list"></div>
-    </section>
-    <section class="tuto-section">
-      <div class="section-head">
-        <p class="eyebrow">02</p>
-        <h2 data-i18n="tutos.gamesTitle"></h2>
-        <p data-i18n="tutos.gamesSub"></p>
-      </div>
-      <div class="filter" id="game-filter" role="group"></div>
-      <div class="tuto-grid" id="games-list"></div>
-    </section>
-  </div>
-</main>
-<footer class="site">
-  <div class="wrap">
-    <a class="brand" href="./"><img src="erable.png" alt="">Erable</a>
-    <p data-i18n-html="footer.text"></p>
-    <a class="btn secondary small" href="https://github.com/erablesimu/erable"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg><span data-i18n="footer.source">Code source</span></a>
-  </div>
-</footer>
-<script src="site.js"></script>
-<script src="tutos.js"></script>
-</body>
+<body><p><a href="guides.html">guides.html</a></p></body>
 </html>
