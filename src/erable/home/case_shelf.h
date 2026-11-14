@@ -41,6 +41,8 @@ public:
     /// A better picture for one case (a downloaded cover).
     void SetArt(int index, const QPixmap& art);
     void SetStyle(Style style_);
+    /// Draws the cases again in the theme just applied.
+    void RefreshTheme();
     [[nodiscard]] Style CurrentStyle() const {
         return style;
     }

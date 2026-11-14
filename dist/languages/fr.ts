@@ -21,6 +21,10 @@
 <context>
     <name>HomeScreen</name>
     <message>
+        <source>Theme: Maple, Spring Maple or Winter Maple</source>
+        <translation>Thème : Maple, Spring Maple ou Winter Maple</translation>
+    </message>
+    <message>
         <source>How the games are shown</source>
         <translation>Présentation des jeux</translation>
     </message>

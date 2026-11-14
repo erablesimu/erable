@@ -9,6 +9,7 @@
 #include <numeric>
 #include <utility>
 
+#include <QApplication>
 #include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
@@ -18,10 +19,10 @@
 
 namespace {
 
-constexpr QColor Maple{0xf0, 0x70, 0x2f};
-constexpr QColor MapleHi{0xff, 0xa2, 0x5a};
-constexpr QColor MapleDeep{0x9c, 0x3a, 0x12};
-constexpr QColor CaseInk{0x1c, 0x15, 0x11};
+// The case's maple parts in the theme's accent (Maple's orange, Spring's green, Winter's frost)
+QColor Accent() {
+    return qApp->palette().color(QPalette::Highlight);
+}
 constexpr QColor Text{0xf6, 0xee, 0xe8};
 constexpr QColor Muted{0xb8, 0xa8, 0x9c};
 
@@ -85,6 +86,16 @@ QSize CaseShelf::minimumSizeHint() const {
     return {320, 240};
 }
 
+void CaseShelf::RefreshTheme() {
+    for (std::size_t i = 0; i < entries.size(); ++i) {
+        if (entries[i].art.isNull() && !entries[i].add) {
+            spine_colours[i] = SpineColour({});
+        }
+    }
+    ClearCache();
+    update();
+}
+
 void CaseShelf::SetStyle(Style style_) {
     style = style_;
     update();
@@ -92,7 +103,7 @@ void CaseShelf::SetStyle(Style style_) {
 
 QColor CaseShelf::SpineColour(const QPixmap& art) {
     if (art.isNull()) {
-        return Maple;
+        return Accent();
     }
     const QImage pixel = art.toImage().scaled(1, 1, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     const QColor average = QColor::fromRgb(pixel.pixel(0, 0));
@@ -284,7 +295,7 @@ void CaseShelf::DrawCase(QPainter& painter, const Entry& entry, const QRectF& bo
     }
 
     painter.setPen(Qt::NoPen);
-    painter.setBrush(CaseInk);
+    painter.setBrush(qApp->palette().color(QPalette::Window).darker(115));
     painter.drawPath(shell);
     painter.save();
     painter.setClipPath(shell);
@@ -293,9 +304,9 @@ void CaseShelf::DrawCase(QPainter& painter, const Entry& entry, const QRectF& bo
     const double spine = w * 0.085;
     const QRectF spine_box{box.left(), box.top(), spine, h};
     QLinearGradient spine_fill{spine_box.topLeft(), spine_box.topRight()};
-    spine_fill.setColorAt(0, MapleDeep);
-    spine_fill.setColorAt(0.45, Maple);
-    spine_fill.setColorAt(1, MapleDeep);
+    spine_fill.setColorAt(0, Accent().darker(155));
+    spine_fill.setColorAt(0.45, Accent());
+    spine_fill.setColorAt(1, Accent().darker(155));
     painter.fillRect(spine_box, spine_fill);
     painter.fillPath(MapleLeaf({spine_box.center().x(), box.top() + spine * 0.9}, spine * 0.62),
                      QColor{255, 255, 255, 220});
@@ -314,7 +325,7 @@ void CaseShelf::DrawCase(QPainter& painter, const Entry& entry, const QRectF& bo
     const QRectF front{box.left() + spine, box.top(), w - spine, h};
     const double band = h * 0.075;
     const QRectF band_box{front.left(), front.top(), front.width(), band};
-    painter.fillRect(band_box, Maple);
+    painter.fillRect(band_box, Accent());
     painter.fillPath(MapleLeaf({band_box.left() + band * 0.75, band_box.center().y()}, band * 0.62),
                      Qt::white);
     painter.setPen(Qt::white);
@@ -334,8 +345,8 @@ void CaseShelf::DrawCase(QPainter& painter, const Entry& entry, const QRectF& bo
         // A square icon: on a blur of its own colours, with the title under it
         if (art.isNull()) {
             QLinearGradient fill{art_box.topLeft(), art_box.bottomRight()};
-            fill.setColorAt(0, MapleHi);
-            fill.setColorAt(1, MapleDeep.darker(180));
+            fill.setColorAt(0, Accent().lighter(130));
+            fill.setColorAt(1, Accent().darker(280));
             painter.fillRect(art_box, fill);
         } else {
             const QImage backdrop = Blurred(art, art_box.size().toSize());
@@ -484,8 +495,8 @@ void CaseShelf::paintEvent(QPaintEvent*) {
     if (!placements.empty()) {
         const QPointF foot = placements.back().transform.map(QPointF(0, 0));
         QRadialGradient glow{foot, size.width() * 0.9};
-        glow.setColorAt(0, QColor{Maple.red(), Maple.green(), Maple.blue(), 70});
-        glow.setColorAt(1, QColor{Maple.red(), Maple.green(), Maple.blue(), 0});
+        glow.setColorAt(0, QColor{Accent().red(), Accent().green(), Accent().blue(), 70});
+        glow.setColorAt(1, QColor{Accent().red(), Accent().green(), Accent().blue(), 0});
         painter.save();
         painter.translate(foot);
         painter.scale(1.0, 0.22);
@@ -529,7 +540,8 @@ void CaseShelf::paintEvent(QPaintEvent*) {
         painter.drawImage(flat, CaseImage(place.index));
         if (style == Style::Shelf && std::abs(place.offset) > 0.5) {
             // The neighbours a little darker, so the middle one stands out
-            painter.setBrush(QColor{0x17, 0x12, 0x0f,
+            const QColor shade = qApp->palette().color(QPalette::Window).darker(125);
+            painter.setBrush(QColor{shade.red(), shade.green(), shade.blue(),
                                     static_cast<int>(std::min(1.0, std::abs(place.offset) - 0.5) * 70)});
             painter.drawRoundedRect(flat, size.width() * 0.035, size.width() * 0.035);
         }

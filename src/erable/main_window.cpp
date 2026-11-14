@@ -992,6 +992,7 @@ void MainWindow::InitializeWidgets() {
     connect(home_screen, &HomeScreen::ShowLibrary, this, [this] { ShowHome(false); });
     connect(home_screen, &HomeScreen::OpenSettings, this, &MainWindow::OnConfigure);
     connect(home_screen, &HomeScreen::HomeSettingsChanged, this, &MainWindow::OnSaveConfig);
+    connect(home_screen, &HomeScreen::ThemeChangeRequested, this, &MainWindow::UpdateUITheme);
     connect(home_screen, &HomeScreen::OpenWhatsNew, this, &MainWindow::OnWhatsNew);
     connect(home_screen, &HomeScreen::OpenCaptures, this, [] {
         const auto path = QString::fromStdString(
@@ -6437,6 +6438,9 @@ void MainWindow::UpdateUITheme() {
     RemoveTitlebarFilter();
     ApplyGlobalDarkTitlebar(UISettings::IsDarkTheme());
 #endif
+    if (home_screen) {
+        home_screen->RefreshTheme();
+    }
 }
 
 void MainWindow::LoadTranslation() {

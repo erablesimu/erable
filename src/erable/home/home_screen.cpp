@@ -33,6 +33,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <QPainterPath>
+#include <QApplication>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QStandardItemModel>
@@ -57,18 +58,39 @@
 
 namespace {
 
-// The home's own palette: a warm dark room, whatever theme the rest of Erable uses
-constexpr QColor Bg{0x17, 0x12, 0x0f};
-constexpr QColor BgGlow{0x2a, 0x1a, 0x12};
-constexpr QColor Surface{0x24, 0x1d, 0x19};
-constexpr QColor SurfaceHi{0x2f, 0x26, 0x21};
-constexpr QColor Text{0xf6, 0xee, 0xe8};
-constexpr QColor Muted{0xb8, 0xa8, 0x9c};
-constexpr QColor Line{0x3b, 0x30, 0x2a};
-constexpr QColor Maple{0xf0, 0x70, 0x2f};
-constexpr QColor MapleHi{0xff, 0xa2, 0x5a};
+// The home's palette: a dark room in the theme's colours (Maple's warm greys and maple, Spring's
+// green, Winter's frost). LoadHomeColours sets it from the application palette.
+QColor Bg{0x17, 0x12, 0x0f};
+QColor BgGlow{0x2a, 0x1a, 0x12};
+QColor Surface{0x24, 0x1d, 0x19};
+QColor SurfaceHi{0x2f, 0x26, 0x21};
+QColor Text{0xf6, 0xee, 0xe8};
+QColor Muted{0xb8, 0xa8, 0x9c};
+QColor Line{0x3b, 0x30, 0x2a};
+QColor Maple{0xf0, 0x70, 0x2f};
+QColor MapleHi{0xff, 0xa2, 0x5a};
 constexpr QColor Ok{0x57, 0xc7, 0x6b};
 constexpr QColor Ink{0x1a, 0x12, 0x0d};
+
+QColor Blend(const QColor& a, const QColor& b, double share) {
+    return QColor::fromRgbF(static_cast<float>(a.redF() + (b.redF() - a.redF()) * share),
+                            static_cast<float>(a.greenF() + (b.greenF() - a.greenF()) * share),
+                            static_cast<float>(a.blueF() + (b.blueF() - a.blueF()) * share));
+}
+
+void LoadHomeColours() {
+    const QPalette palette = qApp->palette();
+    const QColor window = palette.color(QPalette::Window);
+    Maple = palette.color(QPalette::Highlight);
+    MapleHi = Maple.lighter(135);
+    Text = palette.color(QPalette::WindowText);
+    Bg = window.darker(125);
+    BgGlow = Blend(window, Maple, 0.1);
+    Surface = palette.color(QPalette::Button);
+    SurfaceHi = palette.color(QPalette::Midlight);
+    Line = palette.color(QPalette::Light);
+    Muted = Blend(Text, window, 0.3);
+}
 
 struct Fonts {
     QString display; ///< Fredoka SemiBold: titles, the brand, the clock
@@ -369,12 +391,8 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     setFocusPolicy(Qt::StrongFocus);
     setAttribute(Qt::WA_StyledBackground, false);
     const Fonts& fonts = HomeFonts();
-    setStyleSheet(
-        QStringLiteral("#HomeScreen QWidget#brand { background: transparent; }"
-                       "#HomeScreen QLineEdit#search { background: %1; color: %2; border: 1px solid %3;"
-                       " border-radius: 18px; padding: 7px 16px; selection-background-color: %4; }"
-                       "#HomeScreen QLineEdit#search:focus { border-color: %4; }")
-            .arg(Surface.name(), Text.name(), Line.name(), Maple.name()));
+    LoadHomeColours();
+    ApplyStyleSheet();
 
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(32, 18, 32, 10);
@@ -443,6 +461,22 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         emit HomeSettingsChanged();
     });
     right->addWidget(style_button);
+    theme_button = new PillButton({}, {}, false, this);
+    theme_button->setToolTip(tr("Theme: Maple, Spring Maple or Winter Maple"));
+    connect(theme_button, &QAbstractButton::clicked, this, [this] {
+        // The next of Erable's themes
+        const auto& themes = UISettings::themes;
+        std::size_t next = 0;
+        for (std::size_t i = 0; i < themes.size(); ++i) {
+            if (UISettings::values.theme == themes[i].second) {
+                next = (i + 1) % themes.size();
+            }
+        }
+        UISettings::values.theme = themes[next].second;
+        emit ThemeChangeRequested();
+        emit HomeSettingsChanged();
+    });
+    right->addWidget(theme_button);
     right->addSpacing(10);
     controller_label = new QLabel(this);
     controller_label->setFont(MakeFont(fonts.body, 14));
@@ -568,6 +602,7 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     music_button->setChecked(UISettings::values.home_music.GetValue());
     UpdateMusic();
     UpdateStyle();
+    UpdateTheme();
     UpdateProfile();
     CollectGames();
     RebuildTiles();
@@ -730,6 +765,45 @@ void HomeScreen::UpdateMusic() {
     } else {
         ambient_timer.stop();
     }
+}
+
+void HomeScreen::ApplyStyleSheet() {
+    setStyleSheet(
+        QStringLiteral("#HomeScreen QWidget#brand { background: transparent; }"
+                       "#HomeScreen QLineEdit#search { background: %1; color: %2; border: 1px solid %3;"
+                       " border-radius: 18px; padding: 7px 16px; selection-background-color: %4; }"
+                       "#HomeScreen QLineEdit#search:focus { border-color: %4; }")
+            .arg(Surface.name(), Text.name(), Line.name(), Maple.name()));
+}
+
+void HomeScreen::RefreshTheme() {
+    LoadHomeColours();
+    ApplyStyleSheet();
+    for (QLabel* label : {controller_label, clock, title, meta}) {
+        QPalette palette = label->palette();
+        palette.setColor(QPalette::WindowText, label == meta || label == controller_label ? Muted : Text);
+        label->setPalette(palette);
+    }
+    shelf->RefreshTheme();
+    UpdateTheme();
+    UpdateStatus();
+    UpdateSelection();
+    for (QWidget* child : findChildren<QWidget*>()) {
+        child->update();
+    }
+    update();
+}
+
+void HomeScreen::UpdateTheme() {
+    const std::string& current = UISettings::values.theme;
+    QString name = QString::fromUtf8(UISettings::themes.front().first);
+    for (const auto& [label, id] : UISettings::themes) {
+        if (current == id) {
+            name = QString::fromUtf8(label);
+        }
+    }
+    theme_button->setText(name);
+    theme_button->updateGeometry();
 }
 
 void HomeScreen::UpdateStyle() {

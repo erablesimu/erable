@@ -50,6 +50,9 @@ public:
     /// Stops the music while a game runs.
     void StopMusic();
 
+    /// Takes the colours of the theme just applied (the palette MainWindow set).
+    void RefreshTheme();
+
     /// The folder Erable reads the player's games from first (Documents\Erable\Jeux).
     [[nodiscard]] static QString GamesFolder();
 
@@ -63,6 +66,8 @@ signals:
     void ReportProblem();
     /// The music or the shelf style changed: saved at once, so a crash or a forced close keeps it.
     void HomeSettingsChanged();
+    /// The theme button picked the next theme (in UISettings): MainWindow applies it.
+    void ThemeChangeRequested();
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
@@ -91,6 +96,8 @@ private:
     void EnsureProfile(bool requested = false);
     void UpdateMusic();
     void UpdateStyle();
+    void UpdateTheme();
+    void ApplyStyleSheet();
     void UpdateStatus();
     void Launch();
     void ToggleFavorite();
@@ -112,6 +119,7 @@ private:
     PillButton* music_button = nullptr;
     PillButton* song_button = nullptr;
     PillButton* style_button = nullptr;
+    PillButton* theme_button = nullptr;
     QLabel* controller_label = nullptr;
     QLabel* clock = nullptr;
     QLabel* title = nullptr;
