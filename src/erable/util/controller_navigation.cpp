@@ -4,6 +4,8 @@
 #include "common/settings_input.h"
 #include "hid_core/frontend/emulated_controller.h"
 #include "hid_core/hid_core.h"
+#include <QMetaObject>
+
 #include "erable/util/controller_navigation.h"
 
 ControllerNavigation::ControllerNavigation(Core::HID::HIDCore& hid_core, QWidget* parent) {
@@ -33,7 +35,11 @@ void ControllerNavigation::UnloadController() {
 void ControllerNavigation::TriggerButton(Settings::NativeButton::Values native_button,
                                          Qt::Key key) {
     if (button_values[native_button].value && !button_values[native_button].locked) {
-        emit TriggerKeyboardEvent(key);
+        // Sent once the controller's own update is over: a receiver that boots a game reloads the
+        // controllers, and this controller, still inside its change callback, would take its lock
+        // again (an abort when the home screen's A started Mario Kart World).
+        QMetaObject::invokeMethod(
+            this, [this, key] { emit TriggerKeyboardEvent(key); }, Qt::QueuedConnection);
     }
 }
 

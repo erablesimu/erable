@@ -61,6 +61,10 @@ version. Les sections suivantes gardent l'historique.
 - Quand une image communautaire existe pour un jeu, elle est téléchargée une fois et gardée dans
   `%APPDATA%\erable\cache\covers` ; sinon le boîtier utilise l'icône du jeu.
 
+**Correctif**
+- Lancer un jeu avec A à la manette depuis l'accueil ne fait plus planter Erable (Mario Kart
+  World s'arrêtait net au lancement).
+
 **Chargements de zone**
 - Les blocs de mémoire vidéo libérés sont gardés 30 secondes et réutilisés au lieu d'être rendus au
   pilote puis redemandés : les entrées de zone d'Ocarina en demandaient des centaines d'un coup.
