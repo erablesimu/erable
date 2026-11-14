@@ -75,6 +75,28 @@ struct ByteAddressedRange {
     return VkExtent2D{width / 2, height};
 }
 
+/// What a pooled VkImage was made with (image pool, from Fritchii's EXP42): the parts of its
+/// VkImageCreateInfo that differ between texture cache images, and its view format list (a
+/// stable table entry, compared by address). valid is false for images the pool never takes.
+struct ImagePoolKey {
+    bool valid{};
+    VkImageCreateFlags flags{};
+    VkImageType type{};
+    VkFormat format{};
+    u32 width{};
+    u32 height{};
+    u32 depth{};
+    u32 levels{};
+    u32 layers{};
+    VkSampleCountFlagBits samples{};
+    VkImageTiling tiling{};
+    VkImageUsageFlags usage{};
+    const VkFormat* view_formats{};
+    size_t view_format_count{};
+
+    bool operator==(const ImagePoolKey&) const noexcept = default;
+};
+
 class TextureCacheRuntime {
 public:
     explicit TextureCacheRuntime(const Device& device_, Scheduler& scheduler_,
@@ -117,6 +139,19 @@ public:
     /// Images that did not fit the device memory budget so far (see MemoryAllocator).
     u32 MemoryPressureEvents() const noexcept {
         return memory_allocator.MemoryPressureEvents();
+    }
+
+    /// Image pool (from Fritchii's EXP42): VkImages of deleted render targets, kept once the GPU
+    /// is done with them for the next image made with the same create info. A null image when
+    /// none is pooled (or EDEN_NX2_IMAGE_POOL=0).
+    [[nodiscard]] vk::Image TakePooledImage(const ImagePoolKey& key);
+
+    /// Keeps `image` (GPU work on it done, `bytes` of device memory) for TakePooledImage.
+    void PoolImage(const ImagePoolKey& key, vk::Image image, u64 bytes);
+
+    /// Device memory the pool holds: counted by the driver, not by the texture cache.
+    [[nodiscard]] u64 PooledImageBytes() const noexcept {
+        return image_pool_bytes;
     }
 
     u32 FailedImages() const noexcept {
@@ -361,6 +396,28 @@ public:
         vk::Buffer bridge;
     };
     std::deque<PendingByteAddressedShadow> pending_byte_addressed_shadows;
+
+    /// The image pool, oldest first. Capped at ImagePoolMaxBytes and ImagePoolMaxFrames of age,
+    /// emptied when images stop fitting in device memory.
+    struct PooledImage {
+        ImagePoolKey key;
+        vk::Image image;
+        u64 bytes;
+        u64 frame;
+    };
+    static constexpr u64 ImagePoolMaxBytes = u64{512} << 20;
+    static constexpr u64 ImagePoolMaxFrames = 180;
+    std::deque<PooledImage> image_pool;
+    u64 image_pool_bytes{};
+    u64 image_pool_frame{};
+    u32 image_pool_seen_pressure{};
+    u32 image_pool_seen_failed{};
+    /// Since the last report (TickFrame, every 600 frames while the pool is in use).
+    u64 image_pool_taken{};
+    u64 image_pool_missed{};
+    u64 image_pool_given{};
+    u64 image_pool_evicted{};
+    void TrimImagePool(u64 max_bytes);
 };
 
 class Framebuffer {
@@ -539,6 +596,15 @@ public:
     }
 
     /// Returns true when the image is already initialized and mark it as initialized
+    /// Image pool: the deleted image's VkImages go to the runtime's pool instead of being
+    /// destroyed, when eligible. Called once the GPU is done with them (TextureCache::TickFrame).
+    void ReleaseToPool();
+
+    /// Whether the image took a pooled VkImage.
+    [[nodiscard]] bool FromPool() const noexcept {
+        return from_pool;
+    }
+
     [[nodiscard]] bool ExchangeInitialization() noexcept {
         return std::exchange(initialized, true);
     }
@@ -686,6 +752,12 @@ private:
 
     /// Records a clear of the whole image to zero.
     void ClearTiles();
+
+    /// Image pool: what original_image and scaled_image were made with. Declared before them:
+    /// their initializers fill these in.
+    ImagePoolKey original_pool_key;
+    ImagePoolKey scaled_pool_key;
+    bool from_pool = false; ///< original_image came from the pool
 
     vk::Image original_image;
     vk::Image scaled_image;

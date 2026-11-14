@@ -23,6 +23,9 @@ version. Les sections suivantes gardent l'historique.
   les anciennes cibles de rendu sont supprimées dès qu'elles ne servent plus, au lieu de
   s'accumuler jusqu'à un grand ménage qui figeait l'image. `EDEN_NX2_TC_COLD_SWEEP=0` revient
   à l'ancien comportement.
+- Les images Vulkan des cibles de rendu supprimées sont gardées quelques secondes (512 Mo au plus)
+  et reprises par la prochaine image de même taille, au lieu d'être détruites puis recréées.
+  `EDEN_NX2_IMAGE_POOL=0` revient à l'ancien comportement.
 - Le tampon de profondeur d'Ocarina, plus grand que l'image, n'est plus rechargé depuis la mémoire
   du jeu à chaque image alors qu'il est aussitôt effacé.
 - Les écritures de registres GPU qui ne changent rien sont écartées plus tôt (plus de la moitié

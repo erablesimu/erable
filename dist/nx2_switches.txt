@@ -23,6 +23,10 @@ EDEN_NX2_SPLIT=2
 # up until the texture collector's bursts. =0 keeps them for the collector, as before.
 #EDEN_NX2_TC_COLD_SWEEP=0
 
+# Vulkan images of deleted render targets are kept (512 MiB, 180 frames at most) for the next image
+# of the same size instead of being destroyed and made again. =0 destroys them, as before.
+#EDEN_NX2_IMAGE_POOL=0
+
 # Batch GPU fence syncpoints to reduce host driver overhead and smooth frametimes.
 EDEN_NX2_FENCE_BATCH=1
 
