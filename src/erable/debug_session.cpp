@@ -29,14 +29,15 @@ namespace DebugSession {
 namespace {
 
 // What the trace launcher (erable-trace.bat) set: frame hitches and their causes, the sound a game
-// sends, the game's file reads and the texture cache; and the GPU thread's time per second by
-// zone, idle included, which shows CPU work saved even when the frame rate is capped.
-constexpr std::array<std::pair<const char*, const char*>, 5> Switches{{
+// sends, the game's file reads and the texture cache. The GPU thread profile
+// (EDEN_NX2_GPU_PROFILE) is left out: it times every zone and counts spin lock contention, and a
+// build-30 session with it lost the game's sound after 50 s (the audio renderer never stopped).
+// nx2_switches.txt can still turn it on for a session that needs it.
+constexpr std::array<std::pair<const char*, const char*>, 4> Switches{{
     {"EDEN_NX2_STUTTER_TRACE", "1"},
     {"EDEN_NX2_AUDIO_LEVEL", "1"},
     {"EDEN_NX2_FS_READ_TRACE", "1"},
     {"EDEN_NX2_TC_LOG", "1"},
-    {"EDEN_NX2_GPU_PROFILE", "1"},
 }};
 
 constexpr std::string_view Pending = "pending";
