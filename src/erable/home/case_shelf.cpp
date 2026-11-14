@@ -85,8 +85,31 @@ QSize CaseShelf::minimumSizeHint() const {
     return {320, 240};
 }
 
+void CaseShelf::SetStyle(Style style_) {
+    style = style_;
+    update();
+}
+
+QColor CaseShelf::SpineColour(const QPixmap& art) {
+    if (art.isNull()) {
+        return Maple;
+    }
+    const QImage pixel = art.toImage().scaled(1, 1, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    const QColor average = QColor::fromRgb(pixel.pixel(0, 0));
+    float h, s, v;
+    average.getHsvF(&h, &s, &v);
+    if (h < 0) {
+        h = 0.05f; // grey pictures get a warm spine
+    }
+    return QColor::fromHsvF(h, std::clamp(s * 1.3f, 0.45f, 0.85f), std::clamp(v, 0.42f, 0.66f));
+}
+
 void CaseShelf::SetEntries(std::vector<Entry> entries_, int selected_) {
     entries = std::move(entries_);
+    spine_colours.clear();
+    for (const Entry& entry : entries) {
+        spine_colours.push_back(entry.add ? QColor{0x3b, 0x30, 0x2a} : SpineColour(entry.art));
+    }
     ClearCache();
     selected = entries.empty() ? 0 : std::clamp(selected_, 0, static_cast<int>(entries.size()) - 1);
     position = selected;
@@ -111,14 +134,17 @@ void CaseShelf::SetArt(int index, const QPixmap& art) {
         return;
     }
     entries[index].art = art;
+    spine_colours[index] = SpineColour(art);
     case_images[index] = {};
     reflections[index] = {};
+    spine_images[index] = {};
     update();
 }
 
 void CaseShelf::ClearCache() {
     case_images.assign(entries.size(), QImage{});
     reflections.assign(entries.size(), QImage{});
+    spine_images.assign(entries.size(), QImage{});
 }
 
 void CaseShelf::resizeEvent(QResizeEvent* event) {
@@ -145,7 +171,62 @@ QSizeF CaseShelf::CaseSize() const {
     return {case_height * CaseAspect, case_height};
 }
 
+QSizeF CaseShelf::SpineSize() const {
+    const QSizeF size = CaseSize();
+    return {size.width() * 0.16, size.height() * 0.92};
+}
+
+std::vector<CaseShelf::Placement> CaseShelf::CrateLayout() const {
+    const QSizeF size = CaseSize();
+    const QSizeF spine = SpineSize();
+    const double centre = width() / 2.0;
+    const double floor = size.height() + (height() - size.height() * (1.0 + ReflectionShare * 0.6)) / 2;
+    const double gap = size.width() * 0.08 + spine.height() * 0.11; // room for a spine's lean
+    const double first = size.width() / 2 + gap + spine.width() / 2; // the nearest spine's centre
+    const double step = spine.width() + 4;
+    std::vector<Placement> placements;
+    for (int i = 0; i < static_cast<int>(entries.size()); ++i) {
+        const double offset = i - position;
+        const double distance = std::abs(offset);
+        const double sign = offset < 0 ? -1.0 : 1.0;
+        if (distance > 0.001) {
+            const double x = distance >= 1 ? first + (distance - 1) * step : distance * first;
+            if (x - spine.width() > width() / 2.0 + spine.width()) {
+                continue;
+            }
+            // The two spines next to the selected case lean on it, as if just pushed aside
+            const double lean = -sign * 6.0 * std::min(distance, 1.0) * std::clamp(2.0 - distance, 0.0, 1.0);
+            QTransform transform;
+            transform.translate(centre + sign * x, floor);
+            transform.rotate(lean);
+            placements.push_back({.index = i, .offset = offset, .transform = transform,
+                                  .opacity = std::min(1.0, distance * 1.5), .spine = true});
+        }
+        if (distance < 1.0) {
+            // Coming out of the crate: it turns to face the player as it slides to the middle
+            const double scale = 1.0 - 0.25 * distance;
+            QTransform transform;
+            transform.translate(centre + sign * distance * size.width() * 0.5, floor);
+            transform.rotate(-sign * 70.0 * distance, Qt::YAxis);
+            transform.scale(scale, scale);
+            placements.push_back({.index = i, .offset = offset, .transform = transform,
+                                  .opacity = 1.0 - distance});
+        }
+    }
+    // Spines far to near, then the front cases, the selected one last
+    std::ranges::stable_sort(placements, [](const Placement& a, const Placement& b) {
+        if (a.spine != b.spine) {
+            return a.spine;
+        }
+        return std::abs(a.offset) > std::abs(b.offset);
+    });
+    return placements;
+}
+
 std::vector<CaseShelf::Placement> CaseShelf::Layout() const {
+    if (style == Style::Crate) {
+        return CrateLayout();
+    }
     const QSizeF size = CaseSize();
     const double centre = width() / 2.0;
     const double floor = size.height() + (height() - size.height() * (1.0 + ReflectionShare * 0.6)) / 2;
@@ -326,6 +407,51 @@ const QImage& CaseShelf::CaseImage(int index) {
     return image;
 }
 
+void CaseShelf::DrawSpine(QPainter& painter, int index, const QRectF& box) const {
+    const Entry& entry = entries[index];
+    const QColor colour = spine_colours[index];
+    const double w = box.width();
+    QPainterPath shape;
+    shape.addRoundedRect(box, w * 0.12, w * 0.12);
+    QLinearGradient fill{box.topLeft(), box.topRight()};
+    fill.setColorAt(0, colour.darker(150));
+    fill.setColorAt(0.45, colour);
+    fill.setColorAt(1, colour.darker(160));
+    painter.fillPath(shape, fill);
+    painter.fillPath(MapleLeaf({box.center().x(), box.top() + w * 0.62}, w * 0.56),
+                     QColor{255, 255, 255, 225});
+    painter.save();
+    painter.translate(box.center().x(), box.top() + w * 1.2);
+    painter.rotate(90);
+    painter.setPen(QColor{255, 255, 255, entry.add ? 170 : 240});
+    painter.setFont(MakeFont(display_family, w * 0.4));
+    const double length = box.height() - w * 1.5;
+    painter.drawText(QRectF(0, -w / 2, length, w), Qt::AlignLeft | Qt::AlignVCenter,
+                     painter.fontMetrics().elidedText(entry.add ? QStringLiteral("+ ") + entry.title
+                                                                : entry.title,
+                                                      Qt::ElideRight, static_cast<int>(length)));
+    painter.restore();
+    painter.setPen(QPen{QColor{255, 255, 255, 40}, 1});
+    painter.setBrush(Qt::NoBrush);
+    painter.drawPath(shape);
+}
+
+const QImage& CaseShelf::SpineImage(int index) {
+    QImage& image = spine_images[index];
+    if (image.isNull()) {
+        const qreal ratio = devicePixelRatioF();
+        const QSizeF size = SpineSize();
+        image = QImage((size * ratio).toSize(), QImage::Format_ARGB32_Premultiplied);
+        image.setDevicePixelRatio(ratio);
+        image.fill(Qt::transparent);
+        QPainter painter{&image};
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::TextAntialiasing);
+        DrawSpine(painter, index, QRectF(QPointF(0, 0), size));
+    }
+    return image;
+}
+
 const QImage& CaseShelf::Reflection(int index) {
     QImage& image = reflections[index];
     if (image.isNull()) {
@@ -370,9 +496,27 @@ void CaseShelf::paintEvent(QPaintEvent*) {
         painter.restore();
     }
 
+    if (style == Style::Crate) {
+        // The shelf the cases stand on
+        const QPointF foot = placements.back().transform.map(QPointF(0, 0));
+        QLinearGradient wood{QPointF(0, foot.y()), QPointF(0, foot.y() + 22)};
+        wood.setColorAt(0, QColor{0x5a, 0x3a, 0x26, 230});
+        wood.setColorAt(1, QColor{0x2a, 0x1a, 0x10, 0});
+        painter.fillRect(QRectF(0, foot.y(), width(), 22), wood);
+    }
+    const QSizeF spine_size = SpineSize();
+    const QRectF spine_flat{-spine_size.width() / 2, -spine_size.height(), spine_size.width(),
+                            spine_size.height()};
     for (const Placement& place : placements) {
         painter.setOpacity(place.opacity);
         painter.setTransform(place.transform);
+        if (place.spine) {
+            painter.setPen(Qt::NoPen);
+            painter.setBrush(QColor{0, 0, 0, 70});
+            painter.drawRoundedRect(spine_flat.translated(3, 2), 5, 5);
+            painter.drawImage(spine_flat, SpineImage(place.index));
+            continue;
+        }
         // Reflection first: it lies under the case
         const QImage& reflection = Reflection(place.index);
         painter.drawImage(QRectF(flat.left(), 0, size.width(), size.height() * ReflectionShare),
@@ -383,7 +527,7 @@ void CaseShelf::paintEvent(QPaintEvent*) {
         painter.drawRoundedRect(flat.translated(size.width() * 0.02, size.height() * 0.015),
                                 size.width() * 0.04, size.width() * 0.04);
         painter.drawImage(flat, CaseImage(place.index));
-        if (std::abs(place.offset) > 0.5) {
+        if (style == Style::Shelf && std::abs(place.offset) > 0.5) {
             // The neighbours a little darker, so the middle one stands out
             painter.setBrush(QColor{0x17, 0x12, 0x0f,
                                     static_cast<int>(std::min(1.0, std::abs(place.offset) - 0.5) * 70)});
@@ -399,10 +543,15 @@ void CaseShelf::mousePressEvent(QMouseEvent* event) {
     }
     const QSizeF size = CaseSize();
     const QRectF flat{-size.width() / 2, -size.height(), size.width(), size.height()};
+    const QSizeF spine_size = SpineSize();
+    const QRectF spine_flat{-spine_size.width() / 2, -spine_size.height(), spine_size.width(),
+                            spine_size.height()};
     const auto placements = Layout();
     // The nearest case on top: the last drawn
     for (auto it = placements.rbegin(); it != placements.rend(); ++it) {
-        if (it->transform.map(QPolygonF(flat)).containsPoint(event->position(), Qt::OddEvenFill)) {
+        const QRectF& shape = it->spine ? spine_flat : flat;
+        if (it->opacity > 0.3 &&
+            it->transform.map(QPolygonF(shape)).containsPoint(event->position(), Qt::OddEvenFill)) {
             emit Clicked(it->index);
             event->accept();
             return;

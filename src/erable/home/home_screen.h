@@ -61,8 +61,8 @@ signals:
     void OpenWhatsNew();
     void OpenCaptures();
     void ReportProblem();
-    /// The music was muted, unmuted or changed: saved at once, so a crash or a forced close keeps it.
-    void MusicSettingsChanged();
+    /// The music or the shelf style changed: saved at once, so a crash or a forced close keeps it.
+    void HomeSettingsChanged();
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
@@ -90,6 +90,7 @@ private:
     /// when requested from the profile button).
     void EnsureProfile(bool requested = false);
     void UpdateMusic();
+    void UpdateStyle();
     void UpdateStatus();
     void Launch();
     void ToggleFavorite();
@@ -110,6 +111,7 @@ private:
     PillButton* profile_button = nullptr;
     PillButton* music_button = nullptr;
     PillButton* song_button = nullptr;
+    PillButton* style_button = nullptr;
     QLabel* controller_label = nullptr;
     QLabel* clock = nullptr;
     QLabel* title = nullptr;

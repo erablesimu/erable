@@ -419,7 +419,7 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         UISettings::values.home_music = on;
         UpdateMusic();
         if (changed) {
-            emit MusicSettingsChanged();
+            emit HomeSettingsChanged();
         }
     });
     right->addWidget(music_button);
@@ -432,9 +432,17 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         music.Stop();
         music_button->setChecked(true);
         UpdateMusic();
-        emit MusicSettingsChanged();
+        emit HomeSettingsChanged();
     });
     right->addWidget(song_button);
+    style_button = new PillButton({}, {}, false, this);
+    style_button->setToolTip(tr("How the games are shown"));
+    connect(style_button, &QAbstractButton::clicked, this, [this] {
+        UISettings::values.home_style = 1 - UISettings::values.home_style.GetValue();
+        UpdateStyle();
+        emit HomeSettingsChanged();
+    });
+    right->addWidget(style_button);
     right->addSpacing(10);
     controller_label = new QLabel(this);
     controller_label->setFont(MakeFont(fonts.body, 14));
@@ -559,6 +567,7 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
 
     music_button->setChecked(UISettings::values.home_music.GetValue());
     UpdateMusic();
+    UpdateStyle();
     UpdateProfile();
     CollectGames();
     RebuildTiles();
@@ -721,6 +730,14 @@ void HomeScreen::UpdateMusic() {
     } else {
         ambient_timer.stop();
     }
+}
+
+void HomeScreen::UpdateStyle() {
+    const bool crate = UISettings::values.home_style.GetValue() == 1;
+    shelf->SetStyle(crate ? CaseShelf::Style::Crate : CaseShelf::Style::Shelf);
+    // Names the other style: what a click turns to
+    style_button->setText(crate ? tr("Shelf") : tr("Crate"));
+    style_button->updateGeometry();
 }
 
 void HomeScreen::UpdateStatus() {

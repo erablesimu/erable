@@ -114,6 +114,8 @@ struct Values {
     // Home screen: its music (on or muted) and which of its three loops plays
     Setting<bool> home_music{linkage, true, "home_music", Category::Ui};
     Setting<u32, true> home_song{linkage, 0, 0, 2, "home_song", Category::Ui};
+    /// How the home shows the games: 0 the half-stacked shelf, 1 the crate of spines
+    Setting<u32, true> home_style{linkage, 0, 0, 1, "home_style", Category::Ui};
     Setting<bool> show_low_ram_warning{linkage, true, "show_low_ram_warning", Category::Ui};
     Setting<bool> pause_when_in_background{linkage,
                                            false,

@@ -21,6 +21,18 @@
 <context>
     <name>HomeScreen</name>
     <message>
+        <source>How the games are shown</source>
+        <translation>Présentation des jeux</translation>
+    </message>
+    <message>
+        <source>Shelf</source>
+        <translation>Étagère</translation>
+    </message>
+    <message>
+        <source>Crate</source>
+        <translation>Pile</translation>
+    </message>
+    <message>
         <source>Search a game</source>
         <translation>Rechercher un jeu</translation>
     </message>
