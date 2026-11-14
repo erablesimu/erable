@@ -16,6 +16,7 @@
 #include <optional>
 #include <string_view>
 #include <thread>
+#include "common/memory_detect.h"
 #include "common/container/unordered_map.h"
 #include "common/container/unordered_set.h"
 #include <unordered_map>
@@ -463,6 +464,8 @@ PFN_vkFreeMemory g_vma_free_memory{};
 /// a 16-minute session), many of them blocks the texture collector had just emptied. Only device
 /// memory no one maps (VMA would map a kept host-visible block a second time) and requests that
 /// carry nothing but flags or a priority; at most KeptPerType blocks a type, each for KeepSeconds.
+/// None while Windows' commit is short: the driver charges device memory to it, and a PC with
+/// little RAM needs every MiB for the texture cache.
 class KeptBlocks {
 public:
     static constexpr std::size_t KeptPerType = 8;
@@ -508,6 +511,10 @@ public:
     bool Keep(VkDevice device, VkDeviceMemory memory) {
         std::scoped_lock lock{mutex};
         Trim(device);
+        if (CommitShort()) {
+            owned.erase(memory);
+            return false;
+        }
         const auto it = owned.find(memory);
         if (it == owned.end()) {
             return false;
@@ -569,10 +576,24 @@ private:
         return key;
     }
 
+    /// Less than MinFreeCommit of the system's commit (RAM and page file) left, read at most once
+    /// a second. Never where the host has no commit limit.
+    bool CommitShort() {
+        constexpr u64 MinFreeCommit = 3ULL << 30;
+        const auto now = std::chrono::steady_clock::now();
+        if (now - commit_checked >= std::chrono::seconds{1}) {
+            commit_checked = now;
+            const std::optional<u64> room = Common::GetSystemCommitRoom();
+            commit_short = room && *room < MinFreeCommit;
+        }
+        return commit_short;
+    }
+
     void Trim(VkDevice device) {
         const auto now = std::chrono::steady_clock::now();
+        const bool give_all_back = CommitShort();
         std::erase_if(kept, [&](const Entry& entry) {
-            if (now - entry.since < KeepSeconds) {
+            if (!give_all_back && now - entry.since < KeepSeconds) {
                 return false;
             }
             g_vma_free_memory(device, entry.memory, nullptr);
@@ -585,6 +606,8 @@ private:
     std::vector<Entry> kept;
     std::unordered_map<VkDeviceMemory, Key> owned;
     u64 reused = 0;
+    std::chrono::steady_clock::time_point commit_checked{};
+    bool commit_short = false;
 };
 
 KeptBlocks g_kept_blocks;

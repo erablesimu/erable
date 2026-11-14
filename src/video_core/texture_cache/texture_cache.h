@@ -258,6 +258,13 @@ void TextureCache<P>::RunGarbageCollector(bool out_of_memory) {
                                ? static_cast<double>(it->second) / static_cast<double>(block.block_size)
                                : 0.0;
                 }
+                // Short of memory, larger images first: each deletion frees more, so fewer
+                // go (a quarter of the block-fill scale for 8 MiB and up).
+                if (high_priority_mode) {
+                    const double share =
+                        (std::min)(1.0, static_cast<double>(block.size) / (8.0 * 1024 * 1024));
+                    fill -= 0.25 * share;
+                }
                 ordered.emplace_back(fill, image_id);
             }
             std::stable_sort(ordered.begin(), ordered.end(),
