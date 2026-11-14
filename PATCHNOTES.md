@@ -19,6 +19,9 @@ version. Les sections suivantes gardent l'historique.
 - DLSS : image d'entrée nettoyée (plus de pixels invalides) ; « No Sharpening » sur la 1.0.
 
 **Tous les jeux**
+- Windows : la RAM émulée n'est plus réservée d'un bloc au lancement (14 Go) mais au fur et à
+  mesure que le jeu la prend (environ 10 Go pour Ocarina) : environ 4 Go rendus au système et au
+  cache de textures, surtout utile aux PC avec peu de mémoire.
 - Fermer un jeu pendant le chargement des shaders ne bloque plus Erable.
 - Moins d'attente : recompilations de shaders de calcul en arrière-plan, état de dessin réutilisé,
   préparation des shaders sur les autres cœurs pour de plus grandes tables de textures.

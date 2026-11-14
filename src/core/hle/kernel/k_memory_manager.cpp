@@ -49,7 +49,29 @@ KMemoryManager::KMemoryManager(Core::System& system)
 
 void KMemoryManager::Initialize(KVirtualAddress management_region, size_t management_region_size) {
     // Memory a previous kernel handed out may still hold its data.
-    m_system.DeviceMemory().buffer.ForgetContents();
+    auto& buffer = m_system.DeviceMemory().buffer;
+    buffer.ForgetContents();
+
+    // Guest memory may be committed only as it is handed out (HostMemory::MarkUsed). What the
+    // kernel uses without handing it out, everything outside the pools, is committed now.
+    {
+        size_t cursor = 0;
+        for (const auto& it : m_system.Kernel().MemoryLayout().GetPhysicalMemoryRegionTree()) {
+            if (!it.IsDerivedFrom(KMemoryRegionType_DramUserPool) ||
+                it.GetAddress() < Core::DramMemoryMap::Base) {
+                continue;
+            }
+            const size_t begin = it.GetAddress() - Core::DramMemoryMap::Base;
+            const size_t end = begin + it.GetSize();
+            if (begin > cursor) {
+                buffer.Commit(cursor, begin - cursor);
+            }
+            cursor = (std::max)(cursor, end);
+        }
+        if (cursor < buffer.BackingSize()) {
+            buffer.Commit(cursor, buffer.BackingSize() - cursor);
+        }
+    }
 
     // Clear the management region to zero.
     const KVirtualAddress management_region_end = management_region + management_region_size;
@@ -145,6 +167,7 @@ void KMemoryManager::Initialize(KVirtualAddress management_region, size_t manage
 
                 // Open/reserve the ini memory.
                 manager.OpenFirst(ini_start, ini_size / PageSize);
+                this->MarkUsed(ini_start, ini_size / PageSize);
                 reserved_sizes[it.GetAttributes()] += ini_size;
 
                 // Free memory after the ini to the heap.

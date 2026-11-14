@@ -73,8 +73,16 @@ public:
     /// Bytes Map, Unmap and Protect have covered since start.
     static u64 MappedBytes() noexcept;
 
-    /// Pages the kernel hands out (cleared or not).
+    /// Pages the kernel hands out (cleared or not). Commits them first where guest memory is
+    /// committed as it is handed out (Windows).
     void MarkUsed(size_t physical_offset, size_t length);
+
+    /// Windows: commits the backing of [physical_offset, physical_offset + length) now, for memory
+    /// the kernel uses without handing it out (everything outside its pools). Elsewhere a no-op.
+    void Commit(size_t physical_offset, size_t length);
+
+    /// Backing memory committed so far (all of it unless committed as it is handed out).
+    [[nodiscard]] u64 CommittedBytes() const noexcept;
 
     /// Pages given back to the kernel: their contents are no longer known to be zero.
     void MarkDirty(size_t physical_offset, size_t length);

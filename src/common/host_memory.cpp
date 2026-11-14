@@ -55,6 +55,8 @@
 #endif // ^^^ POSIX ^^^
 
 #include <algorithm>
+#include <array>
+#include <atomic>
 #include <cstdio>
 #include <cstdlib>
 #include <mutex>
@@ -131,6 +133,21 @@ static void GetFuncAddress(Common::DynamicLibrary& dll, const char* name, T& pfn
     }
 }
 
+/// Guest memory is committed when the kernel hands it out rather than all at once (Windows).
+/// SEC_COMMIT charged the whole 14 GiB of a Switch 2 title's memory to the system's commit up
+/// front, while Ocarina of Time uses about 10 GiB of it: on a 32 GB PC the commit left fell to
+/// 1.8 GB, which held the texture cache to its 3 GB floor. EDEN_NX2_LAZY_COMMIT=0 restores it.
+[[nodiscard]] static bool LazyCommitEnabled() {
+    static const bool enabled = [] {
+        const char* value = std::getenv("EDEN_NX2_LAZY_COMMIT");
+        return value == nullptr || value[0] != '0';
+    }();
+    return enabled;
+}
+
+/// Granularity of the lazy commit: 2 MiB, so a handout costs at most one call per 2 MiB.
+constexpr size_t CommitShift = 21;
+
 class HostMemory::Impl {
 public:
     explicit Impl(size_t backing_size_, size_t virtual_size_)
@@ -167,7 +184,7 @@ public:
         // runs the whole session without fastmem (Ocarina of Time: 20-25% fewer fps). A private
         // commit of the same size does grow the page file, so make one, release it and try again.
         for (int attempt = 1; attempt <= BackingAttempts && !backing_handle; ++attempt) {
-            backing_handle = pfn_CreateFileMapping2(INVALID_HANDLE_VALUE, nullptr, FILE_MAP_WRITE | FILE_MAP_READ, PAGE_READWRITE, SEC_COMMIT, backing_size, nullptr, nullptr, 0);
+            backing_handle = pfn_CreateFileMapping2(INVALID_HANDLE_VALUE, nullptr, FILE_MAP_WRITE | FILE_MAP_READ, PAGE_READWRITE, lazy ? SEC_RESERVE : SEC_COMMIT, backing_size, nullptr, nullptr, 0);
             if (backing_handle) {
                 if (attempt > 1) {
                     LOG_INFO(HW_Memory, "Allocated {} MiB of backing memory on attempt {}", backing_size >> 20, attempt);
@@ -212,6 +229,111 @@ public:
             LOG_CRITICAL(HW_Memory, "Failed to reserve {} GiB of virtual memory", virtual_size >> 30);
             return false;
         }
+        if (lazy) {
+            num_chunks = Common::DivCeil(backing_size, size_t{1} << CommitShift);
+            committed = std::make_unique<std::atomic<bool>[]>(num_chunks);
+            RegisterLazyCommit(this);
+            LOG_INFO(HW_Memory, "{} MiB of guest memory, committed as the kernel hands it out",
+                     backing_size >> 20);
+        }
+        return true;
+    }
+
+    /// Commits the backing pages of [offset, offset + length) that are not yet. False when the
+    /// system has no commit left for them.
+    bool Commit(size_t offset, size_t length) {
+        if (!lazy || length == 0) {
+            return true;
+        }
+        const size_t first = offset >> CommitShift;
+        const size_t last = (std::min)((offset + length - 1) >> CommitShift, num_chunks - 1);
+        bool ok = true;
+        for (size_t chunk = first; chunk <= last; ++chunk) {
+            if (committed[chunk].load(std::memory_order_acquire)) {
+                continue;
+            }
+            std::scoped_lock lock{commit_mutex};
+            if (committed[chunk].load(std::memory_order_relaxed)) {
+                continue;
+            }
+            const size_t begin = chunk << CommitShift;
+            const size_t size = (std::min)(size_t{1} << CommitShift, backing_size - begin);
+            bool done = false;
+            for (int attempt = 1; attempt <= BackingAttempts && !done; ++attempt) {
+                // Committing pages of a view commits them in the section, for every view.
+                done = VirtualAlloc(backing_base + begin, size, MEM_COMMIT, PAGE_READWRITE) != nullptr;
+                if (!done) {
+                    // As at creation: a private commit grows a system-managed page file.
+                    if (void* const probe = VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE)) {
+                        VirtualFree(probe, 0, MEM_RELEASE);
+                    }
+                    Sleep(10);
+                }
+            }
+            if (!done) {
+                LOG_CRITICAL(HW_Memory, "Could not commit {} KiB of guest memory at {:#x} (error {})",
+                             size >> 10, begin, GetLastError());
+                ok = false;
+                continue;
+            }
+            committed[chunk].store(true, std::memory_order_release);
+            committed_bytes.fetch_add(size, std::memory_order_relaxed);
+        }
+        return ok;
+    }
+
+    [[nodiscard]] u64 CommittedBytes() const noexcept {
+        return lazy ? committed_bytes.load(std::memory_order_relaxed) : backing_size;
+    }
+
+    /// A fault on guest memory not committed yet: commits it. Returns whether it did (the access
+    /// can then run again). Called from the vectored exception handler.
+    bool CommitOnFault(uintptr_t address) {
+        size_t offset{};
+        const auto backing_begin = reinterpret_cast<uintptr_t>(backing_base);
+        const auto view_begin = reinterpret_cast<uintptr_t>(virtual_base);
+        if (address >= backing_begin && address < backing_begin + backing_size) {
+            offset = address - backing_begin;
+        } else if (virtual_base && address >= view_begin && address < view_begin + virtual_size) {
+            // The placeholder lock is not taken while guest memory is accessed, but a fault
+            // must not wait on it: when it is busy the next handler takes the fault.
+            std::unique_lock lock{placeholder_mutex, std::try_to_lock};
+            if (!lock.owns_lock()) {
+                return false;
+            }
+            const size_t view_offset = address - view_begin;
+            const auto it = placeholders.find(view_offset);
+            if (it == placeholders.end()) {
+                return false;
+            }
+            const auto host = placeholder_host_pointers.find(it->lower());
+            if (host == placeholder_host_pointers.end()) {
+                return false;
+            }
+            offset = host->second + view_offset - it->lower();
+        } else {
+            return false;
+        }
+        if (offset >= backing_size) {
+            return false;
+        }
+        const size_t chunk = offset >> CommitShift;
+        const bool was_committed = committed[chunk].load(std::memory_order_acquire);
+        if (!was_committed && !Commit(offset, 1)) {
+            return false;
+        }
+        // Committed by another thread since the fault: running the access again is enough, once.
+        // A second fault at the same place is something else (protection), for the next handler.
+        thread_local uintptr_t last_retry = 0;
+        if (was_committed) {
+            if (last_retry == address) {
+                last_retry = 0;
+                return false;
+            }
+            last_retry = address;
+            return true;
+        }
+        last_retry = 0;
         return true;
     }
 
@@ -306,6 +428,9 @@ public:
 private:
     /// Release all resources in the object
     void Release() {
+        if (lazy && committed) {
+            UnregisterLazyCommit(this);
+        }
         if (!placeholders.empty()) {
             for (const auto& placeholder : placeholders) {
                 if (!pfn_UnmapViewOfFile2(process, virtual_base + placeholder.lower(),
@@ -456,6 +581,16 @@ private:
     HANDLE process{};        ///< Current process handle
     HANDLE backing_handle{}; ///< File based backing memory
 
+    const bool lazy = LazyCommitEnabled();                 ///< Backing committed when handed out
+    size_t num_chunks{};                                   ///< 2 MiB chunks of the backing
+    std::unique_ptr<std::atomic<bool>[]> committed;        ///< Per chunk: committed
+    std::atomic<u64> committed_bytes{};
+    std::mutex commit_mutex;
+
+    static void RegisterLazyCommit(Impl* impl);
+    static void UnregisterLazyCommit(Impl* impl);
+    static LONG NTAPI LazyCommitHandler(EXCEPTION_POINTERS* info);
+
     DynamicLibrary kernelbase_dll;
     PFN_CreateFileMapping2 pfn_CreateFileMapping2{};
     PFN_VirtualAlloc2 pfn_VirtualAlloc2{};
@@ -466,6 +601,48 @@ private:
     boost::icl::separate_interval_set<size_t> placeholders;       ///< Mapped placeholders
     ::Common::unordered_map<size_t, size_t> placeholder_host_pointers; ///< Placeholder backing offset
 };
+
+namespace {
+std::mutex g_lazy_commit_mutex;
+std::array<std::atomic<void*>, 4> g_lazy_commit_impls{}; ///< HostMemory::Impl*
+} // Anonymous namespace
+
+void HostMemory::Impl::RegisterLazyCommit(Impl* impl) {
+    std::scoped_lock lock{g_lazy_commit_mutex};
+    static const PVOID handler = AddVectoredExceptionHandler(1, &Impl::LazyCommitHandler);
+    static_cast<void>(handler);
+    for (auto& slot : g_lazy_commit_impls) {
+        if (slot.load() == nullptr) {
+            slot.store(static_cast<void*>(impl));
+            return;
+        }
+    }
+    LOG_CRITICAL(HW_Memory, "Too many guest memories for the lazy commit fault handler");
+}
+
+void HostMemory::Impl::UnregisterLazyCommit(Impl* impl) {
+    std::scoped_lock lock{g_lazy_commit_mutex};
+    for (auto& slot : g_lazy_commit_impls) {
+        if (slot.load() == static_cast<void*>(impl)) {
+            slot.store(nullptr);
+        }
+    }
+}
+
+LONG NTAPI HostMemory::Impl::LazyCommitHandler(EXCEPTION_POINTERS* info) {
+    const EXCEPTION_RECORD* record = info->ExceptionRecord;
+    if (record->ExceptionCode != EXCEPTION_ACCESS_VIOLATION || record->NumberParameters < 2) {
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+    const auto address = static_cast<uintptr_t>(record->ExceptionInformation[1]);
+    for (auto& slot : g_lazy_commit_impls) {
+        Impl* const impl = static_cast<Impl*>(slot.load(std::memory_order_acquire));
+        if (impl != nullptr && impl->CommitOnFault(address)) {
+            return EXCEPTION_CONTINUE_EXECUTION;
+        }
+    }
+    return EXCEPTION_CONTINUE_SEARCH;
+}
 
 #elif defined(__OPENORBIS__) || defined(__managarm__)
 // None of the luxuries of POSIX, all of the suffering
@@ -1288,10 +1465,31 @@ void HostMemory::ClearBackingRegion(size_t physical_offset, size_t length, u32 f
     }
 }
 
+void HostMemory::Commit(size_t physical_offset, size_t length) {
+#ifdef _WIN32
+    if (impl && length != 0) {
+        impl->Commit(physical_offset, length);
+    }
+#else
+    static_cast<void>(physical_offset);
+    static_cast<void>(length);
+#endif
+}
+
+u64 HostMemory::CommittedBytes() const noexcept {
+#ifdef _WIN32
+    if (impl) {
+        return impl->CommittedBytes();
+    }
+#endif
+    return backing_size;
+}
+
 void HostMemory::MarkUsed(size_t physical_offset, size_t length) {
     if (length == 0) {
         return;
     }
+    Commit(physical_offset, length);
     const size_t last = (physical_offset + length - 1) >> GranuleShift;
     for (size_t index = physical_offset >> GranuleShift; index <= last; ++index) {
         if ((granules[index].load(std::memory_order_relaxed) & GranuleUsed) == 0) {

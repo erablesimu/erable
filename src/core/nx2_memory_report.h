@@ -23,7 +23,7 @@ namespace Core::Nx2MemoryReport {
 
 /// How much of the emulated RAM the guest has taken from its pools, next to what the host has
 /// committed for it up front (all of it, see HostMemory) and the commit left on the system. The
-/// gap between the two first figures is what committing the emulated RAM lazily would give back.
+/// gap between what the guest uses and the backing is what committing it lazily gives back.
 inline void Log(Core::System& system) {
     if (!Enabled()) {
         return;
@@ -44,12 +44,13 @@ inline void Log(Core::System& system) {
     static u64 peak = 0;
     peak = (std::max)(peak, used_total);
     const u64 backing = system.DeviceMemory().buffer.BackingSize();
+    const u64 committed = system.DeviceMemory().buffer.CommittedBytes();
     const auto process = Common::GetProcessMemoryUsage();
     LOG_INFO(Kernel,
-             "Nx2Memory guest_used_mib={} guest_peak_mib={} backing_committed_mib={} "
+             "Nx2Memory guest_used_mib={} guest_peak_mib={} backing_mib={} backing_committed_mib={} "
              "pools={}:{}/{},{}:{}/{},{}:{}/{},{}:{}/{} process_private_mib={} "
              "working_set_mib={} system_commit_mib={} system_limit_mib={}",
-             used_total >> 20, peak >> 20, backing >> 20, names[0], used[0] >> 20, size[0] >> 20,
+             used_total >> 20, peak >> 20, backing >> 20, committed >> 20, names[0], used[0] >> 20, size[0] >> 20,
              names[1], used[1] >> 20, size[1] >> 20, names[2], used[2] >> 20, size[2] >> 20,
              names[3], used[3] >> 20, size[3] >> 20, process.commit >> 20,
              process.working_set >> 20, process.system_commit >> 20,

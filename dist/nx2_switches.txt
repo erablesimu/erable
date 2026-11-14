@@ -14,6 +14,11 @@
 # Offload GPU method/macro execution to the back thread (SPLIT=2 delivers up to +54% FPS alone).
 EDEN_NX2_SPLIT=2
 
+# Windows: the emulated RAM is committed as the game takes it (about 10 of 14 GB for Ocarina of
+# Time) instead of all at start, which leaves the rest of the system's commit to the texture
+# cache and other programs. =0 commits all of it at start, as before.
+#EDEN_NX2_LAZY_COMMIT=0
+
 # Batch GPU fence syncpoints to reduce host driver overhead and smooth frametimes.
 EDEN_NX2_FENCE_BATCH=1
 
