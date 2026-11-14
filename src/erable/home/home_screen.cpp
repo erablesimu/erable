@@ -34,6 +34,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QStandardItemModel>
 #include <QStandardPaths>
 #include <QUrl>
@@ -340,60 +341,12 @@ private:
     Icon icon_;
 };
 
-/// The controller hints along the bottom: a badge and what it does, under a thin rule.
-class HintBar : public QWidget {
-public:
-    explicit HintBar(QWidget* parent) : QWidget{parent} {
-        setFixedHeight(40);
-    }
-
-    void SetHints(std::vector<std::pair<QString, QString>> hints, const QString& right) {
-        hints_ = std::move(hints);
-        right_ = right;
-        update();
-    }
-
-protected:
-    void paintEvent(QPaintEvent*) override {
-        QPainter painter{this};
-        painter.setRenderHint(QPainter::Antialiasing);
-        painter.setPen(QPen{Line});
-        painter.drawLine(QPointF{0, 0.5}, QPointF{static_cast<double>(width()), 0.5});
-        const QFont label = MakeFont(HomeFonts().body, 13);
-        const QFont key = MakeFont(HomeFonts().body, 11, QFont::ExtraBold);
-        double x = 0;
-        const double y = 12;
-        for (const auto& [badge, text] : hints_) {
-            painter.setFont(key);
-            const double badge_width =
-                std::max(22.0, QFontMetricsF{key}.horizontalAdvance(badge) + 12);
-            const QRectF pill{x, y, badge_width, 22};
-            painter.setPen(QPen{Line});
-            painter.setBrush(Surface);
-            painter.drawRoundedRect(pill, 11, 11);
-            painter.setPen(Text);
-            painter.drawText(pill, Qt::AlignCenter, badge);
-            painter.setFont(label);
-            painter.setPen(Muted);
-            const double text_width = QFontMetricsF{label}.horizontalAdvance(text);
-            painter.drawText(QRectF{x + badge_width + 7, y, text_width + 2, 22},
-                             Qt::AlignVCenter | Qt::AlignLeft, text);
-            x += badge_width + 7 + text_width + 22;
-        }
-        painter.setFont(label);
-        painter.setPen(Muted);
-        painter.drawText(QRectF{x, y, width() - x, 22}, Qt::AlignVCenter | Qt::AlignRight, right_);
-    }
-
-private:
-    std::vector<std::pair<QString, QString>> hints_;
-    QString right_;
-};
-
 /// The maple leaf and the name, centred in the top bar.
 class BrandMark : public QWidget {
 public:
     explicit BrandMark(QWidget* parent) : QWidget{parent} {
+        setObjectName(QStringLiteral("brand"));
+        setAttribute(Qt::WA_NoSystemBackground);
         setFixedSize(120, 40);
     }
 
@@ -416,15 +369,24 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     setFocusPolicy(Qt::StrongFocus);
     setAttribute(Qt::WA_StyledBackground, false);
     const Fonts& fonts = HomeFonts();
-    setStyleSheet(QStringLiteral("#HomeScreen QScrollArea, #HomeScreen QScrollArea > QWidget > QWidget"
-                                 " { background: transparent; border: none; }"));
+    setStyleSheet(
+        QStringLiteral("#HomeScreen QWidget#brand { background: transparent; }"
+                       "#HomeScreen QLineEdit#search { background: %1; color: %2; border: 1px solid %3;"
+                       " border-radius: 18px; padding: 7px 16px; selection-background-color: %4; }"
+                       "#HomeScreen QLineEdit#search:focus { border-color: %4; }")
+            .arg(Surface.name(), Text.name(), Line.name(), Maple.name()));
 
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(32, 18, 32, 10);
     layout->setSpacing(12);
 
-    // Top bar: profile, the Erable mark, music, controller and clock
+    // Top bar: the profile on the left; the Erable mark and the search in the middle; music,
+    // controller and clock on the right. The two sides share the width, so the middle is centred.
     auto* top = new QHBoxLayout;
+    auto* left = new QHBoxLayout;
+    auto* right = new QHBoxLayout;
+    auto* middle = new QHBoxLayout;
+    middle->setSpacing(14);
     profile_button = new PillButton({}, {}, false, this);
     profile_button->SetAvatar(true);
     profile_button->setToolTip(tr("Your profile"));
@@ -432,10 +394,23 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         profile_checked = false;
         EnsureProfile(true);
     });
-    top->addWidget(profile_button);
-    top->addStretch();
-    top->addWidget(new BrandMark(this));
-    top->addStretch();
+    left->addWidget(profile_button);
+    left->addStretch();
+    middle->addWidget(new BrandMark(this));
+    search = new QLineEdit(this);
+    search->setObjectName(QStringLiteral("search"));
+    search->setPlaceholderText(tr("Search a game"));
+    search->setClearButtonEnabled(true);
+    search->setFixedWidth(260);
+    search->setFont(MakeFont(fonts.body, 14, QFont::DemiBold));
+    search->installEventFilter(this);
+    connect(search, &QLineEdit::textChanged, this, [this] {
+        CollectGames();
+        RebuildTiles();
+    });
+    connect(search, &QLineEdit::returnPressed, this, [this] { setFocus(); });
+    middle->addWidget(search);
+    right->addStretch();
     music_button = new PillButton({}, QStringLiteral("♪"), false, this);
     music_button->setCheckable(true);
     music_button->setToolTip(tr("Home music"));
@@ -447,7 +422,7 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
             emit MusicSettingsChanged();
         }
     });
-    top->addWidget(music_button);
+    right->addWidget(music_button);
     song_button = new PillButton({}, {}, false, this);
     song_button->setToolTip(tr("Next tune"));
     connect(song_button, &QAbstractButton::clicked, this, [this] {
@@ -459,15 +434,18 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         UpdateMusic();
         emit MusicSettingsChanged();
     });
-    top->addWidget(song_button);
-    top->addSpacing(10);
+    right->addWidget(song_button);
+    right->addSpacing(10);
     controller_label = new QLabel(this);
     controller_label->setFont(MakeFont(fonts.body, 14));
-    top->addWidget(controller_label);
-    top->addSpacing(10);
+    right->addWidget(controller_label);
+    right->addSpacing(10);
     clock = new QLabel(this);
     clock->setFont(MakeFont(fonts.display, 22));
-    top->addWidget(clock);
+    right->addWidget(clock);
+    top->addLayout(left, 1);
+    top->addLayout(middle, 0);
+    top->addLayout(right, 1);
     layout->addLayout(top);
 
     // The games as a shelf of cases, the selected one's name under it
@@ -544,17 +522,10 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     dock->addStretch();
     layout->addLayout(dock);
 
-    hints = new HintBar(this);
-    hints->SetHints({{QStringLiteral("◀▶"), tr("Choose")},
-                     {QStringLiteral("A"), tr("Play")},
-                     {QStringLiteral("+"), tr("Game settings")},
-                     {QStringLiteral("Y"), tr("Favourite")}},
-                    tr("Ctrl + L  Library"));
-    layout->addWidget(hints);
 
     controller = new ControllerNavigation(system.HIDCore(), this);
     connect(controller, &ControllerNavigation::TriggerKeyboardEvent, this, [this](Qt::Key key) {
-        if (!isVisible() || !isActiveWindow() || system.IsPoweredOn()) {
+        if (!isVisible() || !isActiveWindow() || system.IsPoweredOn() || search->hasFocus()) {
             return;
         }
         QKeyEvent event{QEvent::KeyPress, key, Qt::NoModifier};
@@ -754,6 +725,8 @@ void HomeScreen::UpdateMusic() {
 
 void HomeScreen::UpdateStatus() {
     clock->setText(QTime::currentTime().toString(QStringLiteral("HH:mm")));
+    // The profiles may load after the home is built: the name is read again now and then.
+    UpdateProfile();
     const auto& hid = system.HIDCore();
     const bool connected =
         hid.GetEmulatedController(Core::HID::NpadIdType::Player1)->IsConnected() ||
@@ -766,6 +739,7 @@ void HomeScreen::UpdateStatus() {
 
 void HomeScreen::CollectGames() {
     games.clear();
+    const QString filter = search->text().trimmed();
     std::set<QString> seen;
     const QStandardItemModel* model = game_list->GetModel();
     const auto visit = [&](auto&& self, const QModelIndex& parent) -> void {
@@ -786,6 +760,13 @@ void HomeScreen::CollectGames() {
                 game.title = item->data(GameListItemPath::TitleRole).toString();
                 if (game.title.isEmpty()) {
                     game.title = QFileInfo(path).completeBaseName();
+                }
+                // A dump's name may carry its title ID: not on a case
+                static const QRegularExpression title_id{
+                    QStringLiteral(R"(\s*\[[0-9A-Fa-f]{16}\]\s*$)")};
+                game.title.remove(title_id);
+                if (!filter.isEmpty() && !game.title.contains(filter, Qt::CaseInsensitive)) {
+                    continue;
                 }
                 game.program_id = item->data(GameListItemPath::ProgramIdRole).toULongLong();
                 game.cover = item->data(GameListItemPath::CoverRole).value<QPixmap>();
@@ -916,7 +897,28 @@ void HomeScreen::OpenGamesFolder() {
     QDesktopServices::openUrl(QUrl::fromLocalFile(GamesFolder()));
 }
 
+bool HomeScreen::eventFilter(QObject* watched, QEvent* event) {
+    // Escape or Down in the search goes back to the games (Escape also clears it)
+    if (watched == search && event->type() == QEvent::KeyPress) {
+        const int key = static_cast<QKeyEvent*>(event)->key();
+        if (key == Qt::Key_Escape || key == Qt::Key_Down) {
+            if (key == Qt::Key_Escape) {
+                search->clear();
+            }
+            setFocus();
+            return true;
+        }
+    }
+    return QWidget::eventFilter(watched, event);
+}
+
 void HomeScreen::keyPressEvent(QKeyEvent* event) {
+    if (event->matches(QKeySequence::Find)) {
+        search->setFocus();
+        search->selectAll();
+        event->accept();
+        return;
+    }
     switch (event->key()) {
     case Qt::Key_Left:
         Select(selected - 1);
@@ -947,7 +949,10 @@ void HomeScreen::keyPressEvent(QKeyEvent* event) {
 void HomeScreen::showEvent(QShowEvent* event) {
     QWidget::showEvent(event);
     // After the window is up, so the profile dialog opens over it
-    QTimer::singleShot(0, this, [this] { EnsureProfile(); });
+    QTimer::singleShot(0, this, [this] {
+        UpdateProfile();
+        EnsureProfile();
+    });
     UpdateMusic();
 }
 

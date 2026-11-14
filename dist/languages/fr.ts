@@ -21,6 +21,10 @@
 <context>
     <name>HomeScreen</name>
     <message>
+        <source>Search a game</source>
+        <translation>Rechercher un jeu</translation>
+    </message>
+    <message>
         <source>Your profile</source>
         <translation>Ton profil</translation>
     </message>

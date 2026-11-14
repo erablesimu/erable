@@ -19,10 +19,10 @@
 class ControllerNavigation;
 class GameList;
 class CaseShelf;
-class HintBar;
 class PillButton;
 class QNetworkAccessManager;
 class QLabel;
+class QLineEdit;
 class QMenu;
 
 namespace Core {
@@ -66,6 +66,7 @@ signals:
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
     void showEvent(QShowEvent* event) override;
     void paintEvent(QPaintEvent* event) override;
 
@@ -118,7 +119,7 @@ private:
     PillButton* settings_button = nullptr;
     PillButton* favorite_button = nullptr;
     PillButton* report_button = nullptr;
-    HintBar* hints = nullptr;
+    QLineEdit* search = nullptr;
     QTimer status_timer;
     QTimer refresh_timer;
     QTimer ambient_timer;

@@ -44,6 +44,10 @@ version. Les sections suivantes gardent l'historique.
   élargit le panier, coups de vent qui poussent les feuilles. Aux couleurs du thème.
 
 **Accueil en boîtiers**
+- Le nom de votre profil s'affiche bien à chaque démarrage (il montrait parfois « Eden »).
+- En haut, le logo Erable est centré avec un champ de recherche (Ctrl + F, Échap pour revenir).
+- Les boîtiers voisins sont à moitié empilés sous le jeu choisi ; la barre de raccourcis du bas,
+  qui doublait les boutons, est retirée. Le numéro de jeu n'apparaît plus dans les titres.
 - Les jeux sont présentés comme des boîtiers Erable en 3D : le jeu choisi au centre, ses voisins
   tournés vers lui, avec leur reflet. Ils glissent d'un jeu à l'autre (flèches, manette, molette
   ou clic), et le nom du jeu s'affiche en grand dessous.

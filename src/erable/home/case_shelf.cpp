@@ -26,8 +26,8 @@ constexpr QColor Text{0xf6, 0xee, 0xe8};
 constexpr QColor Muted{0xb8, 0xa8, 0x9c};
 
 constexpr double CaseAspect = 0.64;   ///< Width over height, about a game case's
-constexpr double SideScale = 0.68;    ///< The neighbours' size
-constexpr double SideTurn = 32;       ///< Degrees the neighbours turn towards the middle
+constexpr double SideScale = 0.74;    ///< The neighbours' size
+constexpr double SideTurn = 40;       ///< Degrees the neighbours turn towards the middle
 constexpr double ReflectionShare = 0.32; ///< Of the case's height, shown under it
 
 QFont MakeFont(const QString& family, double pixels, int weight = QFont::Bold) {
@@ -153,15 +153,16 @@ std::vector<CaseShelf::Placement> CaseShelf::Layout() const {
     for (int i = 0; i < static_cast<int>(entries.size()); ++i) {
         const double offset = i - position;
         const double distance = std::abs(offset);
-        if (distance > 3.6) {
+        if (distance > 4.6) {
             continue;
         }
         const double sign = offset < 0 ? -1.0 : 1.0;
         // Up to one case away it grows into the middle; further ones stack closer together.
         const double inner = std::min(distance, 1.0);
         const double outer = std::max(distance - 1.0, 0.0);
-        const double scale = (1.0 - (1.0 - SideScale) * inner) * std::pow(0.88, outer);
-        const double shift = inner * size.width() * 0.98 + outer * size.width() * 0.52;
+        const double scale = (1.0 - (1.0 - SideScale) * inner) * std::pow(0.92, outer);
+        // Half stacked: each neighbour slides under the one nearer the middle.
+        const double shift = inner * size.width() * 0.66 + outer * size.width() * 0.24;
         const double turn = -sign * SideTurn * std::min(distance, 1.0);
         QTransform transform;
         transform.translate(centre + sign * shift, floor - (1.0 - scale) * size.height() * 0.12);
@@ -171,7 +172,7 @@ std::vector<CaseShelf::Placement> CaseShelf::Layout() const {
             .index = i,
             .offset = offset,
             .transform = transform,
-            .opacity = std::clamp(1.15 - 0.3 * distance, 0.0, 1.0),
+            .opacity = std::clamp(1.1 - 0.2 * distance, 0.0, 1.0),
         });
     }
     // Far ones first, so the near ones cover them
