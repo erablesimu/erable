@@ -67,6 +67,9 @@ version. Les sections suivantes gardent l'historique.
   World s'arrêtait net au lancement).
 
 **Chargements de zone**
+- Quand la mémoire de Windows est presque pleine, Erable ne relit plus des textures depuis la
+  carte graphique pour libérer de la place, sauf en cas de mémoire critique : chaque relecture
+  attendait que la carte graphique ait tout fini, au milieu des entrées de zone.
 - Les blocs de mémoire vidéo libérés sont gardés 30 secondes et réutilisés au lieu d'être rendus au
   pilote puis redemandés : les entrées de zone d'Ocarina en demandaient des centaines d'un coup.
 

@@ -175,8 +175,13 @@ void TextureCache<P>::RunGarbageCollector(bool out_of_memory) {
             return false;
         }
         const bool must_download = IsDownloadable(image) && False(image.flags & ImageFlagBits::BadOverlap);
+        // An image the GPU wrote is read back before it goes, and that waits for the host GPU to
+        // finish all its work (runtime.Finish below): only when memory is critical. Over the
+        // expected size alone, others go first. With Windows' commit nearly full the thresholds
+        // shrink (2.8 GB instead of 5.9 in an Ocarina session), and a zone load evicted 624 such
+        // images in 10 s, each one a full GPU wait in the middle of the load.
         if ((!aggressive_mode && !evict_old_costly && True(image.flags & ImageFlagBits::CostlyLoad)) ||
-            (!high_priority_mode && must_download)) {
+            (!aggressive_mode && !out_of_memory && must_download)) {
             return false;
         }
         if (must_download) {
