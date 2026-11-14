@@ -398,14 +398,17 @@ void LeafCatcher::PaintLeaf(QPainter& painter, const Leaf& leaf, const QRectF& f
     DrawLeaf(painter, size, golden ? Gold : Shade(accent, leaf.shade));
     painter.restore();
     if (golden) {
-        // A twinkle that circles the golden leaf
+        // A soft glint that circles the golden leaf (a round glow: a cross read as a cursor)
         const double turn = elapsed * 3 + leaf.sway;
-        const QPointF star = centre + QPointF(std::cos(turn), std::sin(turn)) * size * 0.75;
-        painter.setPen(QPen{WithAlpha(Qt::white, 220), 1.5, Qt::SolidLine, Qt::RoundCap});
-        const double arm = size * 0.16;
-        painter.drawLine(star - QPointF(arm, 0), star + QPointF(arm, 0));
-        painter.drawLine(star - QPointF(0, arm), star + QPointF(0, arm));
+        const QPointF glint = centre + QPointF(std::cos(turn), std::sin(turn)) * size * 0.75;
+        const double radius = size * 0.2;
+        QRadialGradient spark{glint, radius};
+        spark.setColorAt(0, WithAlpha(Qt::white, 230));
+        spark.setColorAt(0.35, WithAlpha(Gold.lighter(130), 150));
+        spark.setColorAt(1, WithAlpha(Gold, 0));
         painter.setPen(Qt::NoPen);
+        painter.setBrush(spark);
+        painter.drawEllipse(glint, radius, radius);
     }
 }
 
