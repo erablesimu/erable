@@ -105,6 +105,9 @@ enum class Site : u8 {
     ImageJoin,       ///< Of ImageCreate: aliases, copies from the overlaps and their deletion
     UploadBatch,     ///< Small images a pass over a draw's textures filled on several threads
     MemoryAllocateBig, ///< Of MemoryAllocate: allocations over one 16 MiB block (own memory)
+    UploadRead,      ///< Of ImageUpload: the guest data read (copied when it is in pieces)
+    UploadUnswizzle, ///< Of ImageUpload: unswizzled (and converted) on the CPU into staging
+    UploadRecord,    ///< Of ImageUpload: staging asked for and the copy or GPU decode recorded
     Count,
 };
 
@@ -115,7 +118,7 @@ inline constexpr std::array<std::string_view, SiteCount> site_names{
     "texture_collect", "texture_download", "scheduler_finish", "memory_free",
     "image_backend",   "astc_scan",       "image_overlaps",  "image_rescale",
     "image_replace",   "image_upload",    "image_join",      "upload_batch",
-    "memory_allocate_big",
+    "memory_allocate_big", "upload_read",  "upload_unswizzle", "upload_record",
 };
 
 [[nodiscard]] inline bool ReadEnv() {

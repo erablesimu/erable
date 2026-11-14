@@ -2391,7 +2391,10 @@ void TextureCache<P>::RefreshContents(Image& image, ImageId image_id) {
             .copies = {},
         });
     } else if (!UploadInChunks(image)) {
+        std::optional<StutterTrace::SiteScope> record_site{std::in_place,
+                                                           StutterTrace::Site::UploadRecord};
         auto staging = runtime.UploadStagingBuffer(MapSizeBytes(image));
+        record_site.reset();
         UploadImageContents(image, staging);
         runtime.InsertUploadMemoryBarrier();
     }
@@ -2696,28 +2699,37 @@ void TextureCache<P>::UploadImageContents(Image& image, StagingBuffer& staging) 
         for (auto& upload : uploads) {
             upload.buffer_offset -= level_offset;
         }
+        const StutterTrace::SiteScope record_site{StutterTrace::Site::UploadRecord};
         runtime.AccelerateImageUpload(image, staging, uploads, 0, 0);
         return;
     }
     if (True(image.flags & ImageFlagBits::AcceleratedUpload)) {
-        gpu_memory->ReadBlock(gpu_addr, mapped_span.data(), mapped_span.size_bytes(),
-                              VideoCommon::CacheType::NoTextureCache);
+        {
+            const StutterTrace::SiteScope read_site{StutterTrace::Site::UploadRead};
+            gpu_memory->ReadBlock(gpu_addr, mapped_span.data(), mapped_span.size_bytes(),
+                                  VideoCommon::CacheType::NoTextureCache);
+        }
         const auto uploads = FullUploadSwizzles(image.info);
+        const StutterTrace::SiteScope record_site{StutterTrace::Site::UploadRecord};
         runtime.AccelerateImageUpload(image, staging, uploads, 0, 0);
         return;
     }
 
+    std::optional<StutterTrace::SiteScope> step_site{std::in_place, StutterTrace::Site::UploadRead};
     Tegra::Memory::GpuGuestMemory<u8, Tegra::Memory::GuestMemoryFlags::UnsafeRead> swizzle_data(
         *gpu_memory, gpu_addr, image.guest_size_bytes, &swizzle_data_buffer);
+    step_site.emplace(StutterTrace::Site::UploadUnswizzle);
     if (True(image.flags & ImageFlagBits::Converted)) {
         unswizzle_data_buffer.resize_destructive(image.unswizzled_size_bytes);
         auto copies = UnswizzleImage(*gpu_memory, gpu_addr, image.info, swizzle_data,
                                     unswizzle_data_buffer, &unswizzle_worker);
         ConvertImage(unswizzle_data_buffer, image.info, mapped_span, copies);
+        step_site.emplace(StutterTrace::Site::UploadRecord);
         image.UploadMemory(staging, copies);
     } else {
         const auto copies = UnswizzleImage(*gpu_memory, gpu_addr, image.info, swizzle_data,
                                           mapped_span, &unswizzle_worker);
+        step_site.emplace(StutterTrace::Site::UploadRecord);
         image.UploadMemory(staging, copies);
     }
 }
