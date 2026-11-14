@@ -9,6 +9,18 @@ namespace Shader::Backend::GLASM {
 
 #define NotImplemented() throw NotImplementedException("GLASM instruction {}", __LINE__)
 
+void EmitBarrierVoteInit(EmitContext& ctx) {
+    NotImplemented();
+}
+
+void EmitBarrierVote(EmitContext& ctx) {
+    NotImplemented();
+}
+
+void EmitVotedBarrier(EmitContext& ctx) {
+    NotImplemented();
+}
+
 void EmitGetRegister(EmitContext& ctx) {
     NotImplemented();
 }

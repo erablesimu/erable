@@ -486,6 +486,22 @@ Cela bannirait à la fois son nom d&apos;utilisateur du forum et son adresse IP.
 <context>
     <name>ConfigurationShared</name>
     <message>
+        <source>Mario Kart World: 60 FPS mode</source>
+        <translation>Mario Kart World : mode 60 FPS</translation>
+    </message>
+    <message>
+        <source>Forces the game&apos;s 60 FPS mode everywhere, not only in cutscenes. The game advances one 60 FPS step per frame, so it never runs fast. Takes effect after restarting the game and takes precedence over the 30 FPS mode.</source>
+        <translation>Force le mode 60 FPS du jeu partout, pas seulement dans les cinématiques. Le jeu avance d&apos;un pas de 60 FPS par image, il ne tourne donc jamais trop vite. Prend effet après le redémarrage du jeu et passe avant le mode 30 FPS.</translation>
+    </message>
+    <message>
+        <source>Mario Kart World: drop to 30 FPS when slow</source>
+        <translation>Mario Kart World : passer à 30 FPS si ça rame</translation>
+    </message>
+    <message>
+        <source>Only applies with the 60 FPS mode. When your PC can&apos;t hold 60 FPS, the game switches to its 30 FPS mode and keeps normal speed, then tries 60 again every few seconds. Turn it off to stay at 60 FPS, where slow frames play in slow motion. Takes effect after restarting the game.</source>
+        <translation>Seulement avec le mode 60 FPS. Quand votre PC ne tient pas 60 FPS, le jeu passe à son mode 30 FPS et garde sa vitesse normale, puis réessaie 60 FPS toutes les quelques secondes. Désactivez-le pour rester à 60 FPS, où les images lentes passent au ralenti. Prend effet après le redémarrage du jeu.</translation>
+    </message>
+    <message>
         <location filename="../../src/erable/configuration/shared_widget.cpp" line="67"/>
         <source>%</source>
         <translation>%</translation>
