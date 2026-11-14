@@ -39,6 +39,7 @@
 #include "core/core.h"
 #include "core/arm/dynarmic/window_trace.h"
 #include "core/device_memory.h"
+#include "core/nx2_memory_report.h"
 #include "video_core/rasterizer_interface.h"
 #include "video_core/renderer_base.h"
 #include "core/frontend/emu_window.h"
@@ -2172,6 +2173,7 @@ private:
                          m_stats.frame_us / 599, m_stats.max_frame_us, m_stats.hitches,
                          m_stats.fence_us / 600, m_stats.max_fence_us, m_stats.composite_us / 600,
                          m_stats.pace_us / 600, m_stats.ran_ahead);
+                Core::Nx2MemoryReport::Log(system);
                 m_stats = {.last_present = entered};
             }
         }
