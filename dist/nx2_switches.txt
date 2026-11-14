@@ -19,6 +19,10 @@ EDEN_NX2_SPLIT=2
 # cache and other programs. =0 commits all of it at start, as before.
 #EDEN_NX2_LAZY_COMMIT=0
 
+# Render targets the game drew elsewhere since (drifted) are deleted once unused, instead of piling
+# up until the texture collector's bursts. =0 keeps them for the collector, as before.
+#EDEN_NX2_TC_COLD_SWEEP=0
+
 # Batch GPU fence syncpoints to reduce host driver overhead and smooth frametimes.
 EDEN_NX2_FENCE_BATCH=1
 

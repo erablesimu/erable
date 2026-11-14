@@ -766,6 +766,29 @@ private:
     };
     Common::LeastRecentlyUsedCache<LRUItemParams> lru_cache;
 
+    /// Cold sweep (from Fritchii's TC_COLD_FRAMES and EXP58): a single-level 2D render target
+    /// that a newer image overlaps badly (the game drew the next frame's target a little further
+    /// in memory) is watched; once untouched it is deleted without waiting for the collector.
+    /// Ocarina's Castle Town held 7.8-10.5 GB of such images there, deleted in bursts that made
+    /// 140-180 ms frames. EDEN_NX2_TC_COLD_SWEEP=0 turns it off.
+    void WatchColdImage(ImageId image_id);
+    void SweepColdImages();
+    /// Whether a registered image of another shape, touched after this one, covers its memory.
+    [[nodiscard]] bool ColdSuperseded(ImageId image_id, const ImageBase& image);
+    [[nodiscard]] static bool ColdShaped(const ImageInfo& info) noexcept {
+        return info.type == ImageType::e2D && info.resources.levels == 1 &&
+               info.resources.layers == 1 && info.num_samples == 1;
+    }
+    [[nodiscard]] static u64 ColdShapeKey(const ImageInfo& info) noexcept {
+        return (u64{static_cast<u32>(info.format) & 0xFF} << 56) |
+               (u64{info.size.width & 0x3FFFF} << 18) | (info.size.height & 0x3FFFF);
+    }
+    std::vector<std::pair<ImageId, u64>> cold_watch; ///< Image, frame it was watched from
+    ::Common::unordered_set<ImageId> cold_watch_set;
+    u64 cold_deleted{};    ///< Deleted by the sweep in the last 600 frames
+    u64 cold_superseded{}; ///< Of those, GPU-written ones another target replaced
+    u64 cold_kept_read{};  ///< GPU-written ones kept because the CPU read them
+
  #ifdef ERABLE_LEGACY
     static constexpr size_t TICKS_TO_DESTROY = 6;
  #else

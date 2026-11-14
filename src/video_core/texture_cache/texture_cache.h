@@ -410,6 +410,172 @@ void TextureCache<P>::LogThresholds() const {
              expected_memory >> 20, critical_memory >> 20, minimum_memory >> 20);
 }
 
+/// EDEN_NX2_TC_COLD_SWEEP=0 turns the cold sweep off.
+inline bool TcColdSweepEnabled() {
+    static const bool enabled = [] {
+        const char* value = std::getenv("EDEN_NX2_TC_COLD_SWEEP");
+        return value == nullptr || value[0] != '0';
+    }();
+    return enabled;
+}
+
+template <class P>
+void TextureCache<P>::WatchColdImage(ImageId image_id) {
+    if (!TcColdSweepEnabled() || !ColdShaped(slot_images[image_id].info)) {
+        return;
+    }
+    if (cold_watch_set.insert(image_id).second) {
+        cold_watch.emplace_back(image_id, frame_tick);
+    }
+}
+
+template <class P>
+bool TextureCache<P>::ColdSuperseded(ImageId image_id, const ImageBase& image) {
+    const u64 shape = ColdShapeKey(image.info);
+    const u64 touched = lru_cache.Tick(image.lru_index);
+    bool superseded = false;
+    ForEachImageInRegion(image.cpu_addr, image.guest_size_bytes,
+                         [&](ImageId other_id, Image& other) {
+                             if (other_id == image_id ||
+                                 False(other.flags & ImageFlagBits::Registered) ||
+                                 ColdShapeKey(other.info) == shape ||
+                                 lru_cache.Tick(other.lru_index) <= touched) {
+                                 return false;
+                             }
+                             superseded = true;
+                             return true;
+                         });
+    return superseded;
+}
+
+template <class P>
+void TextureCache<P>::SweepColdImages() {
+    if (!TcColdSweepEnabled()) {
+        return;
+    }
+    // Untouched for this many frames: an image the game uploads from guest memory can come back
+    // from there. A GPU-written one only goes once a target of another shape, touched since,
+    // covers its memory and it has been untouched for SupersededFrames (Fritchii's EXP58): the
+    // game reused that memory for another layout, so its contents have no reader left.
+    constexpr u64 ColdFrames = 4;
+    constexpr u64 SupersededFrames = 60;
+    constexpr u64 MaxWatchFrames = 600; // then an image that never got BadOverlap leaves
+    constexpr u32 MaxPerFrame = 16;
+    constexpr ImageFlagBits excluded =
+        ImageFlagBits::Sparse | ImageFlagBits::SparseLayers | ImageFlagBits::SparseTiles |
+        ImageFlagBits::UnwrittenSparse | ImageFlagBits::Unbacked | ImageFlagBits::Converted |
+        ImageFlagBits::AsynchronousDecode | ImageFlagBits::IsDecoding | ImageFlagBits::Remapped |
+        ImageFlagBits::CostlyLoad;
+    const auto queued = [](ImageId image_id, const auto& downloads) {
+        return std::ranges::any_of(downloads, [image_id](const auto& download) {
+            return download.is_swizzle && download.object_id == image_id;
+        });
+    };
+    const auto bound = [this](const ImageBase& image) {
+        return std::ranges::any_of(image.image_view_ids, [this](ImageViewId view) {
+            return render_targets.depth_buffer_id == view ||
+                   std::ranges::find(render_targets.color_buffer_ids, view) !=
+                       render_targets.color_buffer_ids.end();
+        });
+    };
+    u32 deleted = 0;
+    size_t index = 0;
+    while (index < cold_watch.size()) {
+        const ImageId image_id = cold_watch[index].first;
+        const u64 watched_at = cold_watch[index].second;
+        const auto drop = [&] {
+            cold_watch_set.erase(image_id);
+            cold_watch[index] = cold_watch.back();
+            cold_watch.pop_back();
+        };
+        if (!slot_images.contains(image_id)) {
+            drop();
+            continue;
+        }
+        Image& image = slot_images[image_id];
+        if (!ColdShaped(image.info) || False(image.flags & ImageFlagBits::Registered) ||
+            True(image.flags & excluded)) {
+            drop();
+            continue;
+        }
+        if (False(image.flags & ImageFlagBits::BadOverlap)) {
+            if (frame_tick - watched_at > MaxWatchFrames) {
+                drop();
+            } else {
+                ++index;
+            }
+            continue;
+        }
+        const u64 age = frame_tick - lru_cache.Tick(image.lru_index);
+        bool superseded = false;
+        if (True(image.flags & ImageFlagBits::GpuModified)) {
+            if (image.info.forced_flushed || image.info.dma_downloaded) {
+                // The CPU reads it: its contents may be wanted again, as the collector keeps it.
+                ++cold_kept_read;
+                drop();
+                continue;
+            }
+            if (age < SupersededFrames) {
+                if (frame_tick - watched_at > MaxWatchFrames) {
+                    drop();
+                } else {
+                    ++index; // looked at again when old enough
+                }
+                continue;
+            }
+            if (!ColdSuperseded(image_id, image)) {
+                drop();
+                continue;
+            }
+            superseded = true;
+        } else if (age < ColdFrames) {
+            ++index;
+            continue;
+        }
+        if (queued(image_id, uncommitted_downloads) ||
+            std::ranges::any_of(committed_downloads,
+                                [&](const auto& downloads) { return queued(image_id, downloads); }) ||
+            bound(image)) {
+            ++index;
+            continue;
+        }
+        if (deleted >= MaxPerFrame) {
+            break;
+        }
+        // As the collector deletes an image it does not download.
+        MarkStale(image); // before UntrackImage (see MarkStale)
+        if (True(image.flags & ImageFlagBits::Tracked)) {
+            UntrackImage(image, image_id);
+        }
+        if constexpr (requires(const Image& img) { img.MemoryBlock(); }) {
+            const auto block = image.MemoryBlock();
+            if (block.block != 0) {
+                const auto it = block_image_bytes.find(block.block);
+                if (it != block_image_bytes.end()) {
+                    it->second -= (std::min)(it->second, block.size);
+                }
+            }
+        }
+        UnregisterImage(image_id);
+        trace_delete_reason = "cold-sweep";
+        DeleteImage(image_id);
+        ++deleted;
+        cold_superseded += superseded ? 1 : 0;
+        drop();
+    }
+    cold_deleted += deleted;
+    static const bool log_tc = std::getenv("EDEN_NX2_TC_LOG") != nullptr;
+    if (log_tc && frame_tick % 600 == 0) {
+        LOG_INFO(HW_GPU,
+                 "Cold sweep last 600 frames: {} drifted render targets deleted ({} GPU-written "
+                 "and replaced by another shape), {} kept as read by the CPU; {} watched",
+                 cold_deleted, cold_superseded, cold_kept_read, cold_watch.size());
+    }
+    if (frame_tick % 600 == 0) {
+        cold_deleted = cold_superseded = cold_kept_read = 0;
+    }
+}
+
 template <class P>
 void TextureCache<P>::TickFrame() {
     // Upload buffers grown for one huge image (title 1's 341 MiB terrain layer pools) are freed
@@ -779,6 +945,7 @@ void TextureCache<P>::TickFrame() {
         gc_deletes = gc_costly_deletes = gc_download_deletes = async_decodes_queued = 0;
         images_created = images_deleted = 0;
     }
+    SweepColdImages();
     // An image that could not be made at all: the driver is out of memory whatever the counts
     // say, so collect as at the critical threshold.
     bool out_of_memory = false;
@@ -3616,6 +3783,10 @@ ImageId TextureCache<P>::JoinImages(const ImageInfo& info, GPUVAddr gpu_addr, DA
             new_image.overlapping_images.size() > 1) {
             new_image.flags |= ImageFlagBits::BadOverlap;
         }
+        WatchColdImage(aliased_id);
+    }
+    if (!join_bad_overlap_ids.empty()) {
+        WatchColdImage(new_image_id);
     }
 
     // The copy from an alias into the new image, or null when the loop below skips it.

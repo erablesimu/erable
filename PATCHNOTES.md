@@ -18,6 +18,12 @@ version. Les sections suivantes gardent l'historique.
 - Mode 60 FPS partout à vitesse normale (Configurer > jeu), avec un repli automatique à 30 FPS
   quand le PC ne suit pas.
 
+**Moins de mémoire vidéo, moins de grosses saccades**
+- Quand le jeu dessine l'image suivante un peu plus loin en mémoire (Bourg d'Hyrule d'Ocarina),
+  les anciennes cibles de rendu sont supprimées dès qu'elles ne servent plus, au lieu de
+  s'accumuler jusqu'à un grand ménage qui figeait l'image. `EDEN_NX2_TC_COLD_SWEEP=0` revient
+  à l'ancien comportement.
+
 **Stabilité et compatibilité**
 - Un jeu qui refuse de s'arrêter ne bloque plus Erable : il est fermé proprement, et les réglages
   et le temps de jeu sont enregistrés sans risque de fichier abîmé.
