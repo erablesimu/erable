@@ -11047,94 +11047,219 @@ En sélectionnant « Depuis Erable », les données de sauvegarde précédemment
 <context>
     <name>UpdateDialog</name>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.ui" line="14"/>
         <source>Update Available</source>
-        <translation type="unfinished"/>
+        <translation>Mise à jour disponible</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.ui" line="20"/>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="31"/>
-        <source>&lt;a href=&quot;%1&quot;&gt;View on Forgejo&lt;/a&gt;</source>
-        <translation type="unfinished"/>
+        <source>A new version of Erable is available. You have %1.</source>
+        <translation>Une nouvelle version d&apos;Erable est disponible. Vous avez %1.</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.ui" line="33"/>
-        <source>Would you like to install this update?</source>
-        <translation type="unfinished"/>
+        <source>&lt;a href=&quot;%1&quot;&gt;View on GitHub&lt;/a&gt;</source>
+        <translation>&lt;a href=&quot;%1&quot;&gt;Voir sur GitHub&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.ui" line="50"/>
+        <source>WHAT&apos;S NEW</source>
+        <translation>NOUVEAUTÉS</translation>
+    </message>
+    <message>
         <source>Available Versions</source>
-        <translation type="unfinished"/>
+        <translation>Versions disponibles</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.ui" line="58"/>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="29"/>
-        <source>%1 is available for download.</source>
-        <translation type="unfinished"/>
+        <source>Skip This Version</source>
+        <translation>Ignorer cette version</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="80"/>
+        <source>Remind Me Later</source>
+        <translation>Plus tard</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Mettre à jour</translation>
+    </message>
+    <message>
+        <source>Open the Download Page</source>
+        <translation>Ouvrir la page de téléchargement</translation>
+    </message>
+    <message>
+        <source>This release has no PGO build, so the standard build will be downloaded.</source>
+        <translation>Cette version n&apos;a pas de build PGO : le build standard sera téléchargé.</translation>
+    </message>
+    <message>
+        <source>Failed to restart</source>
+        <translation>Redémarrage impossible</translation>
+    </message>
+    <message>
+        <source>Please start %1 again yourself.</source>
+        <translation>Relancez %1 vous-même.</translation>
+    </message>
+    <message>
+        <source>Failed to install the update</source>
+        <translation>Échec de l&apos;installation de la mise à jour</translation>
+    </message>
+    <message>
+        <source>Could not start the update installer.</source>
+        <translation>Impossible de lancer l&apos;installateur de la mise à jour.</translation>
+    </message>
+    <message>
         <source>New Version Location</source>
-        <translation type="unfinished"/>
+        <translation>Emplacement de la nouvelle version</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="82"/>
         <source>All Files (*.*)</source>
-        <translation type="unfinished"/>
+        <translation>Tous les fichiers (*.*)</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="90"/>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="130"/>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="145"/>
+        <source>Download Complete</source>
+        <translation>Téléchargement terminé</translation>
+    </message>
+    <message>
+        <source>Successfully downloaded %1. Would you like to open it?</source>
+        <translation>%1 a bien été téléchargé. Voulez-vous l&apos;ouvrir ?</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Ouvrir</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Another Erable window is already updating this installation.</source>
+        <translation>Une autre fenêtre d&apos;Erable met déjà à jour cette installation.</translation>
+    </message>
+    <message>
+        <source>Could not replace %1. Your installation was not changed.</source>
+        <translation>Impossible de remplacer %1. Votre installation n&apos;a pas été modifiée.</translation>
+    </message>
+    <message>
+        <source>Update Installed</source>
+        <translation>Mise à jour installée</translation>
+    </message>
+    <message>
+        <source>The new version is installed. The previous version is kept as %1.</source>
+        <translation>La nouvelle version est installée. La version précédente est conservée sous %1.</translation>
+    </message>
+    <message>
+        <source>Restart Now</source>
+        <translation>Redémarrer maintenant</translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation>Plus tard</translation>
+    </message>
+    <message>
+        <source>Could not create a folder for the update.</source>
+        <translation>Impossible de créer un dossier pour la mise à jour.</translation>
+    </message>
+    <message>
+        <source>Preparing the update</source>
+        <translation>Préparation de la mise à jour</translation>
+    </message>
+    <message>
+        <source>The downloaded update could not be unpacked.</source>
+        <translation>La mise à jour téléchargée n&apos;a pas pu être décompressée.</translation>
+    </message>
+    <message>
+        <source>Update Ready</source>
+        <translation>Mise à jour prête</translation>
+    </message>
+    <message>
+        <source>Erable will close, install the update and start again. The previous version is kept, and your settings and data are not changed.</source>
+        <translation>Erable va se fermer, installer la mise à jour et redémarrer. La version précédente est conservée, et vos paramètres et données ne sont pas modifiés.</translation>
+    </message>
+    <message>
         <source>Failed to save file</source>
-        <translation type="unfinished"/>
+        <translation>Échec de l&apos;enregistrement du fichier</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="91"/>
         <source>Could not open file %1 for writing.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible d&apos;ouvrir le fichier %1 en écriture.</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="113"/>
-        <source>Downloading...</source>
-        <translation type="unfinished"/>
+        <source>Downloading the update</source>
+        <translation>Téléchargement de la mise à jour</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="113"/>
-        <source>Cancel</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="131"/>
         <source>Could not write to file %1.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible d&apos;écrire dans le fichier %1.</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="146"/>
-        <source>Could not commit to file %1.</source>
-        <translation type="unfinished"/>
+        <source>Downloading the update (try %1 of %2)</source>
+        <translation>Téléchargement de la mise à jour (essai %1 sur %2)</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="158"/>
         <source>Failed to download file</source>
-        <translation type="unfinished"/>
+        <translation>Échec du téléchargement</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="159"/>
         <source>Could not download from %1%2
 Error code: %3</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de télécharger depuis %1%2
+Code d&apos;erreur : %3</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="172"/>
-        <source>Download Complete</source>
-        <translation type="unfinished"/>
+        <source>Download failed verification</source>
+        <translation>Le téléchargement est invalide</translation>
     </message>
     <message>
-        <location filename="../../src/erable/updater/update_dialog.cpp" line="173"/>
-        <source>Successfully downloaded %1. Would you like to open it?</source>
-        <translation type="unfinished"/>
+        <source>The downloaded file does not match the checksum GitHub published for it, so it was discarded. Try again later.</source>
+        <translation>Le fichier téléchargé ne correspond pas à l&apos;empreinte publiée par GitHub : il a été supprimé. Réessayez plus tard.</translation>
+    </message>
+    <message>
+        <source>Could not commit to file %1.</source>
+        <translation>Impossible de finaliser le fichier %1.</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateProgress</name>
+    <message>
+        <source>Starting...</source>
+        <translation>Démarrage...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Almost done...</source>
+        <translation>Presque terminé...</translation>
+    </message>
+    <message>
+        <source>Please wait...</source>
+        <translation>Veuillez patienter...</translation>
+    </message>
+    <message>
+        <source>%1 MB of %2 MB</source>
+        <translation>%1 Mo sur %2 Mo</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 Mo</translation>
+    </message>
+    <message>
+        <source>%1 MB/s</source>
+        <translation>%1 Mo/s</translation>
+    </message>
+    <message>
+        <source>Cancelling...</source>
+        <translation>Annulation...</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n min left</source>
+        <translation>
+            <numerusform>%n min restante</numerusform>
+            <numerusform>%n min restantes</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n s left</source>
+        <translation>
+            <numerusform>%n s restante</numerusform>
+            <numerusform>%n s restantes</numerusform>
+        </translation>
     </message>
 </context>
 <context>

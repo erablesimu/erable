@@ -7,10 +7,11 @@
 #include <QDialog>
 #include "common/net/net.h"
 
+class QGroupBox;
+class QLabel;
 class QRadioButton;
-namespace Ui {
-class UpdateDialog;
-}
+class QTextBrowser;
+class QVBoxLayout;
 
 class UpdateDialog : public QDialog {
     Q_OBJECT
@@ -21,6 +22,11 @@ public:
 
     explicit UpdateDialog(const Common::Net::Release& release, QWidget* parent = nullptr);
     ~UpdateDialog();
+
+    /// A question in the updater's look: `accept` and `reject` name the two buttons, `accept`
+    /// being the one Enter presses. Returns whether `accept` was chosen.
+    static bool Confirm(QWidget* parent, const QString& title, const QString& text,
+                        const QString& accept, const QString& reject);
 
     // Start `target` again once this process has exited, then close `window`.
     static void Restart(QWidget* window, const QString& target);
@@ -43,7 +49,10 @@ private:
     void InstallOnRestart(const std::filesystem::path& exe);
 #endif
 
-    Ui::UpdateDialog* ui;
+    QLabel* m_subtitle = nullptr;
+    QTextBrowser* m_body = nullptr;
+    QGroupBox* m_versions = nullptr;
+    QVBoxLayout* m_radio_buttons = nullptr;
     QList<QRadioButton*> m_buttons;
     Common::Net::Asset m_asset;
 };

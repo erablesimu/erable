@@ -11,7 +11,13 @@
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QPushButton>
+#include <QFrame>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QRadioButton>
+#include <QTextBrowser>
+#include <QVBoxLayout>
 #include <QSaveFile>
 #include <QStandardPaths>
 #include <qdesktopservices.h>
@@ -23,7 +29,7 @@
 #ifdef _WIN32
 #include "qt_common/util/compress.h"
 #endif
-#include "ui_update_dialog.h"
+#include "erable/updater/update_style.h"
 #include "update_dialog.h"
 
 #include "common/httplib.h"
@@ -36,43 +42,113 @@
 
 #undef GetSaveFileName
 
+namespace {
+
+/// "build-31" as "build 31".
+QString ReadableVersion(QString version) {
+    return version.trimmed().replace(QLatin1Char('-'), QLatin1Char(' '));
+}
+
+} // Anonymous namespace
+
 UpdateDialog::UpdateDialog(const Common::Net::Release& release, QWidget* parent)
-    : QDialog(parent), ui(new Ui::UpdateDialog) {
-    ui->setupUi(this);
+    : QDialog(parent) {
+    setObjectName(QStringLiteral("UpdateDialog"));
+    setWindowTitle(tr("Update Available"));
+    setWindowFlag(Qt::WindowContextHelpButtonHint, false);
+    resize(680, 600);
 
-    ui->version->setText(
-        tr("%1 is available for download.").arg(QString::fromStdString(release.title)));
-    ui->url->setText(
-        tr("<a href=\"%1\">View on GitHub</a>").arg(QString::fromStdString(release.html_url)));
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(28, 24, 28, 22);
+    layout->setSpacing(14);
 
+    // The leaf, the new version and the one installed, and the release page
+    auto* header = new QHBoxLayout;
+    header->setSpacing(16);
+    header->addWidget(UpdateStyle::MakeIcon(this, 56), 0, Qt::AlignTop);
+    auto* titles = new QVBoxLayout;
+    titles->setSpacing(2);
+    auto* title = new QLabel(QString::fromStdString(release.title), this);
+    title->setObjectName(QStringLiteral("title"));
+    titles->addWidget(title);
+    m_subtitle = new QLabel(tr("A new version of Erable is available. You have %1.")
+                                .arg(ReadableVersion(QString::fromLatin1(Common::g_build_version))),
+                            this);
+    m_subtitle->setObjectName(QStringLiteral("subtitle"));
+    m_subtitle->setWordWrap(true);
+    titles->addWidget(m_subtitle);
+    header->addLayout(titles, 1);
+    auto* url = new QLabel(tr("<a href=\"%1\">View on GitHub</a>")
+                               .arg(QString::fromStdString(release.html_url)),
+                           this);
+    url->setOpenExternalLinks(true);
+    url->setObjectName(QStringLiteral("subtitle"));
+    header->addWidget(url, 0, Qt::AlignTop);
+    layout->addLayout(header);
+
+    // What changed, build by build
+    auto* section = new QLabel(tr("WHAT'S NEW"), this);
+    section->setObjectName(QStringLiteral("section"));
+    layout->addWidget(section);
+    m_body = new QTextBrowser(this);
+    m_body->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_body->setOpenExternalLinks(true);
+    m_body->setFrameShape(QFrame::NoFrame);
     std::string text{release.body};
     if (auto pos = text.find("# Packages"); pos != std::string::npos) {
         text = text.substr(0, pos);
     }
+    m_body->setMarkdown(QString::fromStdString(text));
+    m_body->document()->setDocumentMargin(10);
+    UpdateStyle::StyleNotes(m_body->document());
+    layout->addWidget(m_body, 1);
 
-    ui->body->setMarkdown(QString::fromStdString(text));
+    m_versions = new QGroupBox(tr("Available Versions"), this);
+    m_radio_buttons = new QVBoxLayout(m_versions);
+    layout->addWidget(m_versions);
 
-    ui->buttonBox->button(QDialogButtonBox::No)->setText(tr("Remind Me Later"));
-    auto* skip = ui->buttonBox->addButton(tr("Skip This Version"), QDialogButtonBox::ActionRole);
+    // Skip on the left, later and update on the right
+    auto* buttons = new QHBoxLayout;
+    buttons->setSpacing(10);
+    auto* skip = new QPushButton(tr("Skip This Version"), this);
+    skip->setObjectName(QStringLiteral("flat"));
+    auto* later = new QPushButton(tr("Remind Me Later"), this);
+    auto* update = new QPushButton(tr("Update"), this);
+    update->setObjectName(QStringLiteral("primary"));
+    update->setDefault(true);
+    for (QPushButton* button : {skip, later, update}) {
+        button->setCursor(Qt::PointingHandCursor);
+    }
+    buttons->addWidget(skip);
+    buttons->addStretch(1);
+    buttons->addWidget(later);
+    buttons->addWidget(update);
+    layout->addLayout(buttons);
     connect(skip, &QPushButton::clicked, this, [this] { done(SkipVersion); });
+    connect(later, &QPushButton::clicked, this, &QDialog::reject);
+    connect(update, &QPushButton::clicked, this, &QDialog::accept);
+
+    setStyleSheet(UpdateStyle::StyleSheet(QStringLiteral("QDialog#UpdateDialog")));
+    update->setFocus();
 
     // TODO(crueter): Find a way to set default
     const auto assets = release.GetPlatformAssets();
 
     if (assets.empty()) {
-        ui->groupBox->setHidden(true);
+        m_versions->setHidden(true);
+        update->setText(tr("Open the Download Page"));
         connect(this, &QDialog::accepted, this, [release]() {
             QDesktopServices::openUrl(QUrl{QString::fromStdString(release.html_url)});
         });
     } else if (assets.size() == 1) {
-        ui->groupBox->setHidden(true);
+        m_versions->setHidden(true);
         m_asset = assets[0];
 
         if (m_asset.name == "Standard" &&
             std::string_view{Common::g_build_release_platform}.ends_with("-pgo")) {
-            ui->version->setText(
-                ui->version->text() +
-                tr(" This release has no PGO build, so the standard build will be downloaded."));
+            m_subtitle->setText(
+                m_subtitle->text() + QLatin1Char(' ') +
+                tr("This release has no PGO build, so the standard build will be downloaded."));
         }
 
         connect(this, &QDialog::accepted, this, &UpdateDialog::Download);
@@ -89,15 +165,61 @@ UpdateDialog::UpdateDialog(const Common::Net::Release& release, QWidget* parent)
                 r->setChecked(true);
             ++i;
 
-            ui->radioButtons->addWidget(r);
+            m_radio_buttons->addWidget(r);
         }
 
         connect(this, &QDialog::accepted, this, &UpdateDialog::Download);
     }
 }
 
-UpdateDialog::~UpdateDialog() {
-    delete ui;
+UpdateDialog::~UpdateDialog() = default;
+
+bool UpdateDialog::Confirm(QWidget* parent, const QString& title, const QString& text,
+                           const QString& accept, const QString& reject) {
+    QDialog dialog{parent};
+    dialog.setObjectName(QStringLiteral("UpdateConfirm"));
+    dialog.setWindowTitle(QStringLiteral("Erable"));
+    dialog.setWindowFlag(Qt::WindowContextHelpButtonHint, false);
+    dialog.setMinimumWidth(500);
+
+    auto* layout = new QVBoxLayout(&dialog);
+    layout->setContentsMargins(28, 24, 28, 22);
+    layout->setSpacing(18);
+    auto* header = new QHBoxLayout;
+    header->setSpacing(16);
+    header->addWidget(UpdateStyle::MakeIcon(&dialog, 48), 0, Qt::AlignTop);
+    auto* texts = new QVBoxLayout;
+    texts->setSpacing(6);
+    auto* title_label = new QLabel(title, &dialog);
+    title_label->setObjectName(QStringLiteral("title"));
+    title_label->setStyleSheet(QStringLiteral("font-size: 21px;"));
+    texts->addWidget(title_label);
+    auto* text_label = new QLabel(text, &dialog);
+    text_label->setObjectName(QStringLiteral("subtitle"));
+    text_label->setStyleSheet(QStringLiteral("font-size: 14px;"));
+    text_label->setWordWrap(true);
+    texts->addWidget(text_label);
+    header->addLayout(texts, 1);
+    layout->addLayout(header);
+
+    auto* buttons = new QHBoxLayout;
+    buttons->setSpacing(10);
+    buttons->addStretch(1);
+    auto* no = new QPushButton(reject, &dialog);
+    auto* yes = new QPushButton(accept, &dialog);
+    yes->setObjectName(QStringLiteral("primary"));
+    yes->setDefault(true);
+    for (QPushButton* button : {no, yes}) {
+        button->setCursor(Qt::PointingHandCursor);
+        buttons->addWidget(button);
+    }
+    layout->addLayout(buttons);
+    QObject::connect(no, &QPushButton::clicked, &dialog, &QDialog::reject);
+    QObject::connect(yes, &QPushButton::clicked, &dialog, &QDialog::accept);
+
+    dialog.setStyleSheet(UpdateStyle::StyleSheet(QStringLiteral("QDialog#UpdateConfirm")));
+    yes->setFocus();
+    return dialog.exec() == QDialog::Accepted;
 }
 
 void UpdateDialog::Restart(QWidget* window, const QString& target) {
@@ -213,13 +335,10 @@ void UpdateDialog::Download() {
         return;
 
     // Download is complete. User may choose to open in the file manager.
-    auto button =
-        QtCommon::Frontend::Question(tr("Download Complete"),
-                                     tr("Successfully downloaded %1. Would you like to open it?")
-                                         .arg(QString::fromStdString(m_asset.filename)),
-                                     QtCommon::Frontend::Yes | QtCommon::Frontend::No);
-
-    if (button == QtCommon::Frontend::Yes) {
+    if (Confirm(parentWidget(), tr("Download Complete"),
+                tr("Successfully downloaded %1. Would you like to open it?")
+                    .arg(QString::fromStdString(m_asset.filename)),
+                tr("Open"), tr("Close"))) {
         QDesktopServices::openUrl(QUrl::fromLocalFile(filename));
     }
 }
@@ -250,12 +369,10 @@ void UpdateDialog::InstallInPlace(const std::filesystem::path& target) {
     }
 
     LOG_INFO(Frontend, "Installed {} over {}", m_asset.filename, target.string());
-    const auto button = QtCommon::Frontend::Question(
-        tr("Update Installed"),
-        tr("The new version is installed. The previous version is kept as %1.\n\nRestart now?")
-            .arg(QString::fromStdString(UpdateInstaller::PreviousPath(target).string())),
-        QtCommon::Frontend::Yes | QtCommon::Frontend::No);
-    if (button == QtCommon::Frontend::Yes) {
+    if (Confirm(parentWidget(), tr("Update Installed"),
+                tr("The new version is installed. The previous version is kept as %1.")
+                    .arg(QString::fromStdString(UpdateInstaller::PreviousPath(target).string())),
+                tr("Restart Now"), tr("Later"))) {
         Restart(parentWidget(), QString::fromStdString(target.string()));
     }
 }
@@ -287,30 +404,30 @@ void UpdateDialog::InstallOnRestart(const std::filesystem::path& exe) {
         return;
     }
 
-    auto progress = QtCommon::Frontend::newProgressDialog(tr("Unpacking..."), tr("Cancel"), 0, 100);
-    progress->show();
+    UpdateProgress progress{tr("Preparing the update"), parentWidget()};
+    progress.show();
     const auto unpacked = QtCommon::Compress::extractDir(
         QString::fromStdWString(archive.wstring()), QString::fromStdWString(staging.wstring()),
         [&](std::size_t total, std::size_t done) {
             QGuiApplication::processEvents();
             if (total != 0) {
-                progress->setValue(static_cast<int>((done * 100) / total));
+                progress.SetPercent(static_cast<int>((done * 100) / total));
             }
-            return !progress->wasCanceled();
+            return !progress.WasCanceled();
         });
-    progress->close();
+    progress.hide();
     if (unpacked.isEmpty() || !std::filesystem::exists(staging / exe.filename(), ec)) {
         fail(tr("The downloaded update could not be unpacked."));
         return;
     }
     std::filesystem::remove(archive, ec);
 
-    const auto button = QtCommon::Frontend::Question(
-        tr("Update Ready"),
+    const bool restart = Confirm(
+        parentWidget(), tr("Update Ready"),
         tr("Erable will close, install the update and start again. The previous version is "
-           "kept, and your settings and data are not changed.\n\nRestart now?"),
-        QtCommon::Frontend::Yes | QtCommon::Frontend::No);
-    if (button != QtCommon::Frontend::Yes ||
+           "kept, and your settings and data are not changed."),
+        tr("Restart Now"), tr("Later"));
+    if (!restart ||
         !LaunchInstaller(parentWidget(), QString::fromStdWString(staging.wstring()))) {
         cleanup();
     }
@@ -345,19 +462,16 @@ bool UpdateDialog::DownloadTo(const QString& filename) {
         return false;
     }
 
-    auto progress =
-        QtCommon::Frontend::newProgressDialog(tr("Downloading..."), tr("Cancel"), 0, 100);
-    progress->show();
+    UpdateProgress progress{tr("Downloading the update"), parentWidget()};
+    progress.show();
 
     QGuiApplication::processEvents();
 
     // Progress dialog.
     auto progress_callback = [&](size_t processed_size, size_t total_size) {
         QGuiApplication::processEvents();
-        if (total_size != 0) {
-            progress->setValue(static_cast<int>((processed_size * 100) / total_size));
-        }
-        return !progress->wasCanceled();
+        progress.SetBytes(processed_size, total_size != 0 ? total_size : m_asset.size);
+        return !progress.WasCanceled();
     };
 
     QCryptographicHash hash(QCryptographicHash::Sha256);
@@ -390,12 +504,12 @@ bool UpdateDialog::DownloadTo(const QString& filename) {
             file.resize(0);
             hash.reset();
             received = 0;
-            progress->setValue(0);
-            progress->setLabelText(tr("Downloading... (try %1 of %2)").arg(attempt).arg(attempts));
+            progress.Restart();
+            progress.SetTitle(tr("Downloading the update (try %1 of %2)").arg(attempt).arg(attempts));
             QEventLoop wait;
             QTimer::singleShot(2000 * (attempt - 1), &wait, &QEventLoop::quit);
             wait.exec();
-            if (progress->wasCanceled()) {
+            if (progress.WasCanceled()) {
                 break;
             }
         }
@@ -409,7 +523,7 @@ bool UpdateDialog::DownloadTo(const QString& filename) {
         LOG_WARNING(Frontend, "GET to {}{} failed ({}), trying again", m_asset.url, m_asset.path,
                     result ? std::to_string(result->status) : httplib::to_string(result.error()));
     }
-    progress->close();
+    progress.hide();
 
     if (!result) {
         LOG_ERROR(Frontend, "GET to {}{} returned null", m_asset.url, m_asset.path);

@@ -6,6 +6,8 @@ version. Les sections suivantes gardent l'historique.
 ## Nouveautés de cette version
 
 **Mises à jour**
+- Fenêtres de mise à jour redessinées aux couleurs d'Erable et entièrement en français : notes
+  plus lisibles, téléchargement avec Mo, vitesse et temps restant, boutons explicites.
 - La fenêtre de mise à jour ne montre plus que ce qui a changé depuis votre version, build par
   build, au lieu de tout l'historique depuis le build 24.
 
