@@ -14,6 +14,7 @@
 #include <QWidget>
 
 #include "common/common_types.h"
+#include "common/uuid.h"
 #include "erable/home/home_music.h"
 
 class ControllerNavigation;
@@ -91,6 +92,8 @@ private:
     void Select(int index);
     void UpdateSelection();
     void UpdateProfile();
+    /// "Who's playing?": pick, add, rename or delete a profile.
+    void ChooseProfile();
     /// Asks for the player's name while the current profile has none of its own (or always,
     /// when requested from the profile button).
     void EnsureProfile(bool requested = false);
@@ -114,6 +117,7 @@ private:
     int selected = 0;
     bool active = false;
     bool profile_checked = false;
+    Common::UUID shown_profile{}; ///< Whose picture the profile button shows
 
     PillButton* profile_button = nullptr;
     PillButton* music_button = nullptr;

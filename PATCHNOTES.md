@@ -42,6 +42,13 @@ version. Les sections suivantes gardent l'historique.
   élargit le panier, coups de vent qui poussent les feuilles. Aux couleurs du thème.
 - Le petit jeu se joue aussi à la manette (croix ou stick gauche), pendant tout le chargement.
 
+**Profils**
+- « Qui joue ? » : un clic sur votre profil en haut à gauche de l'accueil affiche tous les profils
+  en grands avatars ronds, comme sur une console. Choisissez avec qui jouer (souris, flèches ou
+  manette), ajoutez un profil, renommez-le, donnez-lui une image ou supprimez-le. Chaque profil
+  garde ses propres sauvegardes ; changer de profil n'y touche jamais.
+- L'avatar du profil (image ou couleur) s'affiche aussi sur l'accueil.
+
 **Accueil en boîtiers**
 - Le nom de votre profil s'affiche bien à chaque démarrage (il montrait parfois « Eden »).
 - En haut, le logo Erable est centré avec un champ de recherche (Ctrl + F, Échap pour revenir).

@@ -29,6 +29,8 @@ add_executable(erable
     debug_session.h
     home/case_shelf.cpp
     home/case_shelf.h
+    home/profile_picker.cpp
+    home/profile_picker.h
     home/home_music.cpp
     home/home_music.h
     home/home_screen.cpp

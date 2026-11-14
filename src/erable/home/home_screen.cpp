@@ -48,6 +48,7 @@
 #include "core/hle/service/acc/profile_manager.h"
 #include "erable/game/game_list.h"
 #include "erable/home/case_shelf.h"
+#include "erable/home/profile_picker.h"
 #include "erable/util/controller_navigation.h"
 #include "frontend_common/play_time_manager.h"
 #include "hid_core/frontend/emulated_controller.h"
@@ -247,6 +248,12 @@ public:
         updateGeometry();
         update();
     }
+    /// The profile's picture in the avatar circle, and its colour when it has none.
+    void SetAvatarPicture(const QPixmap& picture, const QColor& colour) {
+        avatar_picture_ = picture;
+        avatar_colour_ = colour;
+        update();
+    }
 
     QSize sizeHint() const override {
         const int text_width = fontMetrics().horizontalAdvance(text());
@@ -280,9 +287,10 @@ protected:
             const double size = avatar_ ? 34 : 24;
             const QRectF circle{x, pill.center().y() - size / 2, size, size};
             if (avatar_) {
+                const QColor base = avatar_colour_.isValid() ? avatar_colour_ : Maple;
                 QLinearGradient fill{circle.topLeft(), circle.bottomRight()};
-                fill.setColorAt(0, MapleHi);
-                fill.setColorAt(1, Maple);
+                fill.setColorAt(0, base.lighter(130));
+                fill.setColorAt(1, base);
                 painter.setPen(Qt::NoPen);
                 painter.setBrush(fill);
             } else {
@@ -290,7 +298,22 @@ protected:
                 painter.setBrush(primary_ ? QColor{0, 0, 0, 60} : SurfaceHi);
             }
             painter.drawEllipse(circle);
-            painter.setPen(avatar_ || primary_ ? Ink : Text);
+            if (avatar_ && !avatar_picture_.isNull()) {
+                QPainterPath round;
+                round.addEllipse(circle);
+                painter.save();
+                painter.setClipPath(round);
+                painter.setRenderHint(QPainter::SmoothPixmapTransform);
+                painter.drawPixmap(circle.toRect(), avatar_picture_);
+                painter.restore();
+                x += size + 10;
+                painter.setPen(ink);
+                painter.setFont(font());
+                painter.drawText(QRectF{x, pill.top(), pill.right() - x - 12, pill.height()},
+                                 Qt::AlignVCenter | Qt::AlignLeft, text());
+                return;
+            }
+            painter.setPen(avatar_ ? Qt::white : primary_ ? Ink : Text);
             painter.setFont(MakeFont(avatar_ ? HomeFonts().display : HomeFonts().body,
                                      avatar_ ? 16 : 12, QFont::ExtraBold));
             painter.drawText(circle, Qt::AlignCenter, badge_);
@@ -315,6 +338,8 @@ private:
     QString badge_;
     bool primary_;
     bool avatar_ = false;
+    QPixmap avatar_picture_;
+    QColor avatar_colour_;
 };
 
 /// One game: its picture with rounded corners and its title, larger and ringed in maple when
@@ -408,10 +433,7 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     profile_button = new PillButton({}, {}, false, this);
     profile_button->SetAvatar(true);
     profile_button->setToolTip(tr("Your profile"));
-    connect(profile_button, &QAbstractButton::clicked, this, [this] {
-        profile_checked = false;
-        EnsureProfile(true);
-    });
+    connect(profile_button, &QAbstractButton::clicked, this, &HomeScreen::ChooseProfile);
     left->addWidget(profile_button);
     left->addStretch();
     middle->addWidget(new BrandMark(this));
@@ -1053,8 +1075,27 @@ void HomeScreen::UpdateProfile() {
         manager.GetUser(static_cast<std::size_t>(Settings::values.current_user.GetValue()));
     const QString name = user ? ProfileName(manager, *user) : QString{};
     const QString shown = name.isEmpty() ? tr("Profile") : name;
-    profile_button->setText(shown);
+    if (profile_button->text() != shown) {
+        profile_button->setText(shown);
+        profile_button->updateGeometry();
+    }
     profile_button->SetBadge(shown.left(1).toUpper());
+    // The picture is read from disk only when the profile changes (this runs every 2 s)
+    if (user && *user != shown_profile) {
+        shown_profile = *user;
+        profile_button->SetAvatarPicture(ProfilePicker::ProfilePicture(*user),
+                                         ProfilePicker::ProfileColour(*user));
+    }
+}
+
+void HomeScreen::ChooseProfile() {
+    ProfilePicker picker{system, this};
+    picker.resize(std::max(760, width() * 2 / 3), 420);
+    picker.exec();
+    // Chosen, renamed, given a picture or deleted: the configuration keeps current_user
+    shown_profile = {};
+    UpdateProfile();
+    emit HomeSettingsChanged();
 }
 
 void HomeScreen::EnsureProfile(bool requested) {

@@ -1,5 +1,72 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="fr" sourcelanguage="en_US">
 <context>
+    <name>ProfilePicker</name>
+    <message>
+        <source>Who&apos;s playing?</source>
+        <translation>Qui joue ?</translation>
+    </message>
+    <message>
+        <source>Each profile keeps its own saves. Switching never touches them.</source>
+        <translation>Chaque profil garde ses propres sauvegardes. Changer de profil n&apos;y touche jamais.</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Renommer</translation>
+    </message>
+    <message>
+        <source>Change picture</source>
+        <translation>Changer l&apos;image</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Supprimer</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Ajouter</translation>
+    </message>
+    <message>
+        <source>New profile</source>
+        <translation>Nouveau profil</translation>
+    </message>
+    <message>
+        <source>Rename profile</source>
+        <translation>Renommer le profil</translation>
+    </message>
+    <message>
+        <source>Choose a picture</source>
+        <translation>Choisir une image</translation>
+    </message>
+    <message>
+        <source>Images (*.png *.jpg *.jpeg *.bmp *.webp)</source>
+        <translation>Images (*.png *.jpg *.jpeg *.bmp *.webp)</translation>
+    </message>
+    <message>
+        <source>This file is not a picture Erable can read.</source>
+        <translation>Ce fichier n&apos;est pas une image qu&apos;Erable sait lire.</translation>
+    </message>
+    <message>
+        <source>The picture could not be saved.</source>
+        <translation>L&apos;image n&apos;a pas pu être enregistrée.</translation>
+    </message>
+    <message>
+        <source>Delete profile</source>
+        <translation>Supprimer le profil</translation>
+    </message>
+    <message>
+        <source>Delete the profile &quot;%1&quot;?
+
+Its saves stay on the disk but no profile of Erable will use them any more. Copy them first if you want to keep playing them.</source>
+        <translation>Supprimer le profil « %1 » ?
+
+Ses sauvegardes restent sur le disque, mais plus aucun profil d&apos;Erable ne les utilisera. Copiez-les d&apos;abord si vous voulez continuer ces parties.</translation>
+    </message>
+</context>
+<context>
     <name>LeafCatcher</name>
     <message>
         <source>Best %1</source>
