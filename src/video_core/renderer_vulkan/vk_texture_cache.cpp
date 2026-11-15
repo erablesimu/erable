@@ -3253,10 +3253,12 @@ void Image::ReleaseToPool() {
         if (!key.valid || !image || image.IsUnbacked()) {
             return;
         }
-        // Dedicated allocations (block 0) and memory placed in host memory over budget are
-        // freed as before.
+        // Memory placed in host memory over budget is freed as before. Dedicated allocations
+        // (block 0) are pooled too, keeping their own allocation: the big render targets get one
+        // (a 1280x720 target remade up to 282 times in a fight), and without them the pool took
+        // about one image in ten (an Ocarina dungeon, build-35).
         const vk::Image::MemoryBlock block = image.GetMemoryBlock();
-        if (block.block == 0 || block.size < MinPooledBytes || !image.IsDeviceLocal()) {
+        if (block.size < MinPooledBytes || !image.IsDeviceLocal()) {
             return;
         }
         if (ENABLE_MSAA_RESOLVE_CONSUME) {
