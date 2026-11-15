@@ -21,8 +21,10 @@
 #include <boost/container/small_vector.hpp>
 
 #include "common/alignment.h"
+#include "common/div_ceil.h"
 #include "common/memory_detect.h"
 #include "common/scope_exit.h"
+#include "video_core/textures/workers.h"
 #include "common/settings.h"
 #include "common/slot_vector.h"
 #include "video_core/control/channel_state.h"
@@ -2940,8 +2942,12 @@ void TextureCache<P>::UploadImageContents(Image& image, StagingBuffer& staging) 
     }
 
     std::optional<StutterTrace::SiteScope> step_site{std::in_place, StutterTrace::Site::UploadRead};
-    Tegra::Memory::GpuGuestMemory<u8, Tegra::Memory::GuestMemoryFlags::UnsafeRead> swizzle_data(
-        *gpu_memory, gpu_addr, image.guest_size_bytes, &swizzle_data_buffer);
+    const std::span<const u8> swizzle_data = ReadForUpload(gpu_addr, image.guest_size_bytes);
+    // A gathered copy needs no second snapshot in the parallel unswizzle (reset at return).
+    unswizzle_worker.SetInputPrivate(swizzle_data.data() == swizzle_data_buffer.data());
+    SCOPE_EXIT {
+        unswizzle_worker.SetInputPrivate(false);
+    };
     step_site.emplace(StutterTrace::Site::UploadUnswizzle);
     if (True(image.flags & ImageFlagBits::Converted)) {
         unswizzle_data_buffer.resize_destructive(image.unswizzled_size_bytes);
@@ -2956,6 +2962,49 @@ void TextureCache<P>::UploadImageContents(Image& image, StagingBuffer& staging) 
         step_site.emplace(StutterTrace::Site::UploadRecord);
         image.UploadMemory(staging, copies);
     }
+}
+
+template <class P>
+std::span<const u8> TextureCache<P>::ReadForUpload(GPUVAddr gpu_addr, size_t size) {
+    // Contiguous in host memory: read in place, no copy.
+    if (const u8* const span = gpu_memory->GetSpan(gpu_addr, size)) {
+        return {span, size};
+    }
+    swizzle_data_buffer.resize_destructive(size);
+    u8* const destination = swizzle_data_buffer.data();
+    // A zone entry gathers hundreds of MiB of textures from pieces of guest memory in one frame
+    // (900 MiB, 215 ms on one thread in an Ocarina session): large ones are read in parts on the
+    // texture worker threads too, the caller reading the last part.
+    constexpr size_t ParallelReadMinBytes = size_t{4} << 20;
+    constexpr size_t ReadParts = 4;
+    if (size < ParallelReadMinBytes) {
+        gpu_memory->ReadBlockUnsafe(gpu_addr, destination, size);
+        return {destination, size};
+    }
+    const size_t part = Common::AlignUp(Common::DivCeil(size, ReadParts), size_t{4096});
+    auto& pool = Tegra::Texture::GetThreadWorkers();
+    std::latch completed{static_cast<std::ptrdiff_t>(ReadParts - 1)};
+    for (size_t index = 0; index + 1 < ReadParts; ++index) {
+        const size_t offset = index * part;
+        const size_t length = offset < size ? (std::min)(part, size - offset) : 0;
+        const bool sent = length != 0 && pool.TryQueueWork([this, gpu_addr, destination, offset,
+                                                            length, &completed] {
+            gpu_memory->ReadBlockUnsafe(gpu_addr + offset, destination + offset, length);
+            completed.count_down();
+        });
+        if (!sent) {
+            if (length != 0) {
+                gpu_memory->ReadBlockUnsafe(gpu_addr + offset, destination + offset, length);
+            }
+            completed.count_down();
+        }
+    }
+    const size_t last = (ReadParts - 1) * part;
+    if (last < size) {
+        gpu_memory->ReadBlockUnsafe(gpu_addr + last, destination + last, size - last);
+    }
+    completed.wait();
+    return {destination, size};
 }
 
 template <class P>

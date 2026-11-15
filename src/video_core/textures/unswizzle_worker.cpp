@@ -38,9 +38,15 @@ bool UnswizzleWorker::TryUnswizzle(std::span<u8> output, std::span<const u8> inp
         input.size() < guest_bytes || output.size() < host_bytes) {
         return false;
     }
-    owned.resize_destructive(guest_bytes);
-    std::memcpy(owned.data(), input.data(), guest_bytes);
-    const std::span<const u8> snapshot{owned};
+    // Guest memory may be written by the emulated CPU while the threads read it: they read a
+    // snapshot. A private copy (a texture gathered from pieces of guest memory) needs none, and
+    // copying it again cost as much as the read itself on a zone entry.
+    std::span<const u8> snapshot = input.first(guest_bytes);
+    if (!input_private) {
+        owned.resize_destructive(guest_bytes);
+        std::memcpy(owned.data(), input.data(), guest_bytes);
+        snapshot = owned;
+    }
     const size_t guest_split = first_rows / band_rows * band_bytes;
     const size_t host_split = first_rows * pitch;
     std::latch completed{1};

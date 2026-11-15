@@ -10,6 +10,7 @@
 #include <atomic>
 #include <chrono>
 #include <deque>
+#include <latch>
 #include <limits>
 #include <map>
 #include <mutex>
@@ -522,6 +523,10 @@ private:
     [[nodiscard]] bool IsDownloadable(const ImageBase& image) const noexcept;
 
     void RefreshContents(Image& image, ImageId image_id);
+
+    /// The guest bytes of [gpu_addr, gpu_addr + size) for an upload: guest memory itself when
+    /// contiguous, else gathered into swizzle_data_buffer (large ones on several threads).
+    [[nodiscard]] std::span<const u8> ReadForUpload(GPUVAddr gpu_addr, size_t size);
 
     /// Upload data from guest to an image
     template <typename StagingBuffer>

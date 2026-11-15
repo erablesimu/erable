@@ -28,6 +28,9 @@ version. Les sections suivantes gardent l'historique.
   quand le PC ne suit pas.
 
 **Moins de mémoire vidéo, moins de grosses saccades**
+- Aux entrées de zone, les textures éparpillées dans la mémoire du jeu sont rassemblées sur
+  plusieurs cœurs du processeur au lieu d'un seul, et les grosses ne sont plus recopiées une
+  seconde fois avant d'être décodées (Ocarina en charge près de 900 Mo d'un coup).
 - Quand le jeu dessine l'image suivante un peu plus loin en mémoire (Bourg d'Hyrule d'Ocarina),
   les anciennes cibles de rendu sont supprimées dès qu'elles ne servent plus, au lieu de
   s'accumuler jusqu'à un grand ménage qui figeait l'image. `EDEN_NX2_TC_COLD_SWEEP=0` revient
