@@ -72,6 +72,7 @@ add_executable(tests
     core/nx_archive.cpp
     frontend_common/nx_archive.cpp
     core/vfs_vector.cpp
+    core/kip_ini.cpp
     core/ncz_cache.cpp
     core/ncz_decompressor.cpp
     core/ncz_io_guards.cpp
