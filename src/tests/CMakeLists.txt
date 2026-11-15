@@ -68,6 +68,7 @@ add_executable(tests
     video_core/conditional_barrier.cpp
     video_core/storage_buffer_shared_tracking.cpp
     core/nup_validation.cpp
+    core/npdm_kac.cpp
     core/nx_archive.cpp
     frontend_common/nx_archive.cpp
     core/vfs_vector.cpp
