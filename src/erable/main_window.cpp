@@ -1657,6 +1657,7 @@ void MainWindow::ConnectWidgetEvents() {
     connect(game_list, &GameList::OpenPerGameGeneralRequested, this,
             &MainWindow::OnGameListOpenPerGameProperties);
     connect(game_list, &GameList::LinkToRyujinxRequested, this, &MainWindow::OnLinkToRyujinx);
+    connect(game_list, &GameList::ImportSaveRequested, this, &MainWindow::OnImportSave);
 
     connect(this, &MainWindow::UpdateInstallProgress, this, &MainWindow::IncrementInstallProgress);
 
@@ -6708,6 +6709,10 @@ void VolumeButton::ResetMultiplier() {
 #ifdef main
 #undef main
 #endif
+
+void MainWindow::OnImportSave(u64 program_id, const std::string& game_path) {
+    SavesDialog::ImportGameSave(this, program_id, GameTitleName(game_path));
+}
 
 #if !defined(QT_STATICPLUGIN) || defined(__APPLE__)
 #define VMA_IMPLEMENTATION 1

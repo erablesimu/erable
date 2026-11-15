@@ -6474,6 +6474,10 @@ Veuillez aller dans Configurer -&gt; Système -&gt; Réseau puis en choisir une.
         <translation>Ouvrir l&apos;emplacement des données de sauvegarde</translation>
     </message>
     <message>
+        <source>Import Save Data...</source>
+        <translation>Importer une sauvegarde...</translation>
+    </message>
+    <message>
         <location filename="../../src/erable/game/game_list.cpp" line="458"/>
         <source>Open Mod Data Location</source>
         <translation>Ouvrir l&apos;emplacement des données des mods</translation>
@@ -11256,12 +11260,42 @@ Code d&apos;erreur : %3</translation>
 <context>
     <name>SavesDialog</name>
     <message>
+        <source>Backing up your current saves...</source>
+        <translation>Copie de vos sauvegardes actuelles...</translation>
+    </message>
+    <message>
         <source>Saves</source>
         <translation>Sauvegardes</translation>
     </message>
     <message>
+        <source>Your current saves could not be backed up, so nothing was changed.</source>
+        <translation>Vos sauvegardes actuelles n'ont pas pu être copiées, rien n'a donc été modifié.</translation>
+    </message>
+    <message>
+        <source>Your previous saves are kept in:
+%1</source>
+        <translation>Vos anciennes sauvegardes sont gardées dans :
+%1</translation>
+    </message>
+    <message>
+        <source>Copying the saves...</source>
+        <translation>Copie des sauvegardes...</translation>
+    </message>
+    <message>
         <source>Your saves</source>
         <translation>Vos sauvegardes</translation>
+    </message>
+    <message>
+        <source>Import...</source>
+        <translation>Importer...</translation>
+    </message>
+    <message>
+        <source>Take them from another emulator</source>
+        <translation>Reprendre celles d'un autre émulateur</translation>
+    </message>
+    <message>
+        <source>Eden, Lichii, yuzu... found on this PC in one click. Their saves are left as they are. For one game only: right-click it in the library &gt; Import Save Data.</source>
+        <translation>Eden, Lichii, yuzu… trouvés sur ce PC en un clic. Leurs sauvegardes restent intactes. Pour un seul jeu : clic droit sur lui dans la bibliothèque &gt; Importer une sauvegarde.</translation>
     </message>
     <message>
         <source>Back up...</source>
@@ -11284,20 +11318,8 @@ Code d&apos;erreur : %3</translation>
         <translation>Remettre une copie</translation>
     </message>
     <message>
-        <source>On this PC or another. A copy of your current saves is made first.</source>
-        <translation>Sur ce PC ou un autre. Une copie de vos sauvegardes actuelles est faite avant.</translation>
-    </message>
-    <message>
-        <source>Choose its folder...</source>
-        <translation>Choisir son dossier...</translation>
-    </message>
-    <message>
-        <source>Take them from another emulator</source>
-        <translation>Reprendre celles d'un autre émulateur</translation>
-    </message>
-    <message>
-        <source>Eden, Lichii, Ryujinx... Copies its games' saves into one of your profiles; the other emulator's are left as they are.</source>
-        <translation>Eden, Lichii, Ryujinx… Copie les sauvegardes de ses jeux dans l'un de vos profils ; celles de l'autre émulateur restent intactes.</translation>
+        <source>On this PC or another, or drop the zip on this window. A copy of your current saves is made first.</source>
+        <translation>Sur ce PC ou un autre, ou glissez le zip sur cette fenêtre. Une copie de vos sauvegardes actuelles est faite avant.</translation>
     </message>
     <message>
         <source>Open the saves folder</source>
@@ -11315,13 +11337,13 @@ Code d&apos;erreur : %3</translation>
         <source>No saves yet.</source>
         <translation>Aucune sauvegarde pour l'instant.</translation>
     </message>
-    <message>
-        <source>Backing up your current saves...</source>
-        <translation>Copie de vos sauvegardes actuelles...</translation>
+    <message numerus="yes">
+        <source>%n game save(s)</source>
+        <translation><numerusform>%n jeu sauvegardé</numerusform><numerusform>%n jeux sauvegardés</numerusform><numerusform>%n jeux sauvegardés</numerusform></translation>
     </message>
-    <message>
-        <source>Your current saves could not be backed up, so nothing was changed.</source>
-        <translation>Vos sauvegardes actuelles n'ont pas pu être copiées, rien n'a donc été modifié.</translation>
+    <message numerus="yes">
+        <source>%n profile(s)</source>
+        <translation><numerusform>%n profil</numerusform><numerusform>%n profils</numerusform><numerusform>%n profils</numerusform></translation>
     </message>
     <message>
         <source>There are no saves to back up yet.</source>
@@ -11362,8 +11384,8 @@ Code d&apos;erreur : %3</translation>
         <translation>Les sauvegardes de ce profil seront remplacées par celles de cette copie.</translation>
     </message>
     <message>
-        <source>This file doesn't hold saves from Erable or another emulator.</source>
-        <translation>Ce fichier ne contient pas de sauvegardes d'Erable ou d'un autre émulateur.</translation>
+        <source>This file doesn't hold saves from Erable or another emulator. For one game's save, right-click the game in the library &gt; Import Save Data.</source>
+        <translation>Ce fichier ne contient pas de sauvegardes d'Erable ou d'un autre émulateur. Pour la sauvegarde d'un seul jeu : clic droit sur le jeu dans la bibliothèque &gt; Importer une sauvegarde.</translation>
     </message>
     <message>
         <source>Close the game first. Your current saves are backed up before anything changes. Continue?</source>
@@ -11374,18 +11396,24 @@ Code d&apos;erreur : %3</translation>
         <translation>Remise en place de la copie...</translation>
     </message>
     <message>
-        <source>Your previous saves are kept in:
-%1</source>
-        <translation>Vos anciennes sauvegardes sont gardées dans :
-%1</translation>
-    </message>
-    <message>
         <source>The backup could not be put back completely.</source>
         <translation>La copie n'a pas pu être remise entièrement.</translation>
     </message>
     <message>
         <source>Your saves are back.</source>
         <translation>Vos sauvegardes sont de retour.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 (%n game(s))</source>
+        <translation><numerusform>%1 (%n jeu)</numerusform><numerusform>%1 (%n jeux)</numerusform><numerusform>%1 (%n jeux)</numerusform></translation>
+    </message>
+    <message>
+        <source>Another folder...</source>
+        <translation>Un autre dossier...</translation>
+    </message>
+    <message>
+        <source>Emulators found on this PC. Whose saves do you want?</source>
+        <translation>Émulateurs trouvés sur ce PC. Lesquelles reprendre ?</translation>
     </message>
     <message>
         <source>Choose the other emulator's folder (or its nand folder)</source>
@@ -11395,33 +11423,21 @@ Code d&apos;erreur : %3</translation>
         <source>No saves were found in this folder. Choose the other emulator's own folder (the one holding nand), or its nand folder.</source>
         <translation>Aucune sauvegarde trouvée dans ce dossier. Choisissez le dossier de l'autre émulateur (celui qui contient nand), ou son dossier nand.</translation>
     </message>
+    <message numerus="yes">
+        <source>Saves kept on the console (%n game(s))</source>
+        <translation><numerusform>Sauvegardes gardées sur la console (%n jeu)</numerusform><numerusform>Sauvegardes gardées sur la console (%n jeux)</numerusform><numerusform>Sauvegardes gardées sur la console (%n jeux)</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>Profile %1 (%n game(s))</source>
+        <translation><numerusform>Profil %1 (%n jeu)</numerusform><numerusform>Profil %1 (%n jeux)</numerusform><numerusform>Profil %1 (%n jeux)</numerusform></translation>
+    </message>
     <message>
         <source>That emulator has several profiles. Which one's saves?</source>
         <translation>Cet émulateur a plusieurs profils. Les sauvegardes duquel ?</translation>
     </message>
     <message>
-        <source>Close both emulators' games first. Your current saves are backed up before anything changes. Continue?</source>
-        <translation>Fermez d'abord les jeux des deux émulateurs. Vos sauvegardes actuelles sont copiées avant toute modification. Continuer ?</translation>
-    </message>
-    <message>
-        <source>Copying the saves...</source>
-        <translation>Copie des sauvegardes...</translation>
-    </message>
-    <message>
-        <source>Not every save could be copied.</source>
-        <translation>Toutes les sauvegardes n'ont pas pu être copiées.</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n game save(s)</source>
-        <translation><numerusform>%n jeu sauvegardé</numerusform><numerusform>%n jeux sauvegardés</numerusform><numerusform>%n jeux sauvegardés</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n profile(s)</source>
-        <translation><numerusform>%n profil</numerusform><numerusform>%n profils</numerusform><numerusform>%n profils</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>Profile %1 (%n game(s))</source>
-        <translation><numerusform>Profil %1 (%n jeu)</numerusform><numerusform>Profil %1 (%n jeux)</numerusform><numerusform>Profil %1 (%n jeux)</numerusform></translation>
+        <source>That profile has no saves.</source>
+        <translation>Ce profil n'a aucune sauvegarde.</translation>
     </message>
     <message numerus="yes">
         <source>%n game save(s) will be copied into this profile.</source>
@@ -11431,9 +11447,73 @@ Code d&apos;erreur : %3</translation>
         <source>%n of them replace(s) a save you already have here.</source>
         <translation><numerusform>%n d'entre elles remplace une sauvegarde déjà présente ici.</numerusform><numerusform>%n d'entre elles remplacent une sauvegarde déjà présente ici.</numerusform><numerusform>%n d'entre elles remplacent une sauvegarde déjà présente ici.</numerusform></translation>
     </message>
+    <message>
+        <source>Close both emulators' games first. Your current saves are backed up before anything changes. Continue?</source>
+        <translation>Fermez d'abord les jeux des deux émulateurs. Vos sauvegardes actuelles sont copiées avant toute modification. Continuer ?</translation>
+    </message>
+    <message>
+        <source>Not every save could be copied.</source>
+        <translation>Toutes les sauvegardes n'ont pas pu être copiées.</translation>
+    </message>
     <message numerus="yes">
         <source>%n game save(s) copied. Start the game in Erable to continue where you left off.</source>
         <translation><numerusform>%n sauvegarde copiée. Lancez le jeu dans Erable pour reprendre là où vous en étiez.</numerusform><numerusform>%n sauvegardes copiées. Lancez le jeu dans Erable pour reprendre là où vous en étiez.</numerusform><numerusform>%n sauvegardes copiées. Lancez le jeu dans Erable pour reprendre là où vous en étiez.</numerusform></translation>
+    </message>
+    <message>
+        <source>Import the save of %1</source>
+        <translation>Importer la sauvegarde de %1</translation>
+    </message>
+    <message>
+        <source>kept on the console</source>
+        <translation>gardée sur la console</translation>
+    </message>
+    <message>
+        <source>profile %1</source>
+        <translation>profil %1</translation>
+    </message>
+    <message>
+        <source>A zip file...</source>
+        <translation>Un fichier zip...</translation>
+    </message>
+    <message>
+        <source>No other emulator on this PC has a save of this game. Where is it?</source>
+        <translation>Aucun autre émulateur de ce PC n'a de sauvegarde de ce jeu. Où se trouve-t-elle ?</translation>
+    </message>
+    <message>
+        <source>Saves of this game found on this PC. Which one?</source>
+        <translation>Sauvegardes de ce jeu trouvées sur ce PC. Laquelle ?</translation>
+    </message>
+    <message>
+        <source>Choose the save's folder, or the other emulator's folder</source>
+        <translation>Choisissez le dossier de la sauvegarde, ou celui de l'autre émulateur</translation>
+    </message>
+    <message>
+        <source>Choose the zip holding the save</source>
+        <translation>Choisissez le zip qui contient la sauvegarde</translation>
+    </message>
+    <message>
+        <source>Opening the zip...</source>
+        <translation>Ouverture du zip...</translation>
+    </message>
+    <message>
+        <source>This zip could not be opened.</source>
+        <translation>Ce zip n'a pas pu être ouvert.</translation>
+    </message>
+    <message>
+        <source>No save of this game was found there. Its folder is named %1.</source>
+        <translation>Aucune sauvegarde de ce jeu trouvée ici. Son dossier s'appelle %1.</translation>
+    </message>
+    <message>
+        <source>It replaces the save you have in Erable.</source>
+        <translation>Elle remplace la sauvegarde que vous avez dans Erable.</translation>
+    </message>
+    <message>
+        <source>The save could not be copied.</source>
+        <translation>La sauvegarde n'a pas pu être copiée.</translation>
+    </message>
+    <message>
+        <source>Save imported. Start the game to continue where you left off.</source>
+        <translation>Sauvegarde importée. Lancez le jeu pour reprendre là où vous en étiez.</translation>
     </message>
 </context>
 <context>

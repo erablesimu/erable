@@ -135,6 +135,7 @@ signals:
                         const QtCommon::Game::ShortcutTarget target);
     void OpenPerGameGeneralRequested(const std::string& file);
     void LinkToRyujinxRequested(const u64& program_id);
+    void ImportSaveRequested(u64 program_id, const std::string& game_path);
     void OpenDirectory(const QString& directory);
     void AddDirectory();
     void ShowList(bool show);

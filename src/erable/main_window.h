@@ -426,6 +426,7 @@ private slots:
     void OnRestorePreviousSettings();
     void OnDataDialog();
     void OnSavesDialog();
+    void OnImportSave(u64 program_id, const std::string& game_path);
     void OnToggleFilterBar();
     void OnToggleStatusBar();
     void OnTogglePerfOverlay();
