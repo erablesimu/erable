@@ -5,6 +5,11 @@ version. Les sections suivantes gardent l'historique.
 
 ## Nouveautés de cette version
 
+**À savoir**
+- Build 39 : le traducteur de shaders change, donc les shaders sont recompilés une fois au
+  premier lancement de chaque jeu (10 à 30 minutes pour Ocarina of Time, puis c'est fini). Le jeu
+  démarre dès 60 % ; le reste se fait pendant la partie.
+
 **Accueil**
 - Bouton « Plein écran » en haut à droite de l'accueil (ou touche F11) : l'accueil et la
   bibliothèque remplissent l'écran, sans menus. « Fenêtre » revient comme avant. Le choix est
@@ -37,6 +42,10 @@ version. Les sections suivantes gardent l'historique.
   vitesse.
 - Plus d'écrans de la version 1.0 reconnus, et le jitter FSR ne déborde plus sur les bords de
   l'image avec une carte AMD.
+- Les passes d'agrandissement de l'image sont reconnues à coup sûr, et les shaders des décors se
+  compilent bien plus vite sur les cartes Intel.
+- Les anciennes cibles de rendu qui se chevauchent sont libérées plus tôt : moins de mémoire vidéo
+  occupée dans les lieux comme la Maison des Skulltulas.
 
 **Mario Kart World**
 - Mode 60 FPS partout à vitesse normale (Configurer > jeu), avec un repli automatique à 30 FPS
@@ -66,6 +75,10 @@ version. Les sections suivantes gardent l'historique.
   et le temps de jeu sont enregistrés sans risque de fichier abîmé.
 - Fichiers NSZ et NCZ « solides » lisibles.
 - Corrections du GPU émulé (copies DMA, synchronisation) et des pilotes Intel et AMD (RADV).
+- Des fichiers abîmés (clés, jeux compressés, patchs, codes de triche) ne font plus planter Erable.
+- Le volume réglé dans Erable n'est plus figé au démarrage du jeu.
+- Le plein écran sans bordure se place correctement depuis une fenêtre agrandie.
+- Donkey Kong Bananza : un réglage du processeur dont le jeu a besoin reste actif.
 - Jeux un peu plus rapides à ouvrir : leurs fichiers ne sont lus qu'au moment où ils servent.
 - Le gyroscope de la manette marche toujours après l'avoir rebranchée.
 - Le journal est écrit sur le disque chaque seconde : un plantage n'en perd plus la fin.

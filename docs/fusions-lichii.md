@@ -20,3 +20,8 @@ Règle :
       src/video_core/shader_environment.cpp src/video_core/shader_environment.h \
       src/video_core/renderer_vulkan/pipeline_shader_emission.h
   ```
+
+## Historique
+
+- build-39 (15 novembre 2026) : lot avec changement du traducteur (#1757, #1807, #1825, #1848,
+  #1853). Prochain lot au plus tôt une semaine après.
