@@ -207,9 +207,9 @@ std::pair<ZoneTicks, ZoneTicks> SnapshotZones(u64 now) {
             if (sequence.load(std::memory_order_relaxed) != begin) {
                 continue;
             }
-            // A thread that isn't running has no open zone (its slots start as zero).
+            // A thread that isn't running has no open zone; since is 0 for one never named.
             if (g_totals.running[thread].load(std::memory_order_relaxed) && open < ZoneSlots &&
-                now > since) {
+                since != 0 && now > since) {
                 ticks[thread][open] += now - since;
             }
             break;
@@ -287,7 +287,7 @@ ThreadTicks Snapshot(u64 now) {
                 continue;
             }
             if (g_totals.running[thread].load(std::memory_order_relaxed) &&
-                open < CategoryCount && now > since) {
+                open < CategoryCount && since != 0 && now > since) {
                 ticks[thread][open] += now - since;
             }
             break;
