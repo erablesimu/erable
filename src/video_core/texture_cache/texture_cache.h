@@ -2538,6 +2538,7 @@ void TextureCache<P>::RefreshContents(Image& image, ImageId image_id) {
 
     // Images uploaded by layer stay tracked while some of their layers are dirty.
     if (False(image.flags & ImageFlagBits::Tracked)) {
+        const StutterTrace::SiteScope track_site{StutterTrace::Site::UploadTrack};
         TrackImage(image, image_id);
     }
 
@@ -2609,11 +2610,15 @@ void TextureCache<P>::RefreshContents(Image& image, ImageId image_id) {
             .staging = runtime.UploadStagingBuffer(MapSizeBytes(image)),
             .copies = {},
         });
-    } else if (!UploadInChunks(image)) {
-        std::optional<StutterTrace::SiteScope> record_site{std::in_place,
-                                                           StutterTrace::Site::UploadRecord};
+    } else if (const bool chunked = [&] {
+                   const StutterTrace::SiteScope chunks_site{StutterTrace::Site::UploadChunks};
+                   return UploadInChunks(image);
+               }();
+               !chunked) {
+        std::optional<StutterTrace::SiteScope> staging_site{std::in_place,
+                                                            StutterTrace::Site::UploadStaging};
         auto staging = runtime.UploadStagingBuffer(MapSizeBytes(image));
-        record_site.reset();
+        staging_site.reset();
         UploadImageContents(image, staging);
         runtime.InsertUploadMemoryBarrier();
     }

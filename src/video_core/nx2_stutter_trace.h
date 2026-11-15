@@ -107,7 +107,10 @@ enum class Site : u8 {
     MemoryAllocateBig, ///< Of MemoryAllocate: allocations over one 16 MiB block (own memory)
     UploadRead,      ///< Of ImageUpload: the guest data read (copied when it is in pieces)
     UploadUnswizzle, ///< Of ImageUpload: unswizzled (and converted) on the CPU into staging
-    UploadRecord,    ///< Of ImageUpload: staging asked for and the copy or GPU decode recorded
+    UploadRecord,    ///< Of ImageUpload: the copy or GPU decode recorded
+    UploadTrack,     ///< Of ImageUpload: the image's guest pages tracked for CPU writes
+    UploadStaging,   ///< Of ImageUpload: the staging buffer asked for
+    UploadChunks,    ///< Of ImageUpload: a very large image uploaded in pieces
     Count,
 };
 
@@ -119,6 +122,7 @@ inline constexpr std::array<std::string_view, SiteCount> site_names{
     "image_backend",   "astc_scan",       "image_overlaps",  "image_rescale",
     "image_replace",   "image_upload",    "image_join",      "upload_batch",
     "memory_allocate_big", "upload_read",  "upload_unswizzle", "upload_record",
+    "upload_track", "upload_staging", "upload_chunks",
 };
 
 [[nodiscard]] inline bool ReadEnv() {
