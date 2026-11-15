@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Erable</title>
+<meta name="i18n-title" content="tuto.savesTitle">
+<meta name="description" content="Recover your saves">
+<meta name="theme-color" content="#d2501f">
+<link rel="icon" href="../erable.png">
+<link rel="stylesheet" href="../style.css">
+<script src="../i18n.js"></script>
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href=".././"><img src="../erable.png" alt="">Erable</a>
+    <nav aria-label="Navigation">
+      <a href=".././" data-i18n="nav.home">Accueil</a>
+      <a href="../guides.html" aria-current="page" data-i18n="nav.tutorials">Tutoriels</a>
+      <a href="../changelog.html" data-i18n="nav.changes">Changements</a>
+      <a href="../bugs.html" data-i18n="nav.bugs">Bugs</a>
+      <a href="../report.html" data-i18n="nav.report">Signaler</a>
+    </nav>
+    <div class="lang" role="group" data-i18n-attr="aria-label:nav.language">
+      <button type="button" data-set-lang="fr" lang="fr" title="Français">FR</button>
+      <button type="button" data-set-lang="en" lang="en" title="English">EN</button>
+      <button type="button" data-set-lang="de" lang="de" title="Deutsch">DE</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="tuto-hero">
+    <div class="wrap">
+      <a class="back" href="../guides.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg><span data-i18n="tutos.back"></span></a>
+      <p class="eyebrow"><span data-i18n="tutos.emuTitle"></span></p>
+      <h1 data-lang="fr">Récupérer vos sauvegardes</h1>
+      <p class="lead" data-lang="fr">Les trouver, en faire une copie, les remettre sur un autre PC ou les reprendre d'un autre émulateur.</p>
+      <h1 data-lang="en">Recover your saves</h1>
+      <p class="lead" data-lang="en">Find them, back them up, put them back on another PC or take them from another emulator.</p>
+      <h1 data-lang="de">Spielstände sichern</h1>
+      <p class="lead" data-lang="de">Finden, sichern, auf einem anderen PC wiederherstellen oder aus einem anderen Emulator übernehmen.</p>
+    </div>
+  </section>
+  <div class="wrap tuto-layout">
+    <aside>
+      <nav class="toc" data-lang="fr"><strong data-i18n="tutos.toc"></strong><ol><li><a href="#where">Où les trouver</a></li><li><a href="#backup">Copie de sécurité</a></li><li><a href="#restore">Les remettre</a></li><li><a href="#other">Autre émulateur</a></li></ol></nav>
+      <nav class="toc" data-lang="en"><strong data-i18n="tutos.toc"></strong><ol><li><a href="#where">Where they are</a></li><li><a href="#backup">Backup</a></li><li><a href="#restore">Put them back</a></li><li><a href="#other">Another emulator</a></li></ol></nav>
+      <nav class="toc" data-lang="de"><strong data-i18n="tutos.toc"></strong><ol><li><a href="#where">Wo sie liegen</a></li><li><a href="#backup">Sicherung</a></li><li><a href="#restore">Wiederherstellen</a></li><li><a href="#other">Anderer Emulator</a></li></ol></nav>
+    </aside>
+    <div class="tuto-body">
+      <article data-lang="fr">
+<section class="card tuto-step" id="where"><h2><span class="num">1</span>Où sont vos sauvegardes</h2>
+<ol class="steps">
+<li>Dans la bibliothèque, faites un clic droit sur le jeu → <span class="menu">Ouvrir l'emplacement des données de sauvegarde</span>.</li>
+<li>Le dossier qui s'ouvre contient toute la sauvegarde de ce jeu pour le profil choisi.</li>
+</ol>
+<p>Toutes les sauvegardes sont rangées dans <code>%APPDATA%\erable\nand\user\save</code>, un dossier par profil, puis un dossier par jeu.</p>
+<div class="note">Chaque profil a ses propres sauvegardes. Changer de profil n'en efface aucune.</div>
+</section>
+<section class="card tuto-step" id="backup"><h2><span class="num">2</span>Faire une copie de sécurité</h2>
+<ol class="steps">
+<li>Fermez le jeu.</li>
+<li>En haut à gauche : <span class="menu">Outils → Gestionnaire de données</span>, partie <span class="menu">Sauvegardes</span>.</li>
+<li>Cliquez sur le bouton d'export (infobulle « Exporter toutes les données de ce répertoire ») et choisissez où enregistrer le fichier <code>.zip</code>.</li>
+</ol>
+<div class="note">Gardez ce zip sur une clé USB ou un autre disque : il contient les sauvegardes de tous vos jeux et de tous vos profils.</div>
+</section>
+<section class="card tuto-step" id="restore"><h2><span class="num">3</span>Les remettre, sur ce PC ou un autre</h2>
+<ol class="steps">
+<li>Installez Erable et lancez une fois le jeu, puis fermez-le.</li>
+<li><span class="menu">Outils → Gestionnaire de données</span>, partie <span class="menu">Sauvegardes</span> : bouton d'import (infobulle « Importer les données dans ce répertoire »), puis choisissez votre zip.</li>
+</ol>
+<div class="warn">L'import remplace <strong>toutes</strong> les sauvegardes déjà présentes. Pour ne remettre qu'un seul jeu, copiez plutôt son dossier (étape 1) à la même place sur l'autre PC.</div>
+</section>
+<section class="card tuto-step" id="other"><h2><span class="num">4</span>Reprendre celles d'un autre émulateur</h2>
+<ol class="steps">
+<li>Fermez l'autre émulateur (Eden, Lichii…).</li>
+<li>Au premier lancement, Erable propose d'importer son profil : choisissez-le et gardez <span class="menu">Copier</span>, qui laisse l'original intact.</li>
+<li>Sinon, copiez à la main le dossier du jeu depuis le dossier <code>nand\user\save</code> de l'autre émulateur vers celui d'Erable (étape 1).</li>
+</ol>
+</section>
+      </article>
+      <article data-lang="en">
+<section class="card tuto-step" id="where"><h2><span class="num">1</span>Where your saves are</h2>
+<ol class="steps">
+<li>In the library, right-click the game → <span class="menu">Open Save Data Location</span>.</li>
+<li>The folder that opens holds this game's whole save for the chosen profile.</li>
+</ol>
+<p>All saves live in <code>%APPDATA%\erable\nand\user\save</code>: one folder per profile, then one per game.</p>
+<div class="note">Each profile has its own saves. Switching profiles deletes none.</div>
+</section>
+<section class="card tuto-step" id="backup"><h2><span class="num">2</span>Make a backup</h2>
+<ol class="steps">
+<li>Close the game.</li>
+<li>Top left: <span class="menu">Tools → Data Manager</span>, <span class="menu">Saves</span> section.</li>
+<li>Click the export button (tooltip "Export all data in this directory") and choose where to save the <code>.zip</code>.</li>
+</ol>
+<div class="note">Keep that zip on a USB stick or another drive: it holds the saves of all your games and profiles.</div>
+</section>
+<section class="card tuto-step" id="restore"><h2><span class="num">3</span>Put them back, on this PC or another</h2>
+<ol class="steps">
+<li>Install Erable and start the game once, then close it.</li>
+<li><span class="menu">Tools → Data Manager</span>, <span class="menu">Saves</span> section: the import button (tooltip "Import data for this directory"), then choose your zip.</li>
+</ol>
+<div class="warn">Importing replaces <strong>all</strong> the saves already there. To bring back a single game, copy its folder (step 1) to the same place on the other PC instead.</div>
+</section>
+<section class="card tuto-step" id="other"><h2><span class="num">4</span>Take them from another emulator</h2>
+<ol class="steps">
+<li>Close the other emulator (Eden, Lichii…).</li>
+<li>On its first start, Erable offers to import its profile: pick it and keep <span class="menu">Copy</span>, which leaves the original untouched.</li>
+<li>Otherwise copy the game's folder by hand from the other emulator's <code>nand\user\save</code> folder to Erable's (step 1).</li>
+</ol>
+</section>
+      </article>
+      <article data-lang="de">
+<section class="card tuto-step" id="where"><h2><span class="num">1</span>Wo deine Spielstände liegen</h2>
+<ol class="steps">
+<li>In der Bibliothek: Rechtsklick auf das Spiel → <span class="menu">Open Save Data Location</span>.</li>
+<li>Der Ordner, der sich öffnet, enthält den ganzen Spielstand dieses Spiels für das gewählte Profil.</li>
+</ol>
+<p>Alle Spielstände liegen in <code>%APPDATA%\erable\nand\user\save</code>: ein Ordner pro Profil, darin einer pro Spiel.</p>
+<div class="note">Jedes Profil hat seine eigenen Spielstände. Ein Profilwechsel löscht keinen.</div>
+</section>
+<section class="card tuto-step" id="backup"><h2><span class="num">2</span>Eine Sicherung anlegen</h2>
+<ol class="steps">
+<li>Schließe das Spiel.</li>
+<li>Oben links: <span class="menu">Tools → Data Manager</span>, Bereich <span class="menu">Saves</span>.</li>
+<li>Klicke auf die Export-Schaltfläche (Tooltip „Export all data in this directory“) und wähle, wo die <code>.zip</code> gespeichert wird.</li>
+</ol>
+<div class="note">Bewahre diese Zip auf einem USB-Stick oder einer anderen Platte auf: Sie enthält die Spielstände aller Spiele und Profile.</div>
+</section>
+<section class="card tuto-step" id="restore"><h2><span class="num">3</span>Wiederherstellen, auf diesem oder einem anderen PC</h2>
+<ol class="steps">
+<li>Installiere Erable, starte das Spiel einmal und schließe es wieder.</li>
+<li><span class="menu">Tools → Data Manager</span>, Bereich <span class="menu">Saves</span>: die Import-Schaltfläche (Tooltip „Import data for this directory“), dann deine Zip wählen.</li>
+</ol>
+<div class="warn">Der Import ersetzt <strong>alle</strong> vorhandenen Spielstände. Für ein einzelnes Spiel kopiere lieber seinen Ordner (Schritt 1) an dieselbe Stelle auf dem anderen PC.</div>
+</section>
+<section class="card tuto-step" id="other"><h2><span class="num">4</span>Aus einem anderen Emulator übernehmen</h2>
+<ol class="steps">
+<li>Schließe den anderen Emulator (Eden, Lichii…).</li>
+<li>Beim ersten Start bietet Erable an, sein Profil zu importieren: wähle es und behalte <span class="menu">Copy</span>, das das Original unverändert lässt.</li>
+<li>Sonst kopiere den Ordner des Spiels von Hand aus dem Ordner <code>nand\user\save</code> des anderen Emulators in den von Erable (Schritt 1).</li>
+</ol>
+</section>
+      </article>
+    </div>
+  </div>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <a class="brand" href=".././"><img src="../erable.png" alt="">Erable</a>
+    <p data-i18n-html="footer.text"></p>
+    <a class="btn secondary small" href="https://github.com/erablesimu/erable"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></svg><span data-i18n="footer.source">Code source</span></a>
+  </div>
+</footer>
+
+</body>
+</html>

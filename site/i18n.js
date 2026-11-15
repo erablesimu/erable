@@ -57,7 +57,7 @@ const I18N = {
 
     "changes.title": "Changements – Erable",
     "changes.h1": "Changements",
-    "changes.lead": "Ce qui change d'une version à l'autre, et le détail des modifications du code.",
+    "changes.lead": "Ce qui change d'une version à l'autre, en bref.",
     "changes.tabReleases": "Versions",
     "changes.tabCommits": "Modifications du code",
     "changes.latest": "Dernière",
@@ -155,7 +155,8 @@ const I18N = {
     "tutos.back": "Tous les tutoriels",
     "tutos.toc": "Au programme",
     "tuto.installTitle": "Installer Erable – Tutoriel",
-    "tuto.ocarinaTitle": "Zelda : Ocarina of Time – Tutoriel"
+    "tuto.ocarinaTitle": "Zelda : Ocarina of Time – Tutoriel",
+    "tuto.savesTitle": "Récupérer vos sauvegardes – Tutoriel"
   },
 
   en: {
@@ -209,7 +210,7 @@ const I18N = {
 
     "changes.title": "Changes – Erable",
     "changes.h1": "Changes",
-    "changes.lead": "What changes from one version to the next, and every change to the code.",
+    "changes.lead": "What changes from one version to the next, in short.",
     "changes.tabReleases": "Versions",
     "changes.tabCommits": "Code changes",
     "changes.latest": "Latest",
@@ -307,7 +308,8 @@ const I18N = {
     "tutos.back": "All guides",
     "tutos.toc": "In this guide",
     "tuto.installTitle": "Install Erable – Guide",
-    "tuto.ocarinaTitle": "Zelda: Ocarina of Time – Guide"
+    "tuto.ocarinaTitle": "Zelda: Ocarina of Time – Guide",
+    "tuto.savesTitle": "Recover your saves – Guide"
   },
 
   de: {
@@ -361,7 +363,7 @@ const I18N = {
 
     "changes.title": "Änderungen – Erable",
     "changes.h1": "Änderungen",
-    "changes.lead": "Was sich von Version zu Version ändert, und jede Änderung am Code.",
+    "changes.lead": "Was sich von Version zu Version ändert, kurz gefasst.",
     "changes.tabReleases": "Versionen",
     "changes.tabCommits": "Code-Änderungen",
     "changes.latest": "Neueste",
@@ -459,7 +461,8 @@ const I18N = {
     "tutos.back": "Alle Anleitungen",
     "tutos.toc": "In dieser Anleitung",
     "tuto.installTitle": "Erable installieren – Anleitung",
-    "tuto.ocarinaTitle": "Zelda: Ocarina of Time – Anleitung"
+    "tuto.ocarinaTitle": "Zelda: Ocarina of Time – Anleitung",
+    "tuto.savesTitle": "Spielstände sichern – Anleitung"
   }
 };
 

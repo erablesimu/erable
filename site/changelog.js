@@ -32,7 +32,7 @@ function renderReleases() {
   const timeline = el("div", { class: "timeline" });
   releases.forEach((release, index) => {
     const notes = el("div", { class: "notes" });
-    notes.innerHTML = DOMPurify.sanitize(marked.parse(release.body || t("changes.noNotes")));
+    notes.replaceChildren(...simplifyNotes(release.body || t("changes.noNotes")).childNodes);
     const title = el("h3", {}, el("a", { href: release.html_url }, release.name || release.tag_name));
     if (index === 0) {
       title.append(el("span", { class: "badge" }, t("changes.latest")));
@@ -40,7 +40,7 @@ function renderReleases() {
     const card = el("article", { class: "card release" },
       el("header", {}, title, el("span", { class: "meta" }, formatDate(release.published_at))),
       notes);
-    if (index > 0 || (release.body || "").length > 1500) {
+    if (index > 0 || notes.textContent.length > 900) {
       notes.classList.add("collapsed");
       const toggle = el("button", { class: "toggle", type: "button" }, t("changes.more"));
       toggle.addEventListener("click", () => {
@@ -109,4 +109,4 @@ document.addEventListener("langchange", () => {
   renderCommits();
   document.querySelector(".notes-lang").hidden = tabs.releases.getAttribute("aria-selected") !== "true" || !t("changes.notesLang");
 });
-show(location.hash === "#code" ? "commits" : "releases");
+show("releases");

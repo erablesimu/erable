@@ -18,10 +18,8 @@ getLatestRelease().then((release) => {
   }
   renderLatest();
   // The notes' first section (from "## Nouveautés ..." on), at most eight items
-  const html = DOMPurify.sanitize(marked.parse(release.body || ""));
-  const notes = document.createElement("div");
-  notes.innerHTML = html;
-  const items = [...notes.querySelectorAll("li")].slice(0, 8);
+  const notes = simplifyNotes(release.body);
+  const items = [...notes.querySelectorAll("li")].slice(0, 6);
   const target = document.getElementById("latest-notes");
   if (items.length === 0) {
     target.replaceChildren(el("p", { class: "status" }, t("changes.noNotes")));

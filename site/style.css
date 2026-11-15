@@ -263,6 +263,7 @@ a.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); bord
 
 /* Changes page */
 .tabs { display: inline-flex; gap: 4px; padding: 4px; margin: 8px 0 28px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); flex-wrap: wrap; }
+.tabs[hidden] { display: none; }
 .tabs button {
   font: inherit; font-weight: 600; padding: 8px 18px; border-radius: 10px; border: 0;
   background: transparent; color: var(--muted); cursor: pointer;

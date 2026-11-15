@@ -184,7 +184,7 @@ write("changelog.html", head("", "changes.title", "Erable's release notes and co
       <h1 data-i18n="changes.h1"></h1>
       <p class="lead" data-i18n="changes.lead"></p>
     </div>
-    <div class="tabs" role="tablist">
+    <div class="tabs" role="tablist" hidden>
       <button role="tab" id="tab-releases" aria-selected="true" aria-controls="releases" data-i18n="changes.tabReleases"></button>
       <button role="tab" id="tab-commits" aria-selected="false" aria-controls="commits" data-i18n="changes.tabCommits"></button>
     </div>
@@ -686,6 +686,94 @@ tutorial("guides/zelda-ocarina.html", "tuto.ocarinaTitle", "tutos.gamesTitle", "
           "de": "Weniger Ruckler und ein schärferes Bild: die richtigen Einstellungen, Schritt für Schritt."})
 print("ok")
 
+
+# ---------------------------------------------------------------- saves
+SAVE_PATH = r"%APPDATA%\erable\nand\user\save"
+saves = {
+    "fr": "\n".join([
+        sec("where", 1, "Où sont vos sauvegardes", f"""<ol class="steps">
+<li>Dans la bibliothèque, faites un clic droit sur le jeu → {m("Ouvrir l'emplacement des données de sauvegarde")}.</li>
+<li>Le dossier qui s'ouvre contient toute la sauvegarde de ce jeu pour le profil choisi.</li>
+</ol>
+<p>Toutes les sauvegardes sont rangées dans <code>{SAVE_PATH}</code>, un dossier par profil, puis un dossier par jeu.</p>
+<div class="note">Chaque profil a ses propres sauvegardes. Changer de profil n'en efface aucune.</div>"""),
+        sec("backup", 2, "Faire une copie de sécurité", f"""<ol class="steps">
+<li>Fermez le jeu.</li>
+<li>En haut à gauche : {m('Outils → Gestionnaire de données')}, partie {m('Sauvegardes')}.</li>
+<li>Cliquez sur le bouton d'export (infobulle « Exporter toutes les données de ce répertoire ») et choisissez où enregistrer le fichier <code>.zip</code>.</li>
+</ol>
+<div class="note">Gardez ce zip sur une clé USB ou un autre disque : il contient les sauvegardes de tous vos jeux et de tous vos profils.</div>"""),
+        sec("restore", 3, "Les remettre, sur ce PC ou un autre", f"""<ol class="steps">
+<li>Installez Erable et lancez une fois le jeu, puis fermez-le.</li>
+<li>{m('Outils → Gestionnaire de données')}, partie {m('Sauvegardes')} : bouton d'import (infobulle « Importer les données dans ce répertoire »), puis choisissez votre zip.</li>
+</ol>
+<div class="warn">L'import remplace <strong>toutes</strong> les sauvegardes déjà présentes. Pour ne remettre qu'un seul jeu, copiez plutôt son dossier (étape 1) à la même place sur l'autre PC.</div>"""),
+        sec("other", 4, "Reprendre celles d'un autre émulateur", f"""<ol class="steps">
+<li>Fermez l'autre émulateur (Eden, Lichii…).</li>
+<li>Au premier lancement, Erable propose d'importer son profil : choisissez-le et gardez {m('Copier')}, qui laisse l'original intact.</li>
+<li>Sinon, copiez à la main le dossier du jeu depuis le dossier <code>nand\\user\\save</code> de l'autre émulateur vers celui d'Erable (étape 1).</li>
+</ol>"""),
+    ]),
+    "en": "\n".join([
+        sec("where", 1, "Where your saves are", f"""<ol class="steps">
+<li>In the library, right-click the game → {m('Open Save Data Location')}.</li>
+<li>The folder that opens holds this game's whole save for the chosen profile.</li>
+</ol>
+<p>All saves live in <code>{SAVE_PATH}</code>: one folder per profile, then one per game.</p>
+<div class="note">Each profile has its own saves. Switching profiles deletes none.</div>"""),
+        sec("backup", 2, "Make a backup", f"""<ol class="steps">
+<li>Close the game.</li>
+<li>Top left: {m('Tools → Data Manager')}, {m('Saves')} section.</li>
+<li>Click the export button (tooltip "Export all data in this directory") and choose where to save the <code>.zip</code>.</li>
+</ol>
+<div class="note">Keep that zip on a USB stick or another drive: it holds the saves of all your games and profiles.</div>"""),
+        sec("restore", 3, "Put them back, on this PC or another", f"""<ol class="steps">
+<li>Install Erable and start the game once, then close it.</li>
+<li>{m('Tools → Data Manager')}, {m('Saves')} section: the import button (tooltip "Import data for this directory"), then choose your zip.</li>
+</ol>
+<div class="warn">Importing replaces <strong>all</strong> the saves already there. To bring back a single game, copy its folder (step 1) to the same place on the other PC instead.</div>"""),
+        sec("other", 4, "Take them from another emulator", f"""<ol class="steps">
+<li>Close the other emulator (Eden, Lichii…).</li>
+<li>On its first start, Erable offers to import its profile: pick it and keep {m('Copy')}, which leaves the original untouched.</li>
+<li>Otherwise copy the game's folder by hand from the other emulator's <code>nand\\user\\save</code> folder to Erable's (step 1).</li>
+</ol>"""),
+    ]),
+    "de": "\n".join([
+        sec("where", 1, "Wo deine Spielstände liegen", f"""<ol class="steps">
+<li>In der Bibliothek: Rechtsklick auf das Spiel → {m('Open Save Data Location')}.</li>
+<li>Der Ordner, der sich öffnet, enthält den ganzen Spielstand dieses Spiels für das gewählte Profil.</li>
+</ol>
+<p>Alle Spielstände liegen in <code>{SAVE_PATH}</code>: ein Ordner pro Profil, darin einer pro Spiel.</p>
+<div class="note">Jedes Profil hat seine eigenen Spielstände. Ein Profilwechsel löscht keinen.</div>"""),
+        sec("backup", 2, "Eine Sicherung anlegen", f"""<ol class="steps">
+<li>Schließe das Spiel.</li>
+<li>Oben links: {m('Tools → Data Manager')}, Bereich {m('Saves')}.</li>
+<li>Klicke auf die Export-Schaltfläche (Tooltip „Export all data in this directory“) und wähle, wo die <code>.zip</code> gespeichert wird.</li>
+</ol>
+<div class="note">Bewahre diese Zip auf einem USB-Stick oder einer anderen Platte auf: Sie enthält die Spielstände aller Spiele und Profile.</div>"""),
+        sec("restore", 3, "Wiederherstellen, auf diesem oder einem anderen PC", f"""<ol class="steps">
+<li>Installiere Erable, starte das Spiel einmal und schließe es wieder.</li>
+<li>{m('Tools → Data Manager')}, Bereich {m('Saves')}: die Import-Schaltfläche (Tooltip „Import data for this directory“), dann deine Zip wählen.</li>
+</ol>
+<div class="warn">Der Import ersetzt <strong>alle</strong> vorhandenen Spielstände. Für ein einzelnes Spiel kopiere lieber seinen Ordner (Schritt 1) an dieselbe Stelle auf dem anderen PC.</div>"""),
+        sec("other", 4, "Aus einem anderen Emulator übernehmen", f"""<ol class="steps">
+<li>Schließe den anderen Emulator (Eden, Lichii…).</li>
+<li>Beim ersten Start bietet Erable an, sein Profil zu importieren: wähle es und behalte {m('Copy')}, das das Original unverändert lässt.</li>
+<li>Sonst kopiere den Ordner des Spiels von Hand aus dem Ordner <code>nand\\user\\save</code> des anderen Emulators in den von Erable (Schritt 1).</li>
+</ol>"""),
+    ]),
+}
+saves_toc = {
+    "ids": ["where", "backup", "restore", "other"],
+    "fr": ["Où les trouver", "Copie de sécurité", "Les remettre", "Autre émulateur"],
+    "en": ["Where they are", "Backup", "Put them back", "Another emulator"],
+    "de": ["Wo sie liegen", "Sicherung", "Wiederherstellen", "Anderer Emulator"],
+}
+tutorial("guides/saves.html", "tuto.savesTitle", "tutos.emuTitle", None, saves_toc, saves,
+         {"fr": "Récupérer vos sauvegardes", "en": "Recover your saves", "de": "Spielstände sichern"},
+         {"fr": "Les trouver, en faire une copie, les remettre sur un autre PC ou les reprendre d'un autre émulateur.",
+          "en": "Find them, back them up, put them back on another PC or take them from another emulator.",
+          "de": "Finden, sichern, auf einem anderen PC wiederherstellen oder aus einem anderen Emulator übernehmen."})
 
 # ---------------------------------------------------------------- former addresses
 # The pages had French names until build 33; builds out there still open report.html's old name.

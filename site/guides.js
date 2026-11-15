@@ -37,6 +37,15 @@ const TUTORIALS = [
     },
   },
   {
+    section: "emu", href: "guides/saves.html", image: "guides/img/game-folder.png", steps: 4,
+    title: { fr: "Récupérer vos sauvegardes", en: "Recover your saves", de: "Spielstände sichern" },
+    summary: {
+      fr: "Les trouver, en faire une copie, les remettre sur un autre PC ou les reprendre d'un autre émulateur.",
+      en: "Find them, back them up, put them back on another PC or take them from another emulator.",
+      de: "Finden, sichern, auf einem anderen PC wiederherstellen oder aus einem anderen Emulator übernehmen.",
+    },
+  },
+  {
     section: "games", game: "ocarina", href: "guides/zelda-ocarina.html", image: "guides/img/ocarina-graphics.png", steps: 7,
     title: { fr: "Optimiser Ocarina of Time", en: "Optimise Ocarina of Time", de: "Ocarina of Time optimieren" },
     summary: {
