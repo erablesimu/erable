@@ -2968,7 +2968,7 @@ void RasterizerVulkan::InvalidateCachedWrites(
             texture_cache.WriteMemory(addr, size);
         }
     }
-    if (Settings::values.skip_cpu_inner_invalidation.GetValue()) {
+    if (Settings::SkipCpuInnerInvalidation()) {
         return;
     }
     // Constant buffer data only streamed uniform buffers read needs no buffer cache work: those
