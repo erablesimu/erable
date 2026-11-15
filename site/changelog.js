@@ -19,6 +19,31 @@ function fail(section, error) {
   section.replaceChildren(el("p", { class: "status error" }, t("error.load", { message: error.message })));
 }
 
+/// A release's notes keep the earlier versions' lines: only the lines the release before it didn't
+/// have stay, under their group titles
+function newNotes(releases, index) {
+  const root = simplifyNotes(releases[index].body || "");
+  const next = releases[index + 1];
+  if (next) {
+    const before = new Set([...simplifyNotes(next.body || "").querySelectorAll("li")].map((item) => item.textContent));
+    root.querySelectorAll("li").forEach((item) => before.has(item.textContent) && item.remove());
+  }
+  root.querySelectorAll("ul, ol").forEach((list) => list.children.length === 0 && list.remove());
+  // Titles left with no list after them, and the "what's new" heading itself
+  [...root.children].forEach((node) => {
+    const following = node.nextElementSibling;
+    if (/^H[1-4]$/.test(node.tagName) || (node.tagName === "P" && node.querySelector("strong"))) {
+      if (!following || !/^(UL|OL)$/.test(following.tagName)) {
+        node.remove();
+      }
+    }
+  });
+  if (!root.querySelector("li")) {
+    root.replaceChildren(el("p", { class: "meta" }, t("home.fixes")));
+  }
+  return root;
+}
+
 function renderReleases() {
   const section = document.getElementById("releases");
   const releases = data.releases;
@@ -32,7 +57,7 @@ function renderReleases() {
   const timeline = el("div", { class: "timeline" });
   releases.forEach((release, index) => {
     const notes = el("div", { class: "notes" });
-    notes.replaceChildren(...simplifyNotes(release.body || t("changes.noNotes")).childNodes);
+    notes.replaceChildren(...newNotes(releases, index).childNodes);
     const title = el("h3", {}, el("a", { href: release.html_url }, release.name || release.tag_name));
     if (index === 0) {
       title.append(el("span", { class: "badge" }, t("changes.latest")));

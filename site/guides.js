@@ -80,6 +80,9 @@ function card(tutorial) {
 }
 
 function render() {
+  if (!document.getElementById("emu-list")) {
+    return; // Another page using the list (the home)
+  }
   document.getElementById("emu-list").replaceChildren(
     ...TUTORIALS.filter((tutorial) => tutorial.section === "emu").map(card));
 

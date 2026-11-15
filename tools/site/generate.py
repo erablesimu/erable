@@ -46,6 +46,7 @@ def head(prefix, title_key, description):
       <a href="{prefix}bugs.html"{cur('bugs')} data-i18n="nav.bugs">Bugs</a>
       <a href="{prefix}report.html"{cur('report')} data-i18n="nav.report">Signaler</a>
     </nav>
+    <a class="btn small head-cta" href="https://github.com/erablesimu/erable/releases/latest" data-i18n="nav.download">Télécharger</a>
     <div class="lang" role="group" data-i18n-attr="aria-label:nav.language">
       <button type="button" data-set-lang="fr" lang="fr" title="Français">FR</button>
       <button type="button" data-set-lang="en" lang="en" title="English">EN</button>
@@ -86,94 +87,55 @@ def write(path, text):
 
 # ---------------------------------------------------------------- home
 CURRENT = "home"
-features = [("bolt", "f1"), ("refresh", "f2"), ("gamepad", "f3"), ("globe", "f4"), ("chat", "f5"), ("flag", "f6")]
-feature_cards = "\n".join(
-    f"""      <div class="card feature reveal"><div class="icon">{ICONS[i]}</div><h3 data-i18n="home.{k}t"></h3><p data-i18n="home.{k}p"></p></div>"""
-    for i, k in features)
 write("index.html", head("", "home.title", "Erable, a Nintendo Switch 2 emulator.") + f"""
-<section class="hero">
-  <div class="leaves" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-  <div class="wrap">
-    <div>
-      <a class="pill" id="version-pill" href="changelog.html"><span class="dot"></span><span id="version-text" data-i18n="home.pill">Dernière version</span></a>
+<main class="direct">
+  <section class="wrap d-hero">
+    <div class="d-hero-text">
+      <p class="mono-label" data-i18n="home.kicker"></p>
       <h1 data-i18n-html="home.h1"></h1>
       <p class="lead" data-i18n="home.lead"></p>
       <div class="actions">
-        <a class="btn" id="download" href="https://github.com/erablesimu/erable/releases/latest">{ICONS['download']}<span data-i18n="home.download"></span></a>
-        <a class="btn secondary" href="guides.html"><span data-i18n="home.tutorials"></span>{ICONS['arrow']}</a>
+        <a class="btn big" id="download" href="https://github.com/erablesimu/erable/releases/latest">{ICONS['download']}<span data-i18n="home.download"></span><small id="download-meta"></small></a>
+        <a class="btn secondary" href="guides/install.html"><span data-i18n="home.install"></span>{ICONS['arrow']}</a>
       </div>
       <p class="hero-note" data-i18n="home.note"></p>
     </div>
-    <div class="hero-art" aria-hidden="true">
-      <div class="app-mock">
-        <div class="app-bar"><span class="app-dots"><i></i><i></i><i></i></span><span class="app-brand"><img src="erable.png" alt="">Erable</span><span class="app-search"></span></div>
-        <div class="app-shelf">
-          <div class="case c1"><span class="spine"></span><span class="cover"></span></div>
-          <div class="case c2"><span class="spine"></span><span class="cover"></span></div>
-          <div class="case c3 front"><span class="spine"></span><span class="cover"><img src="erable.png" alt=""></span></div>
-          <div class="case c4"><span class="spine"></span><span class="cover"></span></div>
-          <div class="case c5"><span class="spine"></span><span class="cover"></span></div>
-        </div>
-        <div class="app-title"><span></span><span></span></div>
-        <div class="app-pills"><span class="on"></span><span></span><span></span><span></span></div>
-      </div>
-    </div>
-  </div>
-</section>
-<main>
-  <section class="section wrap">
-    <div class="section-head reveal">
-      <p class="eyebrow" data-i18n="home.featuresEyebrow"></p>
-      <h2 data-i18n="home.featuresTitle"></h2>
-      <p data-i18n="home.featuresSub"></p>
-    </div>
-    <div class="grid">
-{feature_cards}
-    </div>
+    <aside class="d-panel" aria-live="polite">
+      <div class="d-panel-head"><span class="mono-label" data-i18n="home.panelLabel"></span><span class="live" aria-hidden="true"></span></div>
+      <a class="d-tag" id="stat-tag" href="changelog.html">…</a>
+      <p class="d-when" id="stat-when"></p>
+      <dl class="d-stats">
+        <div><dt data-i18n="home.statDownloads"></dt><dd id="stat-downloads">–</dd></div>
+        <div><dt data-i18n="home.statTotal"></dt><dd id="stat-total">–</dd></div>
+        <div><dt data-i18n="home.statSize"></dt><dd id="stat-size">–</dd></div>
+      </dl>
+      <p class="mono-label d-notes-label" data-i18n="home.panelNotes"></p>
+      <ul class="d-notes" id="stat-notes"><li class="status" data-i18n="home.latestLoading"></li></ul>
+    </aside>
   </section>
 
-  <section class="section wrap">
-    <div class="section-head reveal">
-      <p class="eyebrow" data-i18n="home.stepsEyebrow"></p>
-      <h2 data-i18n="home.stepsTitle"></h2>
-    </div>
-    <div class="steps-grid">
-      <div class="card step reveal"><h3 data-i18n="home.s1t"></h3><p data-i18n="home.s1p"></p></div>
-      <div class="card step reveal"><h3 data-i18n="home.s2t"></h3><p data-i18n="home.s2p"></p></div>
-      <div class="card step reveal"><h3 data-i18n="home.s3t"></h3><p data-i18n="home.s3p"></p></div>
-    </div>
-    <p class="reveal"><a class="more" href="guides/install.html"><span data-i18n="home.stepsMore"></span>{ICONS['arrow']}</a></p>
+  <section class="wrap d-section">
+    <div class="d-head"><h2 data-i18n="home.releasesTitle"></h2><a class="more" href="changelog.html"><span data-i18n="home.releasesAll"></span>{ICONS['arrow']}</a></div>
+    <div class="d-rows" id="release-rows"><div class="skeleton"></div><div class="skeleton"></div></div>
   </section>
 
-  <section class="section wrap">
-    <div class="latest card reveal">
-      <div>
-        <p class="eyebrow" data-i18n="home.latestEyebrow"></p>
-        <h2 data-i18n="home.latestTitle"></h2>
-        <p class="meta" data-i18n="home.latestSub"></p>
-        <p class="meta" id="latest-date"></p>
-        <a class="more" href="changelog.html"><span data-i18n="home.latestMore"></span>{ICONS['arrow']}</a>
-      </div>
-      <div id="latest-notes" class="notes"><p class="status" data-i18n="home.latestLoading"></p></div>
-    </div>
+  <section class="wrap d-section">
+    <div class="d-head"><h2 data-i18n="home.guidesTitle"></h2><a class="more" href="guides.html"><span data-i18n="home.guidesAll"></span>{ICONS['arrow']}</a></div>
+    <div class="d-rows" id="guide-rows"></div>
   </section>
 
-  <section class="section wrap">
-    <div class="cta reveal">
-      <div>
-        <h2 data-i18n="home.ctaTitle"></h2>
-        <p data-i18n="home.ctaSub"></p>
-      </div>
-      <div class="actions">
-        <a class="btn light" href="https://github.com/erablesimu/erable/releases/latest">{ICONS['download']}<span data-i18n="home.download"></span></a>
-        <a class="btn ghost" href="guides.html"><span data-i18n="home.tutorials"></span>{ICONS['arrow']}</a>
-      </div>
+  <section class="wrap d-section">
+    <div class="d-facts">
+      <div><p class="mono-label" data-i18n="home.fact1k"></p><p data-i18n="home.fact1"></p></div>
+      <div><p class="mono-label" data-i18n="home.fact2k"></p><p data-i18n="home.fact2"></p></div>
+      <div><p class="mono-label" data-i18n="home.fact3k"></p><p data-i18n="home.fact3"></p></div>
+      <div><p class="mono-label" data-i18n="home.fact4k"></p><p data-i18n="home.fact4"></p></div>
     </div>
   </section>
 </main>
 """ + foot("", ["https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js",
                 "https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js",
-                "site.js", "home.js"]))
+                "site.js", "guides.js", "home.js"]))
 
 # ---------------------------------------------------------------- changes
 CURRENT = "changes"

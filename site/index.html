@@ -22,6 +22,7 @@
       <a href="bugs.html" data-i18n="nav.bugs">Bugs</a>
       <a href="report.html" data-i18n="nav.report">Signaler</a>
     </nav>
+    <a class="btn small head-cta" href="https://github.com/erablesimu/erable/releases/latest" data-i18n="nav.download">Télécharger</a>
     <div class="lang" role="group" data-i18n-attr="aria-label:nav.language">
       <button type="button" data-set-lang="fr" lang="fr" title="Français">FR</button>
       <button type="button" data-set-lang="en" lang="en" title="English">EN</button>
@@ -30,88 +31,48 @@
   </div>
 </header>
 
-<section class="hero">
-  <div class="leaves" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-  <div class="wrap">
-    <div>
-      <a class="pill" id="version-pill" href="changelog.html"><span class="dot"></span><span id="version-text" data-i18n="home.pill">Dernière version</span></a>
+<main class="direct">
+  <section class="wrap d-hero">
+    <div class="d-hero-text">
+      <p class="mono-label" data-i18n="home.kicker"></p>
       <h1 data-i18n-html="home.h1"></h1>
       <p class="lead" data-i18n="home.lead"></p>
       <div class="actions">
-        <a class="btn" id="download" href="https://github.com/erablesimu/erable/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span data-i18n="home.download"></span></a>
-        <a class="btn secondary" href="guides.html"><span data-i18n="home.tutorials"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
+        <a class="btn big" id="download" href="https://github.com/erablesimu/erable/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span data-i18n="home.download"></span><small id="download-meta"></small></a>
+        <a class="btn secondary" href="guides/install.html"><span data-i18n="home.install"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
       </div>
       <p class="hero-note" data-i18n="home.note"></p>
     </div>
-    <div class="hero-art" aria-hidden="true">
-      <div class="app-mock">
-        <div class="app-bar"><span class="app-dots"><i></i><i></i><i></i></span><span class="app-brand"><img src="erable.png" alt="">Erable</span><span class="app-search"></span></div>
-        <div class="app-shelf">
-          <div class="case c1"><span class="spine"></span><span class="cover"></span></div>
-          <div class="case c2"><span class="spine"></span><span class="cover"></span></div>
-          <div class="case c3 front"><span class="spine"></span><span class="cover"><img src="erable.png" alt=""></span></div>
-          <div class="case c4"><span class="spine"></span><span class="cover"></span></div>
-          <div class="case c5"><span class="spine"></span><span class="cover"></span></div>
-        </div>
-        <div class="app-title"><span></span><span></span></div>
-        <div class="app-pills"><span class="on"></span><span></span><span></span><span></span></div>
-      </div>
-    </div>
-  </div>
-</section>
-<main>
-  <section class="section wrap">
-    <div class="section-head reveal">
-      <p class="eyebrow" data-i18n="home.featuresEyebrow"></p>
-      <h2 data-i18n="home.featuresTitle"></h2>
-      <p data-i18n="home.featuresSub"></p>
-    </div>
-    <div class="grid">
-      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div><h3 data-i18n="home.f1t"></h3><p data-i18n="home.f1p"></p></div>
-      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M3 21v-5h5"/></svg></div><h3 data-i18n="home.f2t"></h3><p data-i18n="home.f2p"></p></div>
-      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h4M8 9v4"/><circle cx="15.5" cy="10.5" r=".8" fill="currentColor"/><circle cx="17.5" cy="13" r=".8" fill="currentColor"/><path d="M7 5h10a5 5 0 0 1 4.9 6l-1 5a3 3 0 0 1-5.2 1.4L14 15h-4l-1.7 2.4A3 3 0 0 1 3.1 16l-1-5A5 5 0 0 1 7 5z"/></svg></div><h3 data-i18n="home.f3t"></h3><p data-i18n="home.f3p"></p></div>
-      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><h3 data-i18n="home.f4t"></h3><p data-i18n="home.f4p"></p></div>
-      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 11h.01M12 11h.01M15 11h.01"/></svg></div><h3 data-i18n="home.f5t"></h3><p data-i18n="home.f5p"></p></div>
-      <div class="card feature reveal"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg></div><h3 data-i18n="home.f6t"></h3><p data-i18n="home.f6p"></p></div>
-    </div>
+    <aside class="d-panel" aria-live="polite">
+      <div class="d-panel-head"><span class="mono-label" data-i18n="home.panelLabel"></span><span class="live" aria-hidden="true"></span></div>
+      <a class="d-tag" id="stat-tag" href="changelog.html">…</a>
+      <p class="d-when" id="stat-when"></p>
+      <dl class="d-stats">
+        <div><dt data-i18n="home.statDownloads"></dt><dd id="stat-downloads">–</dd></div>
+        <div><dt data-i18n="home.statTotal"></dt><dd id="stat-total">–</dd></div>
+        <div><dt data-i18n="home.statSize"></dt><dd id="stat-size">–</dd></div>
+      </dl>
+      <p class="mono-label d-notes-label" data-i18n="home.panelNotes"></p>
+      <ul class="d-notes" id="stat-notes"><li class="status" data-i18n="home.latestLoading"></li></ul>
+    </aside>
   </section>
 
-  <section class="section wrap">
-    <div class="section-head reveal">
-      <p class="eyebrow" data-i18n="home.stepsEyebrow"></p>
-      <h2 data-i18n="home.stepsTitle"></h2>
-    </div>
-    <div class="steps-grid">
-      <div class="card step reveal"><h3 data-i18n="home.s1t"></h3><p data-i18n="home.s1p"></p></div>
-      <div class="card step reveal"><h3 data-i18n="home.s2t"></h3><p data-i18n="home.s2p"></p></div>
-      <div class="card step reveal"><h3 data-i18n="home.s3t"></h3><p data-i18n="home.s3p"></p></div>
-    </div>
-    <p class="reveal"><a class="more" href="guides/install.html"><span data-i18n="home.stepsMore"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a></p>
+  <section class="wrap d-section">
+    <div class="d-head"><h2 data-i18n="home.releasesTitle"></h2><a class="more" href="changelog.html"><span data-i18n="home.releasesAll"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a></div>
+    <div class="d-rows" id="release-rows"><div class="skeleton"></div><div class="skeleton"></div></div>
   </section>
 
-  <section class="section wrap">
-    <div class="latest card reveal">
-      <div>
-        <p class="eyebrow" data-i18n="home.latestEyebrow"></p>
-        <h2 data-i18n="home.latestTitle"></h2>
-        <p class="meta" data-i18n="home.latestSub"></p>
-        <p class="meta" id="latest-date"></p>
-        <a class="more" href="changelog.html"><span data-i18n="home.latestMore"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
-      </div>
-      <div id="latest-notes" class="notes"><p class="status" data-i18n="home.latestLoading"></p></div>
-    </div>
+  <section class="wrap d-section">
+    <div class="d-head"><h2 data-i18n="home.guidesTitle"></h2><a class="more" href="guides.html"><span data-i18n="home.guidesAll"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a></div>
+    <div class="d-rows" id="guide-rows"></div>
   </section>
 
-  <section class="section wrap">
-    <div class="cta reveal">
-      <div>
-        <h2 data-i18n="home.ctaTitle"></h2>
-        <p data-i18n="home.ctaSub"></p>
-      </div>
-      <div class="actions">
-        <a class="btn light" href="https://github.com/erablesimu/erable/releases/latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span data-i18n="home.download"></span></a>
-        <a class="btn ghost" href="guides.html"><span data-i18n="home.tutorials"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a>
-      </div>
+  <section class="wrap d-section">
+    <div class="d-facts">
+      <div><p class="mono-label" data-i18n="home.fact1k"></p><p data-i18n="home.fact1"></p></div>
+      <div><p class="mono-label" data-i18n="home.fact2k"></p><p data-i18n="home.fact2"></p></div>
+      <div><p class="mono-label" data-i18n="home.fact3k"></p><p data-i18n="home.fact3"></p></div>
+      <div><p class="mono-label" data-i18n="home.fact4k"></p><p data-i18n="home.fact4"></p></div>
     </div>
   </section>
 </main>
@@ -125,6 +86,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script src="site.js"></script>
+<script src="guides.js"></script>
 <script src="home.js"></script>
 </body>
 </html>
