@@ -707,7 +707,7 @@ saves = {
 <li>Installez Erable sur l'autre PC si besoin.</li>
 <li>{m('Outils → Sauvegardes')} → {m('Remettre une copie')} → {m('Remettre...')}, puis choisissez votre zip.</li>
 </ol>
-<div class="note">Erable fait d'abord une copie automatique de vos sauvegardes actuelles et vous dit où elle est (bouton {m('Copies automatiques')}). Les zips faits avec le Gestionnaire de données marchent aussi : ils vont dans le profil que vous choisissez.</div>"""),
+<div class="note">Erable fait d'abord une copie automatique de vos sauvegardes actuelles et vous dit où elle est. En cas d'erreur, {m('Récupérer une copie automatique...')} en bas de la fenêtre remet vos sauvegardes comme avant. Les zips faits avec le Gestionnaire de données marchent aussi : ils vont dans le profil que vous choisissez.</div>"""),
         sec("other", 4, "Reprendre celles d'un autre émulateur", f"""<ol class="steps">
 <li>Fermez les jeux des deux émulateurs.</li>
 <li>{m('Outils → Sauvegardes')} → {m("Reprendre celles d'un autre émulateur")} → {m('Importer...')}.</li>
@@ -1028,7 +1028,7 @@ saves = {
 <li>Install Erable on the other PC if needed.</li>
 <li>{m('Tools → Saves')} → {m('Put a backup back')} → {m('Restore...')}, then choose your zip.</li>
 </ol>
-<div class="note">Erable first makes an automatic copy of your current saves and tells you where it is ({m('Automatic backups')} button). Zips made with the Data Manager work too: they go into the profile you choose.</div>"""),
+<div class="note">Erable first makes an automatic copy of your current saves and tells you where it is. If something goes wrong, {m('Recover an automatic backup...')} at the bottom of the window puts your saves back as they were. Zips made with the Data Manager work too: they go into the profile you choose.</div>"""),
         sec("other", 4, "Take them from another emulator", f"""<ol class="steps">
 <li>Close both emulators' games.</li>
 <li>{m('Tools → Saves')} → {m('Take them from another emulator')} → {m('Import...')}.</li>
@@ -1284,7 +1284,7 @@ saves = {
 <li>Installez Erable sur l'autre PC si besoin.</li>
 <li>{m('Outils → Sauvegardes')} → {m('Remettre une copie')} → {m('Remettre...')}, puis choisissez votre zip.</li>
 </ol>
-<div class="note">Erable fait d'abord une copie automatique de vos sauvegardes actuelles et vous dit où elle est (bouton {m('Copies automatiques')}). Les zips faits avec le Gestionnaire de données marchent aussi : ils vont dans le profil que vous choisissez.</div>"""),
+<div class="note">Erable fait d'abord une copie automatique de vos sauvegardes actuelles et vous dit où elle est. En cas d'erreur, {m('Récupérer une copie automatique...')} en bas de la fenêtre remet vos sauvegardes comme avant. Les zips faits avec le Gestionnaire de données marchent aussi : ils vont dans le profil que vous choisissez.</div>"""),
         sec("other", 4, "Reprendre celles d'un autre émulateur", f"""<ol class="steps">
 <li>Fermez les jeux des deux émulateurs.</li>
 <li>{m('Outils → Sauvegardes')} → {m("Reprendre celles d'un autre émulateur")} → {m('Choisir son dossier...')}.</li>
@@ -1628,7 +1628,7 @@ saves = {
 <li>Installiere Erable bei Bedarf auf dem anderen PC.</li>
 <li>{m('Tools → Saves')} → {m('Put a backup back')} → {m('Restore...')}, dann deine Zip wählen.</li>
 </ol>
-<div class="note">Erable legt vorher automatisch eine Kopie deiner aktuellen Spielstände an und sagt, wo sie liegt (Schaltfläche {m('Automatic backups')}). Zips aus dem Data Manager gehen auch: sie landen im gewählten Profil.</div>"""),
+<div class="note">Erable legt vorher automatisch eine Kopie deiner aktuellen Spielstände an und sagt, wo sie liegt. Geht etwas schief, stellt {m('Recover an automatic backup...')} unten im Fenster deine Spielstände wie vorher wieder her. Zips aus dem Data Manager gehen auch: sie landen im gewählten Profil.</div>"""),
         sec("other", 4, "Aus einem anderen Emulator übernehmen", f"""<ol class="steps">
 <li>Schließe die Spiele beider Emulatoren.</li>
 <li>{m('Tools → Saves')} → {m('Take them from another emulator')} → {m('Import...')}.</li>

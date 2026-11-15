@@ -37,6 +37,7 @@ private:
     void Backup();
     void Restore();
     void RestoreZip(const QString& path);
+    void RecoverAutomatic();
     void TakeFromEmulator();
 
     QLabel* summary_label = nullptr;

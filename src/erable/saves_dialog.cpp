@@ -225,9 +225,10 @@ bool RunWithProgress(QWidget* parent, const QString& title,
 }
 
 /// Zips the saves as they are into the automatic backups folder before they change, and keeps the
-/// ten newest. `zip` gets the file, or stays empty when there was nothing to back up. False (after
-/// telling the user) if the backup failed or was cancelled.
-bool AutomaticBackup(QWidget* parent, const QString& reason, QString& zip) {
+/// ten newest (and `keep`, a backup being put back). `zip` gets the file, or stays empty when there
+/// was nothing to back up. False (after telling the user) if the backup failed or was cancelled.
+bool AutomaticBackup(QWidget* parent, const QString& reason, QString& zip,
+                     const QString& keep = {}) {
     zip.clear();
     const fs::path root = SavesFolder::Root();
     if (!HasFiles(root)) {
@@ -259,7 +260,8 @@ bool AutomaticBackup(QWidget* parent, const QString& reason, QString& zip) {
     std::vector<fs::path> backups;
     for (const auto& entry : fs::directory_iterator(SavesFolder::BackupsDir(), ec)) {
         if (entry.is_regular_file(ec) && Name(entry.path()).startsWith(QStringLiteral("saves_")) &&
-            entry.path().extension() == ".zip") {
+            entry.path().extension() == ".zip" &&
+            !(!keep.isEmpty() && fs::equivalent(entry.path(), PathOf(keep), ec))) {
             backups.push_back(entry.path());
         }
     }
@@ -443,11 +445,11 @@ SavesDialog::SavesDialog(QWidget* parent) : QDialog{parent} {
     auto* footer = new QHBoxLayout;
     auto* open = ActionButton(this, tr("Open the saves folder"));
     open->setObjectName(QStringLiteral("flat"));
-    auto* open_backups = ActionButton(this, tr("Automatic backups"));
-    open_backups->setObjectName(QStringLiteral("flat"));
+    auto* recover = ActionButton(this, tr("Recover an automatic backup..."));
+    recover->setObjectName(QStringLiteral("flat"));
     auto* close = ActionButton(this, tr("Close"));
     footer->addWidget(open);
-    footer->addWidget(open_backups);
+    footer->addWidget(recover);
     footer->addStretch(1);
     footer->addWidget(close);
     layout->addSpacing(4);
@@ -457,11 +459,7 @@ SavesDialog::SavesDialog(QWidget* parent) : QDialog{parent} {
     connect(backup, &QPushButton::clicked, this, &SavesDialog::Backup);
     connect(restore, &QPushButton::clicked, this, &SavesDialog::Restore);
     connect(open, &QPushButton::clicked, this, &SavesDialog::OpenFolder);
-    connect(open_backups, &QPushButton::clicked, this, [] {
-        std::error_code ec;
-        fs::create_directories(SavesFolder::BackupsDir(), ec);
-        QDesktopServices::openUrl(QUrl::fromLocalFile(Native(SavesFolder::BackupsDir())));
-    });
+    connect(recover, &QPushButton::clicked, this, &SavesDialog::RecoverAutomatic);
     connect(close, &QPushButton::clicked, this, &QDialog::accept);
 
     setStyleSheet(UpdateStyle::StyleSheet(QStringLiteral("SavesDialog")) +
@@ -586,7 +584,7 @@ void SavesDialog::RestoreZip(const QString& path) {
         return;
     }
     QString before;
-    if (!AutomaticBackup(this, QStringLiteral("before-restore"), before)) {
+    if (!AutomaticBackup(this, QStringLiteral("before-restore"), before, path)) {
         return;
     }
     const QString destination = Native(target);
@@ -605,6 +603,63 @@ void SavesDialog::RestoreZip(const QString& path) {
     }
     LOG_INFO(Frontend, "Saves: restored {} into {}", path.toStdString(), destination.toStdString());
     QMessageBox::information(this, tr("Saves"), tr("Your saves are back.") + KeptIn(before));
+}
+
+void SavesDialog::RecoverAutomatic() {
+    std::vector<fs::path> backups;
+    std::error_code ec;
+    for (const auto& entry : fs::directory_iterator(SavesFolder::BackupsDir(), ec)) {
+        if (entry.is_regular_file(ec) && Name(entry.path()).startsWith(QStringLiteral("saves_")) &&
+            entry.path().extension() == ".zip") {
+            backups.push_back(entry.path());
+        }
+    }
+    if (backups.empty()) {
+        QMessageBox::information(this, tr("Recover an automatic backup"),
+                                 tr("No automatic backup yet. Erable makes one before each "
+                                    "import or restore."));
+        return;
+    }
+    std::ranges::sort(backups, std::greater{});
+
+    // "saves_<date>_<time>_<why>.zip": shown as its date, why it was made and its size
+    static const QRegularExpression pattern{
+        QStringLiteral("^saves_(\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2})_(.+)\\.zip$")};
+    const QLocale locale;
+    QStringList choices;
+    for (const fs::path& backup : backups) {
+        const QString file = Name(backup);
+        const QRegularExpressionMatch match = pattern.match(file);
+        if (!match.hasMatch()) {
+            choices << file;
+            continue;
+        }
+        const QDateTime when =
+            QDateTime::fromString(match.captured(1), QStringLiteral("yyyy-MM-dd_HH-mm-ss"));
+        const QString why = match.captured(2);
+        const QString reason = why == QStringLiteral("before-restore")
+                                   ? tr("before a restore")
+                                   : tr("before an import");
+        choices << QStringLiteral("%1  ·  %2  ·  %3")
+                       .arg(locale.toString(when, QLocale::ShortFormat), reason,
+                            locale.formattedDataSize(
+                                static_cast<qint64>(fs::file_size(backup, ec))));
+    }
+    const QString open_folder = tr("Open their folder");
+    choices << open_folder;
+    bool ok = false;
+    const QString choice = QInputDialog::getItem(
+        this, tr("Recover an automatic backup"),
+        tr("Your saves as they were just before a change, newest first. Which one?"), choices, 0,
+        false, &ok);
+    if (!ok) {
+        return;
+    }
+    if (choice == open_folder) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(Native(SavesFolder::BackupsDir())));
+        return;
+    }
+    RestoreZip(Native(backups[static_cast<size_t>(choices.indexOf(choice))]));
 }
 
 void SavesDialog::TakeFromEmulator() {

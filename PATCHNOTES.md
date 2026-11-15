@@ -25,7 +25,8 @@ version. Les sections suivantes gardent l'historique.
   tous les jeux et profils en un zip, et sa remise en place (on peut glisser le zip sur la fenêtre).
 - Clic droit sur un jeu > Importer une sauvegarde : ne reprend que ce jeu, depuis un autre
   émulateur du PC, un dossier ou un zip.
-- Erable fait une copie automatique de vos sauvegardes avant chaque changement et dit où elle est.
+- Erable fait une copie automatique de vos sauvegardes avant chaque changement. En cas d'erreur,
+  « Récupérer une copie automatique… » en bas de la fenêtre remet tout comme avant.
 
 **Zelda Ocarina of Time**
 - Avec le déblocage des FPS, le Chant de l'Épouvantail s'enregistre à la bonne durée et les

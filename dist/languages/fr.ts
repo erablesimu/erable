@@ -11326,10 +11326,6 @@ Code d&apos;erreur : %3</translation>
         <translation>Ouvrir le dossier des sauvegardes</translation>
     </message>
     <message>
-        <source>Automatic backups</source>
-        <translation>Copies automatiques</translation>
-    </message>
-    <message>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
@@ -11514,6 +11510,34 @@ Code d&apos;erreur : %3</translation>
     <message>
         <source>Save imported. Start the game to continue where you left off.</source>
         <translation>Sauvegarde importée. Lancez le jeu pour reprendre là où vous en étiez.</translation>
+    </message>
+    <message>
+        <source>Recover an automatic backup...</source>
+        <translation>Récupérer une copie automatique...</translation>
+    </message>
+    <message>
+        <source>Recover an automatic backup</source>
+        <translation>Récupérer une copie automatique</translation>
+    </message>
+    <message>
+        <source>No automatic backup yet. Erable makes one before each import or restore.</source>
+        <translation>Aucune copie automatique pour l'instant. Erable en fait une avant chaque import ou remise en place.</translation>
+    </message>
+    <message>
+        <source>before a restore</source>
+        <translation>avant une remise en place</translation>
+    </message>
+    <message>
+        <source>before an import</source>
+        <translation>avant un import</translation>
+    </message>
+    <message>
+        <source>Open their folder</source>
+        <translation>Ouvrir leur dossier</translation>
+    </message>
+    <message>
+        <source>Your saves as they were just before a change, newest first. Which one?</source>
+        <translation>Vos sauvegardes telles qu'elles étaient juste avant un changement, de la plus récente à la plus ancienne. Laquelle ?</translation>
     </message>
 </context>
 <context>
