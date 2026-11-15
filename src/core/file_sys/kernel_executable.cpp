@@ -106,6 +106,12 @@ KIP::KIP(const VirtualFile& file) : status(Loader::ResultStatus::Success) {
         offset += header.sections[i].compressed_size;
 
         if (header.sections[i].compressed_size == 0 && header.sections[i].decompressed_size != 0) {
+            // Sections 3 to 5 (.bss and two unused ones) hold no file data and nothing reads
+            // them: the loader takes the .bss size from the header. Their sizes come from the
+            // file, so do not allocate them.
+            if (i >= 3) {
+                continue;
+            }
             decompressed_sections[i] = std::vector<u8>(header.sections[i].decompressed_size);
         } else if (header.sections[i].compressed_size == header.sections[i].decompressed_size) {
             decompressed_sections[i] = std::move(compressed);

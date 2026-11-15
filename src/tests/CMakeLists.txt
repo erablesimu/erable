@@ -51,6 +51,7 @@ add_executable(tests
     audio_core/hardware_audio_codec.cpp
     core/gpu_dirty_memory.cpp
     core/memory_acquire.cpp
+    core/kip_sections.cpp
     core/memory_span.cpp
     core/builtin_patches.cpp
     core/cheat_parser.cpp
