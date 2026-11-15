@@ -13,6 +13,7 @@
 #include <QKeyEvent>
 
 #include "common/settings_input.h"
+#include "qt_common/config/uisettings.h"
 #include "hid_core/frontend/emulated_controller.h"
 #include "hid_core/hid_core.h"
 #include "hid_core/hid_types.h"
@@ -107,6 +108,7 @@ QPainterPath SyrupDrop(double size) {
 } // namespace
 
 LeafCatcher::LeafCatcher(QWidget* parent) : QWidget{parent} {
+    best = (std::max)(best, static_cast<int>(UISettings::values.leaf_catcher_best.GetValue()));
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
     setCursor(Qt::BlankCursor);
@@ -129,6 +131,12 @@ void LeafCatcher::SetRunning(bool running) {
         setFocus();
     } else {
         frame_timer.stop();
+        // Kept when the game pauses (the game started), not at each point: saving writes the
+        // whole configuration.
+        if (best > static_cast<int>(UISettings::values.leaf_catcher_best.GetValue())) {
+            UISettings::values.leaf_catcher_best = static_cast<u32>(best);
+            emit RecordChanged();
+        }
     }
 }
 

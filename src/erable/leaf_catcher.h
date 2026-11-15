@@ -32,6 +32,11 @@ public:
     /// Advances the game by `seconds` (what the frame timer does; also used to render previews).
     void Advance(double seconds);
 
+signals:
+    /// A new best score was stored in UISettings (when the game pauses): the settings are saved.
+    void RecordChanged();
+
+public:
     /// Controllers move the basket too: the D-pad or the left stick of player 1 (or handheld).
     void SetControllers(Core::HID::HIDCore* hid_core_) {
         hid_core = hid_core_;

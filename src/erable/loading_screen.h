@@ -94,6 +94,14 @@ private:
     VideoCore::LoadCallbackStage previous_stage;
     LeafCatcher* leaf_catcher = nullptr;
 
+public:
+    /// The leaf game, for MainWindow to save a new record.
+    [[nodiscard]] LeafCatcher* Game() const noexcept {
+        return leaf_catcher;
+    }
+
+private:
+
     QGraphicsOpacityEffect* opacity_effect = nullptr;
     QPushButton* skip_button = nullptr;
     QLabel* game_icon = nullptr;

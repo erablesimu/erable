@@ -12,6 +12,7 @@ version. Les sections suivantes gardent l'historique.
 - Au lancement d'un jeu depuis l'accueil, son image et son nom s'affichent tout de suite avec un
   anneau qui tourne (« Lancement du jeu… »), et le curseur d'attente de Windows pendant les
   secondes où Erable ouvre le jeu et démarre Vulkan : on voit que ça charge, pas que ça a planté.
+- Le record du petit jeu des feuilles est enfin gardé d'une session à l'autre.
 
 **Zelda Ocarina of Time**
 - Avec le déblocage des FPS, le Chant de l'Épouvantail s'enregistre à la bonne durée et les

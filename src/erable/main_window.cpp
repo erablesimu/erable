@@ -38,6 +38,7 @@
 #include "install_dialog.h"
 
 #include "bootmanager.h"
+#include "leaf_catcher.h"
 #include "loading_screen.h"
 #include "qt_common/util/vk.h"
 #include "ryujinx_dialog.h"
@@ -1016,6 +1017,8 @@ void MainWindow::InitializeWidgets() {
     });
 
     loading_screen = new LoadingScreen(this);
+    // The leaf game's record is saved as soon as the game stops for the emulator.
+    connect(loading_screen->Game(), &LeafCatcher::RecordChanged, this, &MainWindow::OnSaveConfig);
     loading_screen->hide();
     ui->horizontalLayout->addWidget(loading_screen);
     connect(loading_screen, &LoadingScreen::Hidden, this, [&] {

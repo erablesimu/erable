@@ -118,6 +118,8 @@ struct Values {
     Setting<u32, true> home_style{linkage, 0, 0, 1, "home_style", Category::Ui};
     /// The home (with the library) fills the screen, while no game runs.
     Setting<bool> home_fullscreen{linkage, false, "home_fullscreen", Category::Ui};
+    /// The loading screen's leaf game: the best score, kept across sessions.
+    Setting<u32> leaf_catcher_best{linkage, 0, "leaf_catcher_best", Category::Ui};
     Setting<bool> show_low_ram_warning{linkage, true, "show_low_ram_warning", Category::Ui};
     Setting<bool> pause_when_in_background{linkage,
                                            false,
