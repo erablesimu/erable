@@ -8,12 +8,15 @@
 #include <QLocalSocket>
 #include <QMessageBox>
 #include <QProcess>
+#include <chrono>
 #include <cstdlib>
 #include <exception>
+#include <thread>
 #include <filesystem>
 #include <system_error>
 
 #include "common/fs/fs_paths.h"
+#include "common/logging.h"
 #include "common/fs/path_util.h"
 #include "debug_session.h"
 #include "nx2_switches.h"
@@ -121,6 +124,26 @@ static void SetUpNvidiaShaderDiskCache() {
     setenv("__GL_SHADER_DISK_CACHE_SIZE", "10737418240", 0);
 }
 #endif
+
+namespace {
+
+/// Once the window has closed, nothing can keep Erable running: a thread that never ends (in a
+/// destructor, a static, a driver) left a 40 MB erable.exe in the background holding the log, so
+/// the next launch logged elsewhere and a debug session lost its log. If the process is still
+/// here 20 s after the window closed, the stage it got stuck in is in the log and it ends.
+void ArmExitWatchdog() {
+    std::thread([] {
+        std::this_thread::sleep_for(std::chrono::seconds{20});
+        LOG_CRITICAL(Frontend, "Erable still running 20 s after its window closed: ending it");
+        Common::Log::Flush();
+#ifdef _WIN32
+        TerminateProcess(GetCurrentProcess(), 0);
+#endif
+        std::_Exit(0);
+    }).detach();
+}
+
+} // Anonymous namespace
 
 int main(int argc, char* argv[]) {
 #if defined(__unix__) && !defined(__APPLE__) && !defined(__ANDROID__)
@@ -306,13 +329,17 @@ int main(int argc, char* argv[]) {
             app.connect(&app, &QGuiApplication::applicationStateChanged, &main_window,
                         &MainWindow::OnAppFocusStateChanged);
             result = app.exec();
+            LOG_INFO(Frontend, "Exit: the window closed, tearing down");
+            ArmExitWatchdog();
         }
+        LOG_INFO(Frontend, "Exit: main window destroyed");
         instance_server.close();
         // Debug mode > Record my session, after a game ran: record from a new launch.
         if (DebugSession::RestartRequested()) {
             QProcess::startDetached(QCoreApplication::applicationFilePath(),
                                     QCoreApplication::arguments().mid(1));
         }
+        LOG_INFO(Frontend, "Exit: leaving main (the application object and statics go next)");
         return result;
     } catch (const std::exception& exception) {
         QMessageBox::critical(nullptr, QObject::tr("Erable startup stopped"),

@@ -13,6 +13,8 @@ version. Les sections suivantes gardent l'historique.
   anneau qui tourne (« Lancement du jeu… »), et le curseur d'attente de Windows pendant les
   secondes où Erable ouvre le jeu et démarre Vulkan : on voit que ça charge, pas que ça a planté.
 - Le record du petit jeu des feuilles est enfin gardé d'une session à l'autre.
+- Erable ne reste plus en arrière-plan après sa fermeture : si quelque chose l'y retient plus de
+  20 secondes, il se ferme de lui-même (cela bloquait le journal et la mémoire du PC).
 
 **Zelda Ocarina of Time**
 - Avec le déblocage des FPS, le Chant de l'Épouvantail s'enregistre à la bonne durée et les
