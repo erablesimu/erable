@@ -4092,6 +4092,9 @@ void MainWindow::ShowFullscreen() {
             return;
         }
         window->hide();
+        // A maximized window keeps the work area and ignores the new geometry, so the taskbar
+        // stays visible; the saved geometry restores the maximized state afterwards.
+        window->setWindowState(window->windowState() & ~Qt::WindowMaximized);
         window->setWindowFlags(window->windowFlags() | Qt::FramelessWindowHint);
         const auto screen_geometry = GuessCurrentScreen(window)->geometry();
         window->setGeometry(screen_geometry.x(), screen_geometry.y(), screen_geometry.width(),
