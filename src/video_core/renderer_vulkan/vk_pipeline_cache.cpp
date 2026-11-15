@@ -1428,6 +1428,7 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
         size_t built{};
         size_t compute_built{};
         size_t graphics_built{};
+        size_t graphics_done{}; ///< Graphics jobs ended (built or not): the rest are compute
         bool has_loaded{};
         std::unique_ptr<PipelineStatistics> statistics;
         /// Records the load never chooses, as in the old cache; begin is the index in records
@@ -1729,6 +1730,7 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
                             state.incomplete_graphics.emplace_back(key.Hash(),
                                                                    pipeline_record(index));
                         }
+                        ++state.graphics_done;
                         built_one();
                         return {};
                     }
@@ -1738,18 +1740,21 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
                         std::scoped_lock lock{state.mutex};
                         state.graphics_built += pipeline->Failed() ? 0 : 1;
                         graphics_cache.emplace(key, std::move(pipeline));
+                        ++state.graphics_done;
                         built_one();
                     };
                 },
             },
             &boot);
     }
+    // Kept for the hand-off below: what the boot load leaves goes to the background prebuild.
+    const auto boot_list = std::move(boot_graphics);
     boot_graphics.clear();
 
     // With the precache, the prebuild starts after it.
     const size_t deferred_pipelines = prebuild.size();
-    const auto start_prebuild = [&] {
-        for (PrebuildRecord& record : prebuild) {
+    const auto add_prebuild = [this](PrebuildRecord& record) {
+        {
             scheduled_prebuild->Add(
                 record.key, TranslationBytes(record.payload_size), DriverCompileBytes,
                 [this, record = std::move(record)]() mutable {
@@ -1770,6 +1775,11 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
                         return std::unique_ptr<GraphicsPipeline>{};
                     }
                 });
+        }
+    };
+    const auto start_prebuild = [&] {
+        for (PrebuildRecord& record : prebuild) {
+            add_prebuild(record);
         }
         prebuild.clear();
         if (deferred_pipelines != 0) {
@@ -1794,7 +1804,65 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
         callback(VideoCore::LoadCallbackStage::Build, state.built, state.total);
         state.has_loaded = true;
     }
+    // The game starts once most of the boot pipelines are built (60%, EDEN_NX2_PLAYABLE_SHARE
+    // in percent, 100 = all), every compute one among them: the rest are built by the background
+    // prebuild while it plays, a draw that needs one first building it at once. A boot load the
+    // driver had to compile in full took 11 minutes (build-36, Ocarina of Time).
+    static const size_t playable_percent = [] {
+        const char* const value = std::getenv("EDEN_NX2_PLAYABLE_SHARE");
+        const unsigned long percent = value != nullptr ? std::strtoul(value, nullptr, 10) : 60;
+        return static_cast<size_t>(std::clamp<unsigned long>(percent, 1, 100));
+    }();
+    bool handed_off = false;
+    const size_t compute_total = state.total - queued_graphics;
+    while (playable_percent < 100 && !boot.Idle() && !stop_loading.stop_requested()) {
+        {
+            std::scoped_lock lock{state.mutex};
+            const size_t compute_done = state.built - state.graphics_done;
+            if (compute_done >= compute_total && state.built * 100 >= state.total * playable_percent &&
+                state.graphics_done < queued_graphics) {
+                handed_off = true;
+            }
+        }
+        if (handed_off) {
+            jobs.Cancel(boot);
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds{50});
+    }
     boot.Wait();
+    size_t handed_pipelines = 0;
+    if (handed_off && !stop_loading.stop_requested()) {
+        // The boot pipelines a cancelled job never built, for the background prebuild
+        for (const auto& [index, key] : boot_list) {
+            if (graphics_cache.contains(key)) {
+                continue;
+            }
+            const CacheV2::LogRecord& record = *records[index];
+            PrebuildRecord pending{
+                .key = key,
+                .record_key = record.key,
+                .offset = record.offset,
+                .payload_size = record.payload.size(),
+                .payload = record.offset == 0
+                               ? std::vector<u8>(record.payload.begin(), record.payload.end())
+                               : std::vector<u8>{},
+            };
+            ++handed_pipelines;
+            if (prebuild_now) {
+                add_prebuild(pending);
+            } else {
+                prebuild.push_back(std::move(pending));
+            }
+        }
+        if (prebuild_now && handed_pipelines != 0) {
+            prebuild_load_begin = load_begin;
+        }
+        LOG_INFO(Render_Vulkan,
+                 "Shader cache v2 boot load: the game starts at {}% built, {} pipelines left "
+                 "to the background prebuild",
+                 playable_percent, handed_pipelines);
+    }
     {
         const size_t used_sessions = std::min<size_t>(
             static_cast<size_t>(std::ranges::count_if(

@@ -27,6 +27,10 @@ EDEN_NX2_SPLIT=2
 # of the same size instead of being destroyed and made again. =0 destroys them, as before.
 #EDEN_NX2_IMAGE_POOL=0
 
+# The game starts once this share of the boot shader pipelines is built (60% by default); the rest
+# are built in the background while it plays. =100 waits for all of them, as before.
+#EDEN_NX2_PLAYABLE_SHARE=100
+
 # Batch GPU fence syncpoints to reduce host driver overhead and smooth frametimes.
 EDEN_NX2_FENCE_BATCH=1
 
