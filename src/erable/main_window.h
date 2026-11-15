@@ -425,6 +425,7 @@ private slots:
     void OnApplyRecommendedSettings();
     void OnRestorePreviousSettings();
     void OnDataDialog();
+    void OnSavesDialog();
     void OnToggleFilterBar();
     void OnToggleStatusBar();
     void OnTogglePerfOverlay();

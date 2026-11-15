@@ -19,13 +19,24 @@ version. Les sections suivantes gardent l'historique.
 - Erable ne reste plus en arrière-plan après sa fermeture : si quelque chose l'y retient plus de
   20 secondes, il se ferme de lui-même (cela bloquait le journal et la mémoire du PC).
 
+**Sauvegardes**
+- Nouvelle fenêtre Outils > Sauvegardes : une copie de sécurité de tous les jeux et de tous les
+  profils en un seul zip, sa remise en place sur ce PC ou un autre, et la reprise des sauvegardes
+  d'un autre émulateur (Eden, Lichii, Ryujinx…). Erable fait une copie automatique avant chaque
+  changement et dit où elle se trouve.
+
 **Zelda Ocarina of Time**
 - Avec le déblocage des FPS, le Chant de l'Épouvantail s'enregistre à la bonne durée et les
   cinématiques vidéo restent synchronisées.
+- Avec le déblocage des FPS au-dessus de 60, les vêtements et les cheveux bougent à la bonne
+  vitesse.
+- Plus d'écrans de la version 1.0 reconnus, et le jitter FSR ne déborde plus sur les bords de
+  l'image avec une carte AMD.
 
 **Mario Kart World**
 - Mode 60 FPS partout à vitesse normale (Configurer > jeu), avec un repli automatique à 30 FPS
   quand le PC ne suit pas.
+- Horloge du GPU plus fidèle, et compteurs de synchronisation exacts.
 
 **Moins de mémoire vidéo, moins de grosses saccades**
 - Aux entrées de zone, les textures éparpillées dans la mémoire du jeu sont rassemblées sur
@@ -50,6 +61,9 @@ version. Les sections suivantes gardent l'historique.
   et le temps de jeu sont enregistrés sans risque de fichier abîmé.
 - Fichiers NSZ et NCZ « solides » lisibles.
 - Corrections du GPU émulé (copies DMA, synchronisation) et des pilotes Intel et AMD (RADV).
+- Jeux un peu plus rapides à ouvrir : leurs fichiers ne sont lus qu'au moment où ils servent.
+- Le gyroscope de la manette marche toujours après l'avoir rebranchée.
+- Le journal est écrit sur le disque chaque seconde : un plantage n'en perd plus la fin.
 
 **Mises à jour**
 - Fenêtres de mise à jour redessinées aux couleurs d'Erable et entièrement en français : notes

@@ -126,24 +126,25 @@
 <section class="card tuto-step" id="backup"><h2><span class="num">2</span>Eine Sicherung anlegen</h2>
 <ol class="steps">
 <li>Schließe das Spiel.</li>
-<li>Oben links: <span class="menu">Tools → Data Manager</span>, Bereich <span class="menu">Saves</span>.</li>
-<li>Klicke auf die Export-Schaltfläche (Tooltip „Export all data in this directory“) und wähle, wo die <code>.zip</code> gespeichert wird.</li>
+<li>Oben links: <span class="menu">Tools → Saves</span>.</li>
+<li><span class="menu">Make a backup</span> → <span class="menu">Back up...</span>, dann wählen, wo die <code>.zip</code> gespeichert wird.</li>
 </ol>
-<div class="note">Bewahre diese Zip auf einem USB-Stick oder einer anderen Platte auf: Sie enthält die Spielstände aller Spiele und Profile.</div>
+<div class="note">Diese Zip enthält die Spielstände aller Spiele und aller Profile. Bewahre sie auf einem USB-Stick oder einer anderen Platte auf.</div>
 </section>
 <section class="card tuto-step" id="restore"><h2><span class="num">3</span>Wiederherstellen, auf diesem oder einem anderen PC</h2>
 <ol class="steps">
-<li>Installiere Erable, starte das Spiel einmal und schließe es wieder.</li>
-<li><span class="menu">Tools → Data Manager</span>, Bereich <span class="menu">Saves</span>: die Import-Schaltfläche (Tooltip „Import data for this directory“), dann deine Zip wählen.</li>
+<li>Installiere Erable bei Bedarf auf dem anderen PC.</li>
+<li><span class="menu">Tools → Saves</span> → <span class="menu">Put a backup back</span> → <span class="menu">Restore...</span>, dann deine Zip wählen.</li>
 </ol>
-<div class="warn">Der Import ersetzt <strong>alle</strong> vorhandenen Spielstände. Für ein einzelnes Spiel kopiere lieber seinen Ordner (Schritt 1) an dieselbe Stelle auf dem anderen PC.</div>
+<div class="note">Erable legt vorher automatisch eine Kopie deiner aktuellen Spielstände an und sagt, wo sie liegt (Schaltfläche <span class="menu">Automatic backups</span>). Zips aus dem Data Manager gehen auch: sie landen im gewählten Profil.</div>
 </section>
 <section class="card tuto-step" id="other"><h2><span class="num">4</span>Aus einem anderen Emulator übernehmen</h2>
 <ol class="steps">
-<li>Schließe den anderen Emulator (Eden, Lichii…).</li>
-<li>Beim ersten Start bietet Erable an, sein Profil zu importieren: wähle es und behalte <span class="menu">Copy</span>, das das Original unverändert lässt.</li>
-<li>Sonst kopiere den Ordner des Spiels von Hand aus dem Ordner <code>nand\user\save</code> des anderen Emulators in den von Erable (Schritt 1).</li>
+<li>Schließe die Spiele beider Emulatoren.</li>
+<li><span class="menu">Tools → Saves</span> → <span class="menu">Take them from another emulator</span> → <span class="menu">Choose its folder...</span>.</li>
+<li>Wähle den Ordner des anderen Emulators (den mit <code>nand</code>, zum Beispiel <code>%APPDATA%\eden</code>), dann das Erable-Profil, das sie bekommt.</li>
 </ol>
+<div class="note">Die Spielstände des anderen Emulators bleiben unberührt, und von deinen wird vorher automatisch eine Kopie angelegt.</div>
 </section>
       </article>
     </div>

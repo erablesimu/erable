@@ -219,6 +219,7 @@
     <addaction name="action_Install_Keys"/>
     <addaction name="menuInstall_Firmware"/>
     <addaction name="action_Verify_installed_contents"/>
+    <addaction name="action_Saves"/>
     <addaction name="action_Data_Manager"/>
     <addaction name="separator"/>
     <addaction name="menu_cabinet_applet"/>
@@ -584,6 +585,11 @@
   <action name="action_Eden_Dependencies">
    <property name="text">
     <string>&amp;Erable Dependencies</string>
+   </property>
+  </action>
+  <action name="action_Saves">
+   <property name="text">
+    <string>&amp;Saves...</string>
    </property>
   </action>
   <action name="action_Data_Manager">

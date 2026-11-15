@@ -699,6 +699,877 @@ saves = {
 <div class="note">Chaque profil a ses propres sauvegardes. Changer de profil n'en efface aucune.</div>"""),
         sec("backup", 2, "Faire une copie de sécurité", f"""<ol class="steps">
 <li>Fermez le jeu.</li>
+<li>En haut à gauche : {m('Outils → Sauvegardes')}.</li>
+<li>{m('Faire une copie de sécurité')} → {m('Copier...')}, puis choisissez où enregistrer le fichier <code>.zip</code>.</li>
+</ol>
+<div class="note">Ce zip contient les sauvegardes de tous vos jeux et de tous vos profils. Gardez-le sur une clé USB ou un autre disque.</div>"""),
+        sec("restore", 3, "Les remettre, sur ce PC ou un autre", f"""<ol class="steps">
+<li>Installez Erable sur l'autre PC si besoin.</li>
+<li>{m('Outils → Sauvegardes')} → {m('Remettre une copie')} → {m('Remettre...')}, puis choisissez votre zip.</li>
+</ol>
+<div class="note">Erable fait d'abord une copie automatique de vos sauvegardes actuelles et vous dit où elle est (bouton {m('Copies automatiques')}). Les zips faits avec le Gestionnaire de données marchent aussi : ils vont dans le profil que vous choisissez.</div>"""),
+        sec("other", 4, "Reprendre celles d'un autre émulateur", f"""<ol class="steps">
+<li>Fermez les jeux des deux émulateurs.</li>
+<li>{m('Outils → Sauvegardes')} → {m("Reprendre celles d'un autre émulateur")} → {m('Choisir son dossier...')}.</li>
+<li>Choisissez le dossier de l'autre émulateur (celui qui contient <code>nand</code>, par exemple <code>%APPDATA%\\eden</code>), puis le profil Erable qui les reçoit.</li>
+</ol>
+<div class="note">Les sauvegardes de l'autre émulateur ne sont pas touchées, et une copie automatique des vôtres est faite avant.</div>"""),
+    ]),
+    "en": "\n".join([
+        sec("install", 1, "Install Erable", f"""<ol class="steps">
+<li>Download <code>erable-windows-x86_64.zip</code> from the latest version:<br>{DOWNLOAD.format('Download Erable')}</li>
+<li>Right-click the zip → {m('Extract All…')}</li>
+<li>In the folder you get, run <code>erable.exe</code>.</li>
+</ol>
+<div class="note">Updates come on their own: at startup, Erable offers to install the new version when there is one.</div>
+<div class="warn">If Windows says libraries are missing, first run <code>vc_redist.x64.exe</code>, which is in the same folder.</div>"""),
+        sec("console", 2, "Add your Switch's firmware and keys", f"""<p>The emulator needs the system (firmware) and the keys (<code>prod.keys</code>) <strong>dumped from your own console</strong>. These files belong to Nintendo: they don't come with Erable, and you must neither download nor share them.</p>
+<ol class="steps">
+<li>Dump the firmware and <code>prod.keys</code> from your Switch.</li>
+<li>In Erable, top left: {m('Tools → Install Firmware → From ZIP')}, then pick the firmware zip.</li>
+<li>Still top left: {m('Tools → Install Decryption Keys')}, then pick your <code>prod.keys</code> file.</li>
+</ol>
+{fig('tools-menu', "Erable's Tools menu with Install Decryption Keys and Install Firmware", 'The <em>Tools</em> menu: <em>Install Decryption Keys</em> and <em>Install Firmware</em>.')}
+<div class="warn">Never download keys or firmware from the Internet: these files mostly circulate on sites that also spread viruses.</div>"""),
+        sec("language", 3, "Games in your language", f"""<ol class="steps">
+<li>Top left: {m('Emulation → Configure')}, then {m('System')}.</li>
+<li><strong>Language</strong>: your language, e.g. <code>British English</code>.</li>
+<li><strong>Region</strong>: <code>Europe</code> (or <code>USA</code>).</li>
+<li>Confirm with {m('OK')}.</li>
+</ol>
+{fig('system-language', 'System tab of the configuration with the game language', "The <em>System</em> tab: the games' language.")}"""),
+        sec("controller", 4, "Play with a controller", f"""<ol class="steps">
+<li>Plug in your controller, then go to {m('Emulation → Configure → Controls')}.</li>
+<li><strong>Input Device</strong>: pick your controller (usually the last one in the list).</li>
+<li>Click each box (A, B, X, Y, sticks, triggers…), then press the matching button on the controller.</li>
+<li>Confirm with {m('OK')}.</li>
+</ol>
+{fig('controls', 'Controls tab with a connected controller and its buttons mapped', 'The <em>Controls</em> tab: the blue <em>[waiting]</em> box waits for you to press a button.')}
+<div class="note">If the controller doesn't show up: close Steam (it captures controllers), try another USB cable, then restart Erable.</div>"""),
+        sec("games", 5, "Add your games and play", f"""<ol class="steps">
+<li>Keep your games (dumped from your cartridges or purchases) in a <code>Switch 2 Games</code> folder, one subfolder per game.</li>
+<li>In the game list, click {m('+ Add New Game Directory')}.</li>
+<li>Select the game's folder, then {m('Select Folder')}.</li>
+<li>Double-click the game to start it.</li>
+</ol>
+{fig('game-folder', "Window for picking a game's folder", "Picking a game's folder.")}
+{fig('game-list', 'Game list with Zelda Ocarina of Time and Pokémon Pokopia', 'Games show up in the list with their play time and add-ons.')}
+<div class="note">The first time, a game may stutter for a few minutes while the emulator prepares its shaders; then it all gets smoother. A problem? <a href="../report.html">Report it here</a>.</div>"""),
+    ]),
+    "de": "\n".join([
+        sec("install", 1, "Erable installieren", f"""<ol class="steps">
+<li>Lade <code>erable-windows-x86_64.zip</code> aus der neuesten Version herunter:<br>{DOWNLOAD.format('Erable herunterladen')}</li>
+<li>Rechtsklick auf die ZIP-Datei → {m('Alle extrahieren…')}</li>
+<li>Starte im entpackten Ordner <code>erable.exe</code>.</li>
+</ol>
+<div class="note">Updates kommen von selbst: Beim Start bietet Erable an, eine neue Version zu installieren, sobald es eine gibt.</div>
+<div class="warn">Meldet Windows fehlende Bibliotheken, starte zuerst <code>vc_redist.x64.exe</code> aus demselben Ordner.</div>"""),
+        sec("console", 2, "Firmware und Schlüssel deiner Switch hinzufügen", f"""<p>Der Emulator braucht das System (Firmware) und die Schlüssel (<code>prod.keys</code>) <strong>aus deiner eigenen Konsole</strong>. Diese Dateien gehören Nintendo: Sie sind nicht in Erable enthalten, und du darfst sie weder herunterladen noch weitergeben.</p>
+<ol class="steps">
+<li>Lies Firmware und <code>prod.keys</code> aus deiner Switch aus.</li>
+<li>In Erable oben links: {m('Tools → Install Firmware → From ZIP')}, dann die ZIP-Datei der Firmware wählen.</li>
+<li>Ebenfalls oben links: {m('Tools → Install Decryption Keys')}, dann deine Datei <code>prod.keys</code> wählen.</li>
+</ol>
+{fig('tools-menu', 'Tools-Menü von Erable mit Install Decryption Keys und Install Firmware', 'Das Menü <em>Tools</em>: <em>Install Decryption Keys</em> und <em>Install Firmware</em>.')}
+<div class="warn">Lade nie Schlüssel oder Firmware aus dem Internet herunter: Diese Dateien kursieren vor allem auf Seiten, die auch Viren verbreiten.</div>"""),
+        sec("language", 3, "Spiele auf Deutsch", f"""<ol class="steps">
+<li>Oben links: {m('Emulation → Configure')}, dann {m('System')}.</li>
+<li><strong>Language</strong>: <code>German (Deutsch)</code>.</li>
+<li><strong>Region</strong>: <code>Europe</code>.</li>
+<li>Mit {m('OK')} bestätigen.</li>
+</ol>
+{fig('system-language', 'Reiter System der Einstellungen mit der Spielsprache', 'Reiter <em>System</em>: die Sprache der Spiele.')}"""),
+        sec("controller", 4, "Mit einem Controller spielen", f"""<ol class="steps">
+<li>Schließe deinen Controller an und öffne {m('Emulation → Configure → Controls')}.</li>
+<li><strong>Input Device</strong>: Wähle deinen Controller (meist der letzte in der Liste).</li>
+<li>Klicke auf jedes Feld (A, B, X, Y, Sticks, Trigger …) und drücke dann die passende Taste am Controller.</li>
+<li>Mit {m('OK')} bestätigen.</li>
+</ol>
+{fig('controls', 'Reiter Controls mit verbundenem Controller und belegten Tasten', 'Reiter <em>Controls</em>: Das blaue Feld <em>[waiting]</em> wartet auf einen Tastendruck.')}
+<div class="note">Taucht der Controller nicht auf: Schließe Steam (es fängt Controller ab), probiere ein anderes USB-Kabel und starte Erable neu.</div>"""),
+        sec("games", 5, "Spiele hinzufügen und spielen", f"""<ol class="steps">
+<li>Lege deine Spiele (aus deinen Modulen oder Käufen ausgelesen) in einen Ordner <code>Switch-2-Spiele</code>, einen Unterordner pro Spiel.</li>
+<li>Klicke in der Spieleliste auf {m('+ Add New Game Directory')}.</li>
+<li>Wähle den Ordner des Spiels und dann {m('Ordner auswählen')}.</li>
+<li>Doppelklicke auf das Spiel, um es zu starten.</li>
+</ol>
+{fig('game-folder', 'Fenster zur Auswahl des Spielordners', 'Den Ordner eines Spiels auswählen.')}
+{fig('game-list', 'Spieleliste mit Zelda Ocarina of Time und Pokémon Pokopia', 'Die Spiele erscheinen in der Liste, mit Spielzeit und Add-ons.')}
+<div class="note">Beim ersten Mal kann ein Spiel ein paar Minuten ruckeln, während der Emulator seine Shader vorbereitet; danach läuft alles flüssiger. Ein Problem? <a href="../report.html">Hier melden</a>.</div>"""),
+    ]),
+}
+
+install_toc = {
+    "ids": ["install", "console", "language", "controller", "games"],
+    "fr": ["Installer Erable", "Firmware et clés", "Jeux en français", "Manette", "Ajouter vos jeux"],
+    "en": ["Install Erable", "Firmware and keys", "Game language", "Controller", "Add your games"],
+    "de": ["Erable installieren", "Firmware und Schlüssel", "Spielsprache", "Controller", "Spiele hinzufügen"],
+}
+tutorial("guides/install.html", "tuto.installTitle", "tutos.emuTitle", None, install_toc, install,
+         {"fr": "Installer Erable", "en": "Install Erable", "de": "Erable installieren"},
+         {"fr": "De zéro à votre premier jeu, pas à pas.",
+          "en": "From nothing to your first game, step by step.",
+          "de": "Von null bis zum ersten Spiel, Schritt für Schritt."})
+
+ocarina = {
+    "fr": "\n".join([
+        sec("ready", 1, "Vérifier que le jeu est prêt", f"""<ol class="steps">
+<li>Ocarina of Time apparaît dans la liste des jeux d'Erable (voir <a href="install.html#games">Ajouter vos jeux</a>).</li>
+<li>Faites un clic droit sur le jeu → {m('Configure Game')}.</li>
+</ol>
+<div class="note">Tous les réglages ci-dessous se font dans cette fenêtre, et ne concernent qu'Ocarina of Time : vos autres jeux gardent leurs réglages. Le jeu doit être fermé.</div>"""),
+        sec("shaders", 2, "Installer le mod de shaders", f"""<p>Le mod <code>ootrshaders</code> limite les saccades : moins de shaders à préparer pendant que vous jouez.</p>
+<ol class="steps">
+<li>Onglet {m('Add-Ons')} → {m('Import Mod from ZIP')}.</li>
+<li>Choisissez <code>ootrshaders.zip</code>, puis le type {m('RomFS')}.</li>
+<li>Vérifiez que <strong>ootrshaders</strong> est coché, puis {m('Apply')}.</li>
+</ol>
+{fig('ocarina-addons', 'Onglet Add-Ons avec ootrshaders, Max Resolution et Dynamic FPS cochés', "Les trois add-ons cochés : <em>ootrshaders</em> (LayeredFS), et les deux intégrés à Erable, <em>Max Resolution</em> et <em>Dynamic FPS by Dark</em>.")}
+<div class="note"><strong>Max Resolution</strong> et <strong>Dynamic FPS</strong> sont déjà inclus dans Erable : laissez-les cochés.</div>
+<div class="warn">Ne prenez ce zip qu'auprès d'une personne de confiance, et analysez-le avec Microsoft Defender avant de l'importer. Un mod de shaders ne contient jamais de <code>.exe</code>.</div>"""),
+        sec("memory", 3, "Augmenter la mémoire émulée", f"""<ol class="steps">
+<li>Onglet {m('System')}, partie <strong>Core</strong>.</li>
+<li><strong>Memory Layout</strong> : <code>6GB DRAM</code> ou <code>8GB DRAM</code>.</li>
+<li>{m('Apply')}.</li>
+</ol>
+{fig('ocarina-memory', 'Onglet System, Memory Layout réglé sur 8GB DRAM', 'Onglet <em>System</em> : <em>Memory Layout</em> sur <em>8GB DRAM</em>.')}
+<div class="warn">Choisissez <strong>8GB</strong> seulement si votre PC a au moins <strong>16 Go</strong> de mémoire vive, et <strong>6GB</strong> s'il en a 12 Go. Sinon, laissez <em>4GB DRAM (Default)</em> : le PC ralentirait au lieu d'accélérer. Pour connaître votre mémoire : {m('Ctrl + Maj + Échap → Performance → Mémoire')}.</div>"""),
+        sec("gpu", 4, "Choisir Vulkan et votre carte graphique", """<ol class="steps">
+<li>Onglet <span class="menu">Graphics</span>.</li>
+<li><strong>API</strong> : <code>Vulkan</code>.</li>
+<li><strong>Device</strong> : votre carte graphique (NVIDIA GeForce ou AMD Radeon), pas la puce graphique intégrée au processeur.</li>
+<li><strong>Resolution</strong> : <code>1X (720p/1080p)</code>.</li>
+</ol>"""),
+        sec("dlss", 5, "Activer le DLSS", f"""<p>Ocarina of Time agrandit son image avec son propre réseau « DLSS ». Selon votre carte :</p>
+<ol class="steps">
+<li><strong>Carte NVIDIA (GeForce RTX)</strong> : cochez {m("Use NVIDIA DLSS in place of a game's DLSS")}. La ligne <em>Ready</em> doit apparaître en vert ; sinon, ouvrez l'application NVIDIA pour qu'elle télécharge les fichiers DLSS, puis rouvrez cette fenêtre.</li>
+<li><strong>Autre carte (AMD, Intel)</strong> : cochez {m("Use the game's own DLSS")}.</li>
+<li>{m('Apply')}, puis {m('OK')}.</li>
+</ol>
+{fig('ocarina-graphics', 'Onglet Graphics avec Vulkan, une carte RTX et le DLSS NVIDIA prêt', 'Onglet <em>Graphics</em> sur une carte NVIDIA : Vulkan, résolution 1X et DLSS NVIDIA « Ready ».')}
+<div class="note">Le DLSS NVIDIA remplace celui du jeu <strong>uniquement en résolution 1X</strong> : gardez <em>Resolution</em> sur <em>1X</em>, le DLSS se charge d'agrandir l'image.</div>"""),
+        sec("precompile", 6, "Précompiler les shaders", f"""<p>Au premier lancement du jeu, Erable propose de préparer les shaders avant de jouer, ce qui évite la plupart des saccades de la première partie.</p>
+<ol class="steps">
+<li>Lancez le jeu, puis choisissez {m('Précompiler maintenant')}.</li>
+<li>Patientez quelques minutes : le jeu démarre tout seul à la fin.</li>
+</ol>
+<div class="note">Cette étape n'a lieu qu'une fois. Elle recommence seulement après une mise à jour du pilote de la carte graphique.</div>"""),
+        sec("cache", 7, "Reprendre le cache d'un autre PC", f"""<p>Si vous avez déjà joué sur un autre PC, son cache de shaders évite presque toutes les saccades sur celui-ci.</p>
+<ol class="steps">
+<li>Sur le PC qui a déjà joué : clic droit sur le jeu → {m('Ouvrir le cache de pipelines transférable')}.</li>
+<li>Fermez Erable, puis copiez le dossier <code>0400486024dec000</code> sur une clé USB.</li>
+<li>Sur l'autre PC : ouvrez le même emplacement de la même façon, fermez Erable, puis collez-y le dossier en remplaçant celui qui existe.</li>
+</ol>
+<div class="warn">Gardez ce dossier pour vous : il contient des éléments du jeu et ne doit pas être publié sur Internet.</div>"""),
+        sec("next", "✓", "Et ensuite ?", """<p>Lancez le jeu. Les premières minutes, et à chaque nouvelle zone, quelques saccades restent normales le temps que l'émulateur prépare les shaders ; elles disparaissent ensuite. Ne videz pas le cache de shaders entre deux parties.</p>
+<p>Un souci ? <a href="../report.html">Signalez-le ici</a>.</p>"""),
+    ]),
+    "en": "\n".join([
+        sec("ready", 1, "Check the game is ready", f"""<ol class="steps">
+<li>Ocarina of Time shows up in Erable's game list (see <a href="install.html#games">Add your games</a>).</li>
+<li>Right-click the game → {m('Configure Game')}.</li>
+</ol>
+<div class="note">All the settings below are made in this window and only apply to Ocarina of Time: your other games keep their settings. The game must be closed.</div>"""),
+        sec("shaders", 2, "Install the shader mod", f"""<p>The <code>ootrshaders</code> mod cuts stutter: fewer shaders to prepare while you play.</p>
+<ol class="steps">
+<li>{m('Add-Ons')} tab → {m('Import Mod from ZIP')}.</li>
+<li>Pick <code>ootrshaders.zip</code>, then the {m('RomFS')} type.</li>
+<li>Check that <strong>ootrshaders</strong> is ticked, then {m('Apply')}.</li>
+</ol>
+{fig('ocarina-addons', 'Add-Ons tab with ootrshaders, Max Resolution and Dynamic FPS ticked', 'The three add-ons ticked: <em>ootrshaders</em> (LayeredFS), and the two built into Erable, <em>Max Resolution</em> and <em>Dynamic FPS by Dark</em>.')}
+<div class="note"><strong>Max Resolution</strong> and <strong>Dynamic FPS</strong> already come with Erable: leave them ticked.</div>
+<div class="warn">Only take this zip from someone you trust, and scan it with Microsoft Defender before importing it. A shader mod never contains an <code>.exe</code>.</div>"""),
+        sec("memory", 3, "Raise the emulated memory", f"""<ol class="steps">
+<li>{m('System')} tab, <strong>Core</strong> section.</li>
+<li><strong>Memory Layout</strong>: <code>6GB DRAM</code> or <code>8GB DRAM</code>.</li>
+<li>{m('Apply')}.</li>
+</ol>
+{fig('ocarina-memory', 'System tab with Memory Layout set to 8GB DRAM', 'The <em>System</em> tab: <em>Memory Layout</em> on <em>8GB DRAM</em>.')}
+<div class="warn">Choose <strong>8GB</strong> only if your PC has at least <strong>16 GB</strong> of RAM, and <strong>6GB</strong> if it has 12 GB. Otherwise leave <em>4GB DRAM (Default)</em>: the PC would slow down instead of speeding up. To see your memory: {m('Ctrl + Shift + Esc → Performance → Memory')}.</div>"""),
+        sec("gpu", 4, "Choose Vulkan and your graphics card", """<ol class="steps">
+<li><span class="menu">Graphics</span> tab.</li>
+<li><strong>API</strong>: <code>Vulkan</code>.</li>
+<li><strong>Device</strong>: your graphics card (NVIDIA GeForce or AMD Radeon), not the graphics built into the processor.</li>
+<li><strong>Resolution</strong>: <code>1X (720p/1080p)</code>.</li>
+</ol>"""),
+        sec("dlss", 5, "Turn on DLSS", f"""<p>Ocarina of Time upscales its image with its own "DLSS" network. Depending on your card:</p>
+<ol class="steps">
+<li><strong>NVIDIA card (GeForce RTX)</strong>: tick {m("Use NVIDIA DLSS in place of a game's DLSS")}. The <em>Ready</em> line should appear in green; if not, open the NVIDIA app so it downloads the DLSS files, then reopen this window.</li>
+<li><strong>Other card (AMD, Intel)</strong>: tick {m("Use the game's own DLSS")}.</li>
+<li>{m('Apply')}, then {m('OK')}.</li>
+</ol>
+{fig('ocarina-graphics', 'Graphics tab with Vulkan, an RTX card and NVIDIA DLSS ready', 'The <em>Graphics</em> tab on an NVIDIA card: Vulkan, 1X resolution and NVIDIA DLSS "Ready".')}
+<div class="note">NVIDIA DLSS replaces the game's <strong>only at 1X resolution</strong>: keep <em>Resolution</em> on <em>1X</em> and let DLSS upscale the image.</div>"""),
+        sec("precompile", 6, "Precompile the shaders", f"""<p>The first time you start the game, Erable offers to prepare the shaders before you play, which avoids most of the first session's stutter.</p>
+<ol class="steps">
+<li>Start the game, then choose {m('Précompiler maintenant')} (precompile now).</li>
+<li>Wait a few minutes: the game starts by itself at the end.</li>
+</ol>
+<div class="note">This only happens once. It runs again only after a graphics driver update.</div>"""),
+        sec("cache", 7, "Reuse another PC's cache", f"""<p>If you have already played on another PC, its shader cache avoids almost all stutter on this one.</p>
+<ol class="steps">
+<li>On the PC that has played: right-click the game → {m('Ouvrir le cache de pipelines transférable')} (open transferable pipeline cache).</li>
+<li>Close Erable, then copy the <code>0400486024dec000</code> folder to a USB stick.</li>
+<li>On the other PC: open the same place the same way, close Erable, then paste the folder there, replacing the existing one.</li>
+</ol>
+<div class="warn">Keep this folder to yourself: it contains parts of the game and must not be published online.</div>"""),
+        sec("next", "✓", "What next?", """<p>Start the game. In the first minutes, and in each new area, a few stutters are normal while the emulator prepares shaders; they go away afterwards. Don't clear the shader cache between sessions.</p>
+<p>A problem? <a href="../report.html">Report it here</a>.</p>"""),
+    ]),
+    "de": "\n".join([
+        sec("ready", 1, "Prüfen, ob das Spiel bereit ist", f"""<ol class="steps">
+<li>Ocarina of Time erscheint in der Spieleliste von Erable (siehe <a href="install.html#games">Spiele hinzufügen</a>).</li>
+<li>Rechtsklick auf das Spiel → {m('Configure Game')}.</li>
+</ol>
+<div class="note">Alle folgenden Einstellungen nimmst du in diesem Fenster vor, und sie gelten nur für Ocarina of Time: Deine anderen Spiele behalten ihre Einstellungen. Das Spiel muss geschlossen sein.</div>"""),
+        sec("shaders", 2, "Den Shader-Mod installieren", f"""<p>Der Mod <code>ootrshaders</code> verringert Ruckler: weniger Shader, die während des Spielens vorbereitet werden müssen.</p>
+<ol class="steps">
+<li>Reiter {m('Add-Ons')} → {m('Import Mod from ZIP')}.</li>
+<li>Wähle <code>ootrshaders.zip</code> und dann den Typ {m('RomFS')}.</li>
+<li>Prüfe, dass <strong>ootrshaders</strong> angehakt ist, dann {m('Apply')}.</li>
+</ol>
+{fig('ocarina-addons', 'Reiter Add-Ons mit ootrshaders, Max Resolution und Dynamic FPS angehakt', 'Die drei angehakten Add-ons: <em>ootrshaders</em> (LayeredFS) sowie die beiden in Erable enthaltenen, <em>Max Resolution</em> und <em>Dynamic FPS by Dark</em>.')}
+<div class="note"><strong>Max Resolution</strong> und <strong>Dynamic FPS</strong> sind bereits in Erable enthalten: Lass sie angehakt.</div>
+<div class="warn">Nimm diese ZIP-Datei nur von einer Person, der du vertraust, und prüfe sie vor dem Import mit Microsoft Defender. Ein Shader-Mod enthält nie eine <code>.exe</code>.</div>"""),
+        sec("memory", 3, "Emulierten Speicher erhöhen", f"""<ol class="steps">
+<li>Reiter {m('System')}, Bereich <strong>Core</strong>.</li>
+<li><strong>Memory Layout</strong>: <code>6GB DRAM</code> oder <code>8GB DRAM</code>.</li>
+<li>{m('Apply')}.</li>
+</ol>
+{fig('ocarina-memory', 'Reiter System, Memory Layout auf 8GB DRAM', 'Reiter <em>System</em>: <em>Memory Layout</em> auf <em>8GB DRAM</em>.')}
+<div class="warn">Wähle <strong>8GB</strong> nur, wenn dein PC mindestens <strong>16 GB</strong> Arbeitsspeicher hat, und <strong>6GB</strong> bei 12 GB. Sonst lass <em>4GB DRAM (Default)</em>: Der PC würde langsamer statt schneller. Deinen Speicher siehst du unter {m('Strg + Umschalt + Esc → Leistung → Arbeitsspeicher')}.</div>"""),
+        sec("gpu", 4, "Vulkan und deine Grafikkarte wählen", """<ol class="steps">
+<li>Reiter <span class="menu">Graphics</span>.</li>
+<li><strong>API</strong>: <code>Vulkan</code>.</li>
+<li><strong>Device</strong>: deine Grafikkarte (NVIDIA GeForce oder AMD Radeon), nicht die im Prozessor eingebaute Grafik.</li>
+<li><strong>Resolution</strong>: <code>1X (720p/1080p)</code>.</li>
+</ol>"""),
+        sec("dlss", 5, "DLSS einschalten", f"""<p>Ocarina of Time skaliert sein Bild mit einem eigenen „DLSS“-Netz hoch. Je nach Karte:</p>
+<ol class="steps">
+<li><strong>NVIDIA-Karte (GeForce RTX)</strong>: Hake {m("Use NVIDIA DLSS in place of a game's DLSS")} an. Die Zeile <em>Ready</em> sollte grün erscheinen; falls nicht, öffne die NVIDIA-App, damit sie die DLSS-Dateien lädt, und öffne dieses Fenster erneut.</li>
+<li><strong>Andere Karte (AMD, Intel)</strong>: Hake {m("Use the game's own DLSS")} an.</li>
+<li>{m('Apply')}, dann {m('OK')}.</li>
+</ol>
+{fig('ocarina-graphics', 'Reiter Graphics mit Vulkan, einer RTX-Karte und NVIDIA DLSS bereit', 'Reiter <em>Graphics</em> mit einer NVIDIA-Karte: Vulkan, Auflösung 1X und NVIDIA DLSS „Ready“.')}
+<div class="note">NVIDIA DLSS ersetzt das des Spiels <strong>nur bei Auflösung 1X</strong>: Lass <em>Resolution</em> auf <em>1X</em>, DLSS übernimmt das Hochskalieren.</div>"""),
+        sec("precompile", 6, "Shader vorkompilieren", f"""<p>Beim ersten Start des Spiels bietet Erable an, die Shader vor dem Spielen vorzubereiten. Das vermeidet die meisten Ruckler der ersten Runde.</p>
+<ol class="steps">
+<li>Starte das Spiel und wähle {m('Précompiler maintenant')} (jetzt vorkompilieren).</li>
+<li>Warte ein paar Minuten: Am Ende startet das Spiel von selbst.</li>
+</ol>
+<div class="note">Das passiert nur einmal – erneut nur nach einem Update des Grafiktreibers.</div>"""),
+        sec("cache", 7, "Den Cache eines anderen PCs übernehmen", f"""<p>Hast du schon auf einem anderen PC gespielt, vermeidet dessen Shader-Cache auf diesem fast alle Ruckler.</p>
+<ol class="steps">
+<li>Auf dem PC, auf dem schon gespielt wurde: Rechtsklick auf das Spiel → {m('Ouvrir le cache de pipelines transférable')} (übertragbaren Pipeline-Cache öffnen).</li>
+<li>Schließe Erable und kopiere den Ordner <code>0400486024dec000</code> auf einen USB-Stick.</li>
+<li>Auf dem anderen PC: Öffne denselben Ort auf dieselbe Weise, schließe Erable und füge den Ordner dort ein, wobei du den vorhandenen ersetzt.</li>
+</ol>
+<div class="warn">Behalte diesen Ordner für dich: Er enthält Teile des Spiels und darf nicht im Internet veröffentlicht werden.</div>"""),
+        sec("next", "✓", "Und dann?", """<p>Starte das Spiel. In den ersten Minuten und in jedem neuen Gebiet sind ein paar Ruckler normal, während der Emulator Shader vorbereitet; danach verschwinden sie. Leere den Shader-Cache nicht zwischen zwei Runden.</p>
+<p>Ein Problem? <a href="../report.html">Hier melden</a>.</p>"""),
+    ]),
+}
+ocarina_toc = {
+    "ids": ["ready", "shaders", "memory", "gpu", "dlss", "precompile", "cache"],
+    "fr": ["Jeu prêt", "Mod de shaders", "Mémoire émulée", "Vulkan et carte", "DLSS", "Précompiler", "Cache d'un autre PC"],
+    "en": ["Game ready", "Shader mod", "Emulated memory", "Vulkan and card", "DLSS", "Precompile", "Another PC's cache"],
+    "de": ["Spiel bereit", "Shader-Mod", "Emulierter Speicher", "Vulkan und Karte", "DLSS", "Vorkompilieren", "Cache eines anderen PCs"],
+}
+tutorial("guides/zelda-ocarina.html", "tuto.ocarinaTitle", "tutos.gamesTitle", "Zelda: Ocarina of Time", ocarina_toc, ocarina,
+         {"fr": "Zelda : Ocarina of Time", "en": "Zelda: Ocarina of Time", "de": "Zelda: Ocarina of Time"},
+         {"fr": "Moins de saccades et une image plus nette : les bons réglages, étape par étape.",
+          "en": "Less stutter and a sharper image: the right settings, step by step.",
+          "de": "Weniger Ruckler und ein schärferes Bild: die richtigen Einstellungen, Schritt für Schritt."})
+print("ok")
+
+
+# ---------------------------------------------------------------- saves
+SAVE_PATH = r"%APPDATA%\erable\nand\user\save"
+saves = {
+    "fr": "\n".join([
+        sec("where", 1, "Où sont vos sauvegardes", f"""<ol class="steps">
+<li>Dans la bibliothèque, faites un clic droit sur le jeu → {m("Ouvrir l'emplacement des données de sauvegarde")}.</li>
+<li>Le dossier qui s'ouvre contient toute la sauvegarde de ce jeu pour le profil choisi.</li>
+</ol>
+<p>Toutes les sauvegardes sont rangées dans <code>{SAVE_PATH}</code>, un dossier par profil, puis un dossier par jeu.</p>
+<div class="note">Chaque profil a ses propres sauvegardes. Changer de profil n'en efface aucune.</div>"""),
+        sec("backup", 2, "Faire une copie de sécurité", f"""<ol class="steps">
+<li>Fermez le jeu.</li>
+<li>En haut à gauche : {m('Outils → Gestionnaire de données')}, partie {m('Sauvegardes')}.</li>
+<li>Cliquez sur le bouton d'export (infobulle « Exporter toutes les données de ce répertoire ») et choisissez où enregistrer le fichier <code>.zip</code>.</li>
+</ol>
+<div class="note">Gardez ce zip sur une clé USB ou un autre disque : il contient les sauvegardes de tous vos jeux et de tous vos profils.</div>"""),
+        sec("restore", 3, "Les remettre, sur ce PC ou un autre", f"""<ol class="steps">
+<li>Installez Erable et lancez une fois le jeu, puis fermez-le.</li>
+<li>{m('Outils → Gestionnaire de données')}, partie {m('Sauvegardes')} : bouton d'import (infobulle « Importer les données dans ce répertoire »), puis choisissez votre zip.</li>
+</ol>
+<div class="warn">L'import remplace <strong>toutes</strong> les sauvegardes déjà présentes. Pour ne remettre qu'un seul jeu, copiez plutôt son dossier (étape 1) à la même place sur l'autre PC.</div>"""),
+        sec("other", 4, "Reprendre celles d'un autre émulateur", f"""<ol class="steps">
+<li>Fermez l'autre émulateur (Eden, Lichii…).</li>
+<li>Au premier lancement, Erable propose d'importer son profil : choisissez-le et gardez {m('Copier')}, qui laisse l'original intact.</li>
+<li>Sinon, copiez à la main le dossier du jeu depuis le dossier <code>nand\\user\\save</code> de l'autre émulateur vers celui d'Erable (étape 1).</li>
+</ol>"""),
+    ]),
+    "en": "\n".join([
+        sec("where", 1, "Where your saves are", f"""<ol class="steps">
+<li>In the library, right-click the game → {m('Open Save Data Location')}.</li>
+<li>The folder that opens holds this game's whole save for the chosen profile.</li>
+</ol>
+<p>All saves live in <code>{SAVE_PATH}</code>: one folder per profile, then one per game.</p>
+<div class="note">Each profile has its own saves. Switching profiles deletes none.</div>"""),
+        sec("backup", 2, "Make a backup", f"""<ol class="steps">
+<li>Close the game.</li>
+<li>Top left: {m('Tools → Saves')}.</li>
+<li>{m('Make a backup')} → {m('Back up...')}, then choose where to save the <code>.zip</code>.</li>
+</ol>
+<div class="note">That zip holds the saves of all your games and all your profiles. Keep it on a USB stick or another drive.</div>"""),
+        sec("restore", 3, "Put them back, on this PC or another", f"""<ol class="steps">
+<li>Install Erable on the other PC if needed.</li>
+<li>{m('Tools → Saves')} → {m('Put a backup back')} → {m('Restore...')}, then choose your zip.</li>
+</ol>
+<div class="note">Erable first makes an automatic copy of your current saves and tells you where it is ({m('Automatic backups')} button). Zips made with the Data Manager work too: they go into the profile you choose.</div>"""),
+        sec("other", 4, "Take them from another emulator", f"""<ol class="steps">
+<li>Close both emulators' games.</li>
+<li>{m('Tools → Saves')} → {m('Take them from another emulator')} → {m('Choose its folder...')}.</li>
+<li>Choose the other emulator's folder (the one holding <code>nand</code>, for example <code>%APPDATA%\\eden</code>), then the Erable profile that gets them.</li>
+</ol>
+<div class="note">The other emulator's saves are left untouched, and an automatic copy of yours is made first.</div>"""),
+    ]),
+    "de": "\n".join([
+        sec("install", 1, "Erable installieren", f"""<ol class="steps">
+<li>Lade <code>erable-windows-x86_64.zip</code> aus der neuesten Version herunter:<br>{DOWNLOAD.format('Erable herunterladen')}</li>
+<li>Rechtsklick auf die ZIP-Datei → {m('Alle extrahieren…')}</li>
+<li>Starte im entpackten Ordner <code>erable.exe</code>.</li>
+</ol>
+<div class="note">Updates kommen von selbst: Beim Start bietet Erable an, eine neue Version zu installieren, sobald es eine gibt.</div>
+<div class="warn">Meldet Windows fehlende Bibliotheken, starte zuerst <code>vc_redist.x64.exe</code> aus demselben Ordner.</div>"""),
+        sec("console", 2, "Firmware und Schlüssel deiner Switch hinzufügen", f"""<p>Der Emulator braucht das System (Firmware) und die Schlüssel (<code>prod.keys</code>) <strong>aus deiner eigenen Konsole</strong>. Diese Dateien gehören Nintendo: Sie sind nicht in Erable enthalten, und du darfst sie weder herunterladen noch weitergeben.</p>
+<ol class="steps">
+<li>Lies Firmware und <code>prod.keys</code> aus deiner Switch aus.</li>
+<li>In Erable oben links: {m('Tools → Install Firmware → From ZIP')}, dann die ZIP-Datei der Firmware wählen.</li>
+<li>Ebenfalls oben links: {m('Tools → Install Decryption Keys')}, dann deine Datei <code>prod.keys</code> wählen.</li>
+</ol>
+{fig('tools-menu', 'Tools-Menü von Erable mit Install Decryption Keys und Install Firmware', 'Das Menü <em>Tools</em>: <em>Install Decryption Keys</em> und <em>Install Firmware</em>.')}
+<div class="warn">Lade nie Schlüssel oder Firmware aus dem Internet herunter: Diese Dateien kursieren vor allem auf Seiten, die auch Viren verbreiten.</div>"""),
+        sec("language", 3, "Spiele auf Deutsch", f"""<ol class="steps">
+<li>Oben links: {m('Emulation → Configure')}, dann {m('System')}.</li>
+<li><strong>Language</strong>: <code>German (Deutsch)</code>.</li>
+<li><strong>Region</strong>: <code>Europe</code>.</li>
+<li>Mit {m('OK')} bestätigen.</li>
+</ol>
+{fig('system-language', 'Reiter System der Einstellungen mit der Spielsprache', 'Reiter <em>System</em>: die Sprache der Spiele.')}"""),
+        sec("controller", 4, "Mit einem Controller spielen", f"""<ol class="steps">
+<li>Schließe deinen Controller an und öffne {m('Emulation → Configure → Controls')}.</li>
+<li><strong>Input Device</strong>: Wähle deinen Controller (meist der letzte in der Liste).</li>
+<li>Klicke auf jedes Feld (A, B, X, Y, Sticks, Trigger …) und drücke dann die passende Taste am Controller.</li>
+<li>Mit {m('OK')} bestätigen.</li>
+</ol>
+{fig('controls', 'Reiter Controls mit verbundenem Controller und belegten Tasten', 'Reiter <em>Controls</em>: Das blaue Feld <em>[waiting]</em> wartet auf einen Tastendruck.')}
+<div class="note">Taucht der Controller nicht auf: Schließe Steam (es fängt Controller ab), probiere ein anderes USB-Kabel und starte Erable neu.</div>"""),
+        sec("games", 5, "Spiele hinzufügen und spielen", f"""<ol class="steps">
+<li>Lege deine Spiele (aus deinen Modulen oder Käufen ausgelesen) in einen Ordner <code>Switch-2-Spiele</code>, einen Unterordner pro Spiel.</li>
+<li>Klicke in der Spieleliste auf {m('+ Add New Game Directory')}.</li>
+<li>Wähle den Ordner des Spiels und dann {m('Ordner auswählen')}.</li>
+<li>Doppelklicke auf das Spiel, um es zu starten.</li>
+</ol>
+{fig('game-folder', 'Fenster zur Auswahl des Spielordners', 'Den Ordner eines Spiels auswählen.')}
+{fig('game-list', 'Spieleliste mit Zelda Ocarina of Time und Pokémon Pokopia', 'Die Spiele erscheinen in der Liste, mit Spielzeit und Add-ons.')}
+<div class="note">Beim ersten Mal kann ein Spiel ein paar Minuten ruckeln, während der Emulator seine Shader vorbereitet; danach läuft alles flüssiger. Ein Problem? <a href="../report.html">Hier melden</a>.</div>"""),
+    ]),
+}
+
+install_toc = {
+    "ids": ["install", "console", "language", "controller", "games"],
+    "fr": ["Installer Erable", "Firmware et clés", "Jeux en français", "Manette", "Ajouter vos jeux"],
+    "en": ["Install Erable", "Firmware and keys", "Game language", "Controller", "Add your games"],
+    "de": ["Erable installieren", "Firmware und Schlüssel", "Spielsprache", "Controller", "Spiele hinzufügen"],
+}
+tutorial("guides/install.html", "tuto.installTitle", "tutos.emuTitle", None, install_toc, install,
+         {"fr": "Installer Erable", "en": "Install Erable", "de": "Erable installieren"},
+         {"fr": "De zéro à votre premier jeu, pas à pas.",
+          "en": "From nothing to your first game, step by step.",
+          "de": "Von null bis zum ersten Spiel, Schritt für Schritt."})
+
+ocarina = {
+    "fr": "\n".join([
+        sec("ready", 1, "Vérifier que le jeu est prêt", f"""<ol class="steps">
+<li>Ocarina of Time apparaît dans la liste des jeux d'Erable (voir <a href="install.html#games">Ajouter vos jeux</a>).</li>
+<li>Faites un clic droit sur le jeu → {m('Configure Game')}.</li>
+</ol>
+<div class="note">Tous les réglages ci-dessous se font dans cette fenêtre, et ne concernent qu'Ocarina of Time : vos autres jeux gardent leurs réglages. Le jeu doit être fermé.</div>"""),
+        sec("shaders", 2, "Installer le mod de shaders", f"""<p>Le mod <code>ootrshaders</code> limite les saccades : moins de shaders à préparer pendant que vous jouez.</p>
+<ol class="steps">
+<li>Onglet {m('Add-Ons')} → {m('Import Mod from ZIP')}.</li>
+<li>Choisissez <code>ootrshaders.zip</code>, puis le type {m('RomFS')}.</li>
+<li>Vérifiez que <strong>ootrshaders</strong> est coché, puis {m('Apply')}.</li>
+</ol>
+{fig('ocarina-addons', 'Onglet Add-Ons avec ootrshaders, Max Resolution et Dynamic FPS cochés', "Les trois add-ons cochés : <em>ootrshaders</em> (LayeredFS), et les deux intégrés à Erable, <em>Max Resolution</em> et <em>Dynamic FPS by Dark</em>.")}
+<div class="note"><strong>Max Resolution</strong> et <strong>Dynamic FPS</strong> sont déjà inclus dans Erable : laissez-les cochés.</div>
+<div class="warn">Ne prenez ce zip qu'auprès d'une personne de confiance, et analysez-le avec Microsoft Defender avant de l'importer. Un mod de shaders ne contient jamais de <code>.exe</code>.</div>"""),
+        sec("memory", 3, "Augmenter la mémoire émulée", f"""<ol class="steps">
+<li>Onglet {m('System')}, partie <strong>Core</strong>.</li>
+<li><strong>Memory Layout</strong> : <code>6GB DRAM</code> ou <code>8GB DRAM</code>.</li>
+<li>{m('Apply')}.</li>
+</ol>
+{fig('ocarina-memory', 'Onglet System, Memory Layout réglé sur 8GB DRAM', 'Onglet <em>System</em> : <em>Memory Layout</em> sur <em>8GB DRAM</em>.')}
+<div class="warn">Choisissez <strong>8GB</strong> seulement si votre PC a au moins <strong>16 Go</strong> de mémoire vive, et <strong>6GB</strong> s'il en a 12 Go. Sinon, laissez <em>4GB DRAM (Default)</em> : le PC ralentirait au lieu d'accélérer. Pour connaître votre mémoire : {m('Ctrl + Maj + Échap → Performance → Mémoire')}.</div>"""),
+        sec("gpu", 4, "Choisir Vulkan et votre carte graphique", """<ol class="steps">
+<li>Onglet <span class="menu">Graphics</span>.</li>
+<li><strong>API</strong> : <code>Vulkan</code>.</li>
+<li><strong>Device</strong> : votre carte graphique (NVIDIA GeForce ou AMD Radeon), pas la puce graphique intégrée au processeur.</li>
+<li><strong>Resolution</strong> : <code>1X (720p/1080p)</code>.</li>
+</ol>"""),
+        sec("dlss", 5, "Activer le DLSS", f"""<p>Ocarina of Time agrandit son image avec son propre réseau « DLSS ». Selon votre carte :</p>
+<ol class="steps">
+<li><strong>Carte NVIDIA (GeForce RTX)</strong> : cochez {m("Use NVIDIA DLSS in place of a game's DLSS")}. La ligne <em>Ready</em> doit apparaître en vert ; sinon, ouvrez l'application NVIDIA pour qu'elle télécharge les fichiers DLSS, puis rouvrez cette fenêtre.</li>
+<li><strong>Autre carte (AMD, Intel)</strong> : cochez {m("Use the game's own DLSS")}.</li>
+<li>{m('Apply')}, puis {m('OK')}.</li>
+</ol>
+{fig('ocarina-graphics', 'Onglet Graphics avec Vulkan, une carte RTX et le DLSS NVIDIA prêt', 'Onglet <em>Graphics</em> sur une carte NVIDIA : Vulkan, résolution 1X et DLSS NVIDIA « Ready ».')}
+<div class="note">Le DLSS NVIDIA remplace celui du jeu <strong>uniquement en résolution 1X</strong> : gardez <em>Resolution</em> sur <em>1X</em>, le DLSS se charge d'agrandir l'image.</div>"""),
+        sec("precompile", 6, "Précompiler les shaders", f"""<p>Au premier lancement du jeu, Erable propose de préparer les shaders avant de jouer, ce qui évite la plupart des saccades de la première partie.</p>
+<ol class="steps">
+<li>Lancez le jeu, puis choisissez {m('Précompiler maintenant')}.</li>
+<li>Patientez quelques minutes : le jeu démarre tout seul à la fin.</li>
+</ol>
+<div class="note">Cette étape n'a lieu qu'une fois. Elle recommence seulement après une mise à jour du pilote de la carte graphique.</div>"""),
+        sec("cache", 7, "Reprendre le cache d'un autre PC", f"""<p>Si vous avez déjà joué sur un autre PC, son cache de shaders évite presque toutes les saccades sur celui-ci.</p>
+<ol class="steps">
+<li>Sur le PC qui a déjà joué : clic droit sur le jeu → {m('Ouvrir le cache de pipelines transférable')}.</li>
+<li>Fermez Erable, puis copiez le dossier <code>0400486024dec000</code> sur une clé USB.</li>
+<li>Sur l'autre PC : ouvrez le même emplacement de la même façon, fermez Erable, puis collez-y le dossier en remplaçant celui qui existe.</li>
+</ol>
+<div class="warn">Gardez ce dossier pour vous : il contient des éléments du jeu et ne doit pas être publié sur Internet.</div>"""),
+        sec("next", "✓", "Et ensuite ?", """<p>Lancez le jeu. Les premières minutes, et à chaque nouvelle zone, quelques saccades restent normales le temps que l'émulateur prépare les shaders ; elles disparaissent ensuite. Ne videz pas le cache de shaders entre deux parties.</p>
+<p>Un souci ? <a href="../report.html">Signalez-le ici</a>.</p>"""),
+    ]),
+    "en": "\n".join([
+        sec("ready", 1, "Check the game is ready", f"""<ol class="steps">
+<li>Ocarina of Time shows up in Erable's game list (see <a href="install.html#games">Add your games</a>).</li>
+<li>Right-click the game → {m('Configure Game')}.</li>
+</ol>
+<div class="note">All the settings below are made in this window and only apply to Ocarina of Time: your other games keep their settings. The game must be closed.</div>"""),
+        sec("shaders", 2, "Install the shader mod", f"""<p>The <code>ootrshaders</code> mod cuts stutter: fewer shaders to prepare while you play.</p>
+<ol class="steps">
+<li>{m('Add-Ons')} tab → {m('Import Mod from ZIP')}.</li>
+<li>Pick <code>ootrshaders.zip</code>, then the {m('RomFS')} type.</li>
+<li>Check that <strong>ootrshaders</strong> is ticked, then {m('Apply')}.</li>
+</ol>
+{fig('ocarina-addons', 'Add-Ons tab with ootrshaders, Max Resolution and Dynamic FPS ticked', 'The three add-ons ticked: <em>ootrshaders</em> (LayeredFS), and the two built into Erable, <em>Max Resolution</em> and <em>Dynamic FPS by Dark</em>.')}
+<div class="note"><strong>Max Resolution</strong> and <strong>Dynamic FPS</strong> already come with Erable: leave them ticked.</div>
+<div class="warn">Only take this zip from someone you trust, and scan it with Microsoft Defender before importing it. A shader mod never contains an <code>.exe</code>.</div>"""),
+        sec("memory", 3, "Raise the emulated memory", f"""<ol class="steps">
+<li>{m('System')} tab, <strong>Core</strong> section.</li>
+<li><strong>Memory Layout</strong>: <code>6GB DRAM</code> or <code>8GB DRAM</code>.</li>
+<li>{m('Apply')}.</li>
+</ol>
+{fig('ocarina-memory', 'System tab with Memory Layout set to 8GB DRAM', 'The <em>System</em> tab: <em>Memory Layout</em> on <em>8GB DRAM</em>.')}
+<div class="warn">Choose <strong>8GB</strong> only if your PC has at least <strong>16 GB</strong> of RAM, and <strong>6GB</strong> if it has 12 GB. Otherwise leave <em>4GB DRAM (Default)</em>: the PC would slow down instead of speeding up. To see your memory: {m('Ctrl + Shift + Esc → Performance → Memory')}.</div>"""),
+        sec("gpu", 4, "Choose Vulkan and your graphics card", """<ol class="steps">
+<li><span class="menu">Graphics</span> tab.</li>
+<li><strong>API</strong>: <code>Vulkan</code>.</li>
+<li><strong>Device</strong>: your graphics card (NVIDIA GeForce or AMD Radeon), not the graphics built into the processor.</li>
+<li><strong>Resolution</strong>: <code>1X (720p/1080p)</code>.</li>
+</ol>"""),
+        sec("dlss", 5, "Turn on DLSS", f"""<p>Ocarina of Time upscales its image with its own "DLSS" network. Depending on your card:</p>
+<ol class="steps">
+<li><strong>NVIDIA card (GeForce RTX)</strong>: tick {m("Use NVIDIA DLSS in place of a game's DLSS")}. The <em>Ready</em> line should appear in green; if not, open the NVIDIA app so it downloads the DLSS files, then reopen this window.</li>
+<li><strong>Other card (AMD, Intel)</strong>: tick {m("Use the game's own DLSS")}.</li>
+<li>{m('Apply')}, then {m('OK')}.</li>
+</ol>
+{fig('ocarina-graphics', 'Graphics tab with Vulkan, an RTX card and NVIDIA DLSS ready', 'The <em>Graphics</em> tab on an NVIDIA card: Vulkan, 1X resolution and NVIDIA DLSS "Ready".')}
+<div class="note">NVIDIA DLSS replaces the game's <strong>only at 1X resolution</strong>: keep <em>Resolution</em> on <em>1X</em> and let DLSS upscale the image.</div>"""),
+        sec("precompile", 6, "Precompile the shaders", f"""<p>The first time you start the game, Erable offers to prepare the shaders before you play, which avoids most of the first session's stutter.</p>
+<ol class="steps">
+<li>Start the game, then choose {m('Précompiler maintenant')} (precompile now).</li>
+<li>Wait a few minutes: the game starts by itself at the end.</li>
+</ol>
+<div class="note">This only happens once. It runs again only after a graphics driver update.</div>"""),
+        sec("cache", 7, "Reuse another PC's cache", f"""<p>If you have already played on another PC, its shader cache avoids almost all stutter on this one.</p>
+<ol class="steps">
+<li>On the PC that has played: right-click the game → {m('Ouvrir le cache de pipelines transférable')} (open transferable pipeline cache).</li>
+<li>Close Erable, then copy the <code>0400486024dec000</code> folder to a USB stick.</li>
+<li>On the other PC: open the same place the same way, close Erable, then paste the folder there, replacing the existing one.</li>
+</ol>
+<div class="warn">Keep this folder to yourself: it contains parts of the game and must not be published online.</div>"""),
+        sec("next", "✓", "What next?", """<p>Start the game. In the first minutes, and in each new area, a few stutters are normal while the emulator prepares shaders; they go away afterwards. Don't clear the shader cache between sessions.</p>
+<p>A problem? <a href="../report.html">Report it here</a>.</p>"""),
+    ]),
+    "de": "\n".join([
+        sec("ready", 1, "Prüfen, ob das Spiel bereit ist", f"""<ol class="steps">
+<li>Ocarina of Time erscheint in der Spieleliste von Erable (siehe <a href="install.html#games">Spiele hinzufügen</a>).</li>
+<li>Rechtsklick auf das Spiel → {m('Configure Game')}.</li>
+</ol>
+<div class="note">Alle folgenden Einstellungen nimmst du in diesem Fenster vor, und sie gelten nur für Ocarina of Time: Deine anderen Spiele behalten ihre Einstellungen. Das Spiel muss geschlossen sein.</div>"""),
+        sec("shaders", 2, "Den Shader-Mod installieren", f"""<p>Der Mod <code>ootrshaders</code> verringert Ruckler: weniger Shader, die während des Spielens vorbereitet werden müssen.</p>
+<ol class="steps">
+<li>Reiter {m('Add-Ons')} → {m('Import Mod from ZIP')}.</li>
+<li>Wähle <code>ootrshaders.zip</code> und dann den Typ {m('RomFS')}.</li>
+<li>Prüfe, dass <strong>ootrshaders</strong> angehakt ist, dann {m('Apply')}.</li>
+</ol>
+{fig('ocarina-addons', 'Reiter Add-Ons mit ootrshaders, Max Resolution und Dynamic FPS angehakt', 'Die drei angehakten Add-ons: <em>ootrshaders</em> (LayeredFS) sowie die beiden in Erable enthaltenen, <em>Max Resolution</em> und <em>Dynamic FPS by Dark</em>.')}
+<div class="note"><strong>Max Resolution</strong> und <strong>Dynamic FPS</strong> sind bereits in Erable enthalten: Lass sie angehakt.</div>
+<div class="warn">Nimm diese ZIP-Datei nur von einer Person, der du vertraust, und prüfe sie vor dem Import mit Microsoft Defender. Ein Shader-Mod enthält nie eine <code>.exe</code>.</div>"""),
+        sec("memory", 3, "Emulierten Speicher erhöhen", f"""<ol class="steps">
+<li>Reiter {m('System')}, Bereich <strong>Core</strong>.</li>
+<li><strong>Memory Layout</strong>: <code>6GB DRAM</code> oder <code>8GB DRAM</code>.</li>
+<li>{m('Apply')}.</li>
+</ol>
+{fig('ocarina-memory', 'Reiter System, Memory Layout auf 8GB DRAM', 'Reiter <em>System</em>: <em>Memory Layout</em> auf <em>8GB DRAM</em>.')}
+<div class="warn">Wähle <strong>8GB</strong> nur, wenn dein PC mindestens <strong>16 GB</strong> Arbeitsspeicher hat, und <strong>6GB</strong> bei 12 GB. Sonst lass <em>4GB DRAM (Default)</em>: Der PC würde langsamer statt schneller. Deinen Speicher siehst du unter {m('Strg + Umschalt + Esc → Leistung → Arbeitsspeicher')}.</div>"""),
+        sec("gpu", 4, "Vulkan und deine Grafikkarte wählen", """<ol class="steps">
+<li>Reiter <span class="menu">Graphics</span>.</li>
+<li><strong>API</strong>: <code>Vulkan</code>.</li>
+<li><strong>Device</strong>: deine Grafikkarte (NVIDIA GeForce oder AMD Radeon), nicht die im Prozessor eingebaute Grafik.</li>
+<li><strong>Resolution</strong>: <code>1X (720p/1080p)</code>.</li>
+</ol>"""),
+        sec("dlss", 5, "DLSS einschalten", f"""<p>Ocarina of Time skaliert sein Bild mit einem eigenen „DLSS“-Netz hoch. Je nach Karte:</p>
+<ol class="steps">
+<li><strong>NVIDIA-Karte (GeForce RTX)</strong>: Hake {m("Use NVIDIA DLSS in place of a game's DLSS")} an. Die Zeile <em>Ready</em> sollte grün erscheinen; falls nicht, öffne die NVIDIA-App, damit sie die DLSS-Dateien lädt, und öffne dieses Fenster erneut.</li>
+<li><strong>Andere Karte (AMD, Intel)</strong>: Hake {m("Use the game's own DLSS")} an.</li>
+<li>{m('Apply')}, dann {m('OK')}.</li>
+</ol>
+{fig('ocarina-graphics', 'Reiter Graphics mit Vulkan, einer RTX-Karte und NVIDIA DLSS bereit', 'Reiter <em>Graphics</em> mit einer NVIDIA-Karte: Vulkan, Auflösung 1X und NVIDIA DLSS „Ready“.')}
+<div class="note">NVIDIA DLSS ersetzt das des Spiels <strong>nur bei Auflösung 1X</strong>: Lass <em>Resolution</em> auf <em>1X</em>, DLSS übernimmt das Hochskalieren.</div>"""),
+        sec("precompile", 6, "Shader vorkompilieren", f"""<p>Beim ersten Start des Spiels bietet Erable an, die Shader vor dem Spielen vorzubereiten. Das vermeidet die meisten Ruckler der ersten Runde.</p>
+<ol class="steps">
+<li>Starte das Spiel und wähle {m('Précompiler maintenant')} (jetzt vorkompilieren).</li>
+<li>Warte ein paar Minuten: Am Ende startet das Spiel von selbst.</li>
+</ol>
+<div class="note">Das passiert nur einmal – erneut nur nach einem Update des Grafiktreibers.</div>"""),
+        sec("cache", 7, "Den Cache eines anderen PCs übernehmen", f"""<p>Hast du schon auf einem anderen PC gespielt, vermeidet dessen Shader-Cache auf diesem fast alle Ruckler.</p>
+<ol class="steps">
+<li>Auf dem PC, auf dem schon gespielt wurde: Rechtsklick auf das Spiel → {m('Ouvrir le cache de pipelines transférable')} (übertragbaren Pipeline-Cache öffnen).</li>
+<li>Schließe Erable und kopiere den Ordner <code>0400486024dec000</code> auf einen USB-Stick.</li>
+<li>Auf dem anderen PC: Öffne denselben Ort auf dieselbe Weise, schließe Erable und füge den Ordner dort ein, wobei du den vorhandenen ersetzt.</li>
+</ol>
+<div class="warn">Behalte diesen Ordner für dich: Er enthält Teile des Spiels und darf nicht im Internet veröffentlicht werden.</div>"""),
+        sec("next", "✓", "Und dann?", """<p>Starte das Spiel. In den ersten Minuten und in jedem neuen Gebiet sind ein paar Ruckler normal, während der Emulator Shader vorbereitet; danach verschwinden sie. Leere den Shader-Cache nicht zwischen zwei Runden.</p>
+<p>Ein Problem? <a href="../report.html">Hier melden</a>.</p>"""),
+    ]),
+}
+ocarina_toc = {
+    "ids": ["ready", "shaders", "memory", "gpu", "dlss", "precompile", "cache"],
+    "fr": ["Jeu prêt", "Mod de shaders", "Mémoire émulée", "Vulkan et carte", "DLSS", "Précompiler", "Cache d'un autre PC"],
+    "en": ["Game ready", "Shader mod", "Emulated memory", "Vulkan and card", "DLSS", "Precompile", "Another PC's cache"],
+    "de": ["Spiel bereit", "Shader-Mod", "Emulierter Speicher", "Vulkan und Karte", "DLSS", "Vorkompilieren", "Cache eines anderen PCs"],
+}
+tutorial("guides/zelda-ocarina.html", "tuto.ocarinaTitle", "tutos.gamesTitle", "Zelda: Ocarina of Time", ocarina_toc, ocarina,
+         {"fr": "Zelda : Ocarina of Time", "en": "Zelda: Ocarina of Time", "de": "Zelda: Ocarina of Time"},
+         {"fr": "Moins de saccades et une image plus nette : les bons réglages, étape par étape.",
+          "en": "Less stutter and a sharper image: the right settings, step by step.",
+          "de": "Weniger Ruckler und ein schärferes Bild: die richtigen Einstellungen, Schritt für Schritt."})
+print("ok")
+
+
+# ---------------------------------------------------------------- saves
+SAVE_PATH = r"%APPDATA%\erable\nand\user\save"
+saves = {
+    "fr": "\n".join([
+        sec("where", 1, "Où sont vos sauvegardes", f"""<ol class="steps">
+<li>Dans la bibliothèque, faites un clic droit sur le jeu → {m("Ouvrir l'emplacement des données de sauvegarde")}.</li>
+<li>Le dossier qui s'ouvre contient toute la sauvegarde de ce jeu pour le profil choisi.</li>
+</ol>
+<p>Toutes les sauvegardes sont rangées dans <code>{SAVE_PATH}</code>, un dossier par profil, puis un dossier par jeu.</p>
+<div class="note">Chaque profil a ses propres sauvegardes. Changer de profil n'en efface aucune.</div>"""),
+        sec("backup", 2, "Faire une copie de sécurité", f"""<ol class="steps">
+<li>Fermez le jeu.</li>
+<li>En haut à gauche : {m('Outils → Sauvegardes')}.</li>
+<li>{m('Faire une copie de sécurité')} → {m('Copier...')}, puis choisissez où enregistrer le fichier <code>.zip</code>.</li>
+</ol>
+<div class="note">Ce zip contient les sauvegardes de tous vos jeux et de tous vos profils. Gardez-le sur une clé USB ou un autre disque.</div>"""),
+        sec("restore", 3, "Les remettre, sur ce PC ou un autre", f"""<ol class="steps">
+<li>Installez Erable sur l'autre PC si besoin.</li>
+<li>{m('Outils → Sauvegardes')} → {m('Remettre une copie')} → {m('Remettre...')}, puis choisissez votre zip.</li>
+</ol>
+<div class="note">Erable fait d'abord une copie automatique de vos sauvegardes actuelles et vous dit où elle est (bouton {m('Copies automatiques')}). Les zips faits avec le Gestionnaire de données marchent aussi : ils vont dans le profil que vous choisissez.</div>"""),
+        sec("other", 4, "Reprendre celles d'un autre émulateur", f"""<ol class="steps">
+<li>Fermez les jeux des deux émulateurs.</li>
+<li>{m('Outils → Sauvegardes')} → {m("Reprendre celles d'un autre émulateur")} → {m('Choisir son dossier...')}.</li>
+<li>Choisissez le dossier de l'autre émulateur (celui qui contient <code>nand</code>, par exemple <code>%APPDATA%\\eden</code>), puis le profil Erable qui les reçoit.</li>
+</ol>
+<div class="note">Les sauvegardes de l'autre émulateur ne sont pas touchées, et une copie automatique des vôtres est faite avant.</div>"""),
+    ]),
+    "en": "\n".join([
+        sec("install", 1, "Install Erable", f"""<ol class="steps">
+<li>Download <code>erable-windows-x86_64.zip</code> from the latest version:<br>{DOWNLOAD.format('Download Erable')}</li>
+<li>Right-click the zip → {m('Extract All…')}</li>
+<li>In the folder you get, run <code>erable.exe</code>.</li>
+</ol>
+<div class="note">Updates come on their own: at startup, Erable offers to install the new version when there is one.</div>
+<div class="warn">If Windows says libraries are missing, first run <code>vc_redist.x64.exe</code>, which is in the same folder.</div>"""),
+        sec("console", 2, "Add your Switch's firmware and keys", f"""<p>The emulator needs the system (firmware) and the keys (<code>prod.keys</code>) <strong>dumped from your own console</strong>. These files belong to Nintendo: they don't come with Erable, and you must neither download nor share them.</p>
+<ol class="steps">
+<li>Dump the firmware and <code>prod.keys</code> from your Switch.</li>
+<li>In Erable, top left: {m('Tools → Install Firmware → From ZIP')}, then pick the firmware zip.</li>
+<li>Still top left: {m('Tools → Install Decryption Keys')}, then pick your <code>prod.keys</code> file.</li>
+</ol>
+{fig('tools-menu', "Erable's Tools menu with Install Decryption Keys and Install Firmware", 'The <em>Tools</em> menu: <em>Install Decryption Keys</em> and <em>Install Firmware</em>.')}
+<div class="warn">Never download keys or firmware from the Internet: these files mostly circulate on sites that also spread viruses.</div>"""),
+        sec("language", 3, "Games in your language", f"""<ol class="steps">
+<li>Top left: {m('Emulation → Configure')}, then {m('System')}.</li>
+<li><strong>Language</strong>: your language, e.g. <code>British English</code>.</li>
+<li><strong>Region</strong>: <code>Europe</code> (or <code>USA</code>).</li>
+<li>Confirm with {m('OK')}.</li>
+</ol>
+{fig('system-language', 'System tab of the configuration with the game language', "The <em>System</em> tab: the games' language.")}"""),
+        sec("controller", 4, "Play with a controller", f"""<ol class="steps">
+<li>Plug in your controller, then go to {m('Emulation → Configure → Controls')}.</li>
+<li><strong>Input Device</strong>: pick your controller (usually the last one in the list).</li>
+<li>Click each box (A, B, X, Y, sticks, triggers…), then press the matching button on the controller.</li>
+<li>Confirm with {m('OK')}.</li>
+</ol>
+{fig('controls', 'Controls tab with a connected controller and its buttons mapped', 'The <em>Controls</em> tab: the blue <em>[waiting]</em> box waits for you to press a button.')}
+<div class="note">If the controller doesn't show up: close Steam (it captures controllers), try another USB cable, then restart Erable.</div>"""),
+        sec("games", 5, "Add your games and play", f"""<ol class="steps">
+<li>Keep your games (dumped from your cartridges or purchases) in a <code>Switch 2 Games</code> folder, one subfolder per game.</li>
+<li>In the game list, click {m('+ Add New Game Directory')}.</li>
+<li>Select the game's folder, then {m('Select Folder')}.</li>
+<li>Double-click the game to start it.</li>
+</ol>
+{fig('game-folder', "Window for picking a game's folder", "Picking a game's folder.")}
+{fig('game-list', 'Game list with Zelda Ocarina of Time and Pokémon Pokopia', 'Games show up in the list with their play time and add-ons.')}
+<div class="note">The first time, a game may stutter for a few minutes while the emulator prepares its shaders; then it all gets smoother. A problem? <a href="../report.html">Report it here</a>.</div>"""),
+    ]),
+    "de": "\n".join([
+        sec("install", 1, "Erable installieren", f"""<ol class="steps">
+<li>Lade <code>erable-windows-x86_64.zip</code> aus der neuesten Version herunter:<br>{DOWNLOAD.format('Erable herunterladen')}</li>
+<li>Rechtsklick auf die ZIP-Datei → {m('Alle extrahieren…')}</li>
+<li>Starte im entpackten Ordner <code>erable.exe</code>.</li>
+</ol>
+<div class="note">Updates kommen von selbst: Beim Start bietet Erable an, eine neue Version zu installieren, sobald es eine gibt.</div>
+<div class="warn">Meldet Windows fehlende Bibliotheken, starte zuerst <code>vc_redist.x64.exe</code> aus demselben Ordner.</div>"""),
+        sec("console", 2, "Firmware und Schlüssel deiner Switch hinzufügen", f"""<p>Der Emulator braucht das System (Firmware) und die Schlüssel (<code>prod.keys</code>) <strong>aus deiner eigenen Konsole</strong>. Diese Dateien gehören Nintendo: Sie sind nicht in Erable enthalten, und du darfst sie weder herunterladen noch weitergeben.</p>
+<ol class="steps">
+<li>Lies Firmware und <code>prod.keys</code> aus deiner Switch aus.</li>
+<li>In Erable oben links: {m('Tools → Install Firmware → From ZIP')}, dann die ZIP-Datei der Firmware wählen.</li>
+<li>Ebenfalls oben links: {m('Tools → Install Decryption Keys')}, dann deine Datei <code>prod.keys</code> wählen.</li>
+</ol>
+{fig('tools-menu', 'Tools-Menü von Erable mit Install Decryption Keys und Install Firmware', 'Das Menü <em>Tools</em>: <em>Install Decryption Keys</em> und <em>Install Firmware</em>.')}
+<div class="warn">Lade nie Schlüssel oder Firmware aus dem Internet herunter: Diese Dateien kursieren vor allem auf Seiten, die auch Viren verbreiten.</div>"""),
+        sec("language", 3, "Spiele auf Deutsch", f"""<ol class="steps">
+<li>Oben links: {m('Emulation → Configure')}, dann {m('System')}.</li>
+<li><strong>Language</strong>: <code>German (Deutsch)</code>.</li>
+<li><strong>Region</strong>: <code>Europe</code>.</li>
+<li>Mit {m('OK')} bestätigen.</li>
+</ol>
+{fig('system-language', 'Reiter System der Einstellungen mit der Spielsprache', 'Reiter <em>System</em>: die Sprache der Spiele.')}"""),
+        sec("controller", 4, "Mit einem Controller spielen", f"""<ol class="steps">
+<li>Schließe deinen Controller an und öffne {m('Emulation → Configure → Controls')}.</li>
+<li><strong>Input Device</strong>: Wähle deinen Controller (meist der letzte in der Liste).</li>
+<li>Klicke auf jedes Feld (A, B, X, Y, Sticks, Trigger …) und drücke dann die passende Taste am Controller.</li>
+<li>Mit {m('OK')} bestätigen.</li>
+</ol>
+{fig('controls', 'Reiter Controls mit verbundenem Controller und belegten Tasten', 'Reiter <em>Controls</em>: Das blaue Feld <em>[waiting]</em> wartet auf einen Tastendruck.')}
+<div class="note">Taucht der Controller nicht auf: Schließe Steam (es fängt Controller ab), probiere ein anderes USB-Kabel und starte Erable neu.</div>"""),
+        sec("games", 5, "Spiele hinzufügen und spielen", f"""<ol class="steps">
+<li>Lege deine Spiele (aus deinen Modulen oder Käufen ausgelesen) in einen Ordner <code>Switch-2-Spiele</code>, einen Unterordner pro Spiel.</li>
+<li>Klicke in der Spieleliste auf {m('+ Add New Game Directory')}.</li>
+<li>Wähle den Ordner des Spiels und dann {m('Ordner auswählen')}.</li>
+<li>Doppelklicke auf das Spiel, um es zu starten.</li>
+</ol>
+{fig('game-folder', 'Fenster zur Auswahl des Spielordners', 'Den Ordner eines Spiels auswählen.')}
+{fig('game-list', 'Spieleliste mit Zelda Ocarina of Time und Pokémon Pokopia', 'Die Spiele erscheinen in der Liste, mit Spielzeit und Add-ons.')}
+<div class="note">Beim ersten Mal kann ein Spiel ein paar Minuten ruckeln, während der Emulator seine Shader vorbereitet; danach läuft alles flüssiger. Ein Problem? <a href="../report.html">Hier melden</a>.</div>"""),
+    ]),
+}
+
+install_toc = {
+    "ids": ["install", "console", "language", "controller", "games"],
+    "fr": ["Installer Erable", "Firmware et clés", "Jeux en français", "Manette", "Ajouter vos jeux"],
+    "en": ["Install Erable", "Firmware and keys", "Game language", "Controller", "Add your games"],
+    "de": ["Erable installieren", "Firmware und Schlüssel", "Spielsprache", "Controller", "Spiele hinzufügen"],
+}
+tutorial("guides/install.html", "tuto.installTitle", "tutos.emuTitle", None, install_toc, install,
+         {"fr": "Installer Erable", "en": "Install Erable", "de": "Erable installieren"},
+         {"fr": "De zéro à votre premier jeu, pas à pas.",
+          "en": "From nothing to your first game, step by step.",
+          "de": "Von null bis zum ersten Spiel, Schritt für Schritt."})
+
+ocarina = {
+    "fr": "\n".join([
+        sec("ready", 1, "Vérifier que le jeu est prêt", f"""<ol class="steps">
+<li>Ocarina of Time apparaît dans la liste des jeux d'Erable (voir <a href="install.html#games">Ajouter vos jeux</a>).</li>
+<li>Faites un clic droit sur le jeu → {m('Configure Game')}.</li>
+</ol>
+<div class="note">Tous les réglages ci-dessous se font dans cette fenêtre, et ne concernent qu'Ocarina of Time : vos autres jeux gardent leurs réglages. Le jeu doit être fermé.</div>"""),
+        sec("shaders", 2, "Installer le mod de shaders", f"""<p>Le mod <code>ootrshaders</code> limite les saccades : moins de shaders à préparer pendant que vous jouez.</p>
+<ol class="steps">
+<li>Onglet {m('Add-Ons')} → {m('Import Mod from ZIP')}.</li>
+<li>Choisissez <code>ootrshaders.zip</code>, puis le type {m('RomFS')}.</li>
+<li>Vérifiez que <strong>ootrshaders</strong> est coché, puis {m('Apply')}.</li>
+</ol>
+{fig('ocarina-addons', 'Onglet Add-Ons avec ootrshaders, Max Resolution et Dynamic FPS cochés', "Les trois add-ons cochés : <em>ootrshaders</em> (LayeredFS), et les deux intégrés à Erable, <em>Max Resolution</em> et <em>Dynamic FPS by Dark</em>.")}
+<div class="note"><strong>Max Resolution</strong> et <strong>Dynamic FPS</strong> sont déjà inclus dans Erable : laissez-les cochés.</div>
+<div class="warn">Ne prenez ce zip qu'auprès d'une personne de confiance, et analysez-le avec Microsoft Defender avant de l'importer. Un mod de shaders ne contient jamais de <code>.exe</code>.</div>"""),
+        sec("memory", 3, "Augmenter la mémoire émulée", f"""<ol class="steps">
+<li>Onglet {m('System')}, partie <strong>Core</strong>.</li>
+<li><strong>Memory Layout</strong> : <code>6GB DRAM</code> ou <code>8GB DRAM</code>.</li>
+<li>{m('Apply')}.</li>
+</ol>
+{fig('ocarina-memory', 'Onglet System, Memory Layout réglé sur 8GB DRAM', 'Onglet <em>System</em> : <em>Memory Layout</em> sur <em>8GB DRAM</em>.')}
+<div class="warn">Choisissez <strong>8GB</strong> seulement si votre PC a au moins <strong>16 Go</strong> de mémoire vive, et <strong>6GB</strong> s'il en a 12 Go. Sinon, laissez <em>4GB DRAM (Default)</em> : le PC ralentirait au lieu d'accélérer. Pour connaître votre mémoire : {m('Ctrl + Maj + Échap → Performance → Mémoire')}.</div>"""),
+        sec("gpu", 4, "Choisir Vulkan et votre carte graphique", """<ol class="steps">
+<li>Onglet <span class="menu">Graphics</span>.</li>
+<li><strong>API</strong> : <code>Vulkan</code>.</li>
+<li><strong>Device</strong> : votre carte graphique (NVIDIA GeForce ou AMD Radeon), pas la puce graphique intégrée au processeur.</li>
+<li><strong>Resolution</strong> : <code>1X (720p/1080p)</code>.</li>
+</ol>"""),
+        sec("dlss", 5, "Activer le DLSS", f"""<p>Ocarina of Time agrandit son image avec son propre réseau « DLSS ». Selon votre carte :</p>
+<ol class="steps">
+<li><strong>Carte NVIDIA (GeForce RTX)</strong> : cochez {m("Use NVIDIA DLSS in place of a game's DLSS")}. La ligne <em>Ready</em> doit apparaître en vert ; sinon, ouvrez l'application NVIDIA pour qu'elle télécharge les fichiers DLSS, puis rouvrez cette fenêtre.</li>
+<li><strong>Autre carte (AMD, Intel)</strong> : cochez {m("Use the game's own DLSS")}.</li>
+<li>{m('Apply')}, puis {m('OK')}.</li>
+</ol>
+{fig('ocarina-graphics', 'Onglet Graphics avec Vulkan, une carte RTX et le DLSS NVIDIA prêt', 'Onglet <em>Graphics</em> sur une carte NVIDIA : Vulkan, résolution 1X et DLSS NVIDIA « Ready ».')}
+<div class="note">Le DLSS NVIDIA remplace celui du jeu <strong>uniquement en résolution 1X</strong> : gardez <em>Resolution</em> sur <em>1X</em>, le DLSS se charge d'agrandir l'image.</div>"""),
+        sec("precompile", 6, "Précompiler les shaders", f"""<p>Au premier lancement du jeu, Erable propose de préparer les shaders avant de jouer, ce qui évite la plupart des saccades de la première partie.</p>
+<ol class="steps">
+<li>Lancez le jeu, puis choisissez {m('Précompiler maintenant')}.</li>
+<li>Patientez quelques minutes : le jeu démarre tout seul à la fin.</li>
+</ol>
+<div class="note">Cette étape n'a lieu qu'une fois. Elle recommence seulement après une mise à jour du pilote de la carte graphique.</div>"""),
+        sec("cache", 7, "Reprendre le cache d'un autre PC", f"""<p>Si vous avez déjà joué sur un autre PC, son cache de shaders évite presque toutes les saccades sur celui-ci.</p>
+<ol class="steps">
+<li>Sur le PC qui a déjà joué : clic droit sur le jeu → {m('Ouvrir le cache de pipelines transférable')}.</li>
+<li>Fermez Erable, puis copiez le dossier <code>0400486024dec000</code> sur une clé USB.</li>
+<li>Sur l'autre PC : ouvrez le même emplacement de la même façon, fermez Erable, puis collez-y le dossier en remplaçant celui qui existe.</li>
+</ol>
+<div class="warn">Gardez ce dossier pour vous : il contient des éléments du jeu et ne doit pas être publié sur Internet.</div>"""),
+        sec("next", "✓", "Et ensuite ?", """<p>Lancez le jeu. Les premières minutes, et à chaque nouvelle zone, quelques saccades restent normales le temps que l'émulateur prépare les shaders ; elles disparaissent ensuite. Ne videz pas le cache de shaders entre deux parties.</p>
+<p>Un souci ? <a href="../report.html">Signalez-le ici</a>.</p>"""),
+    ]),
+    "en": "\n".join([
+        sec("ready", 1, "Check the game is ready", f"""<ol class="steps">
+<li>Ocarina of Time shows up in Erable's game list (see <a href="install.html#games">Add your games</a>).</li>
+<li>Right-click the game → {m('Configure Game')}.</li>
+</ol>
+<div class="note">All the settings below are made in this window and only apply to Ocarina of Time: your other games keep their settings. The game must be closed.</div>"""),
+        sec("shaders", 2, "Install the shader mod", f"""<p>The <code>ootrshaders</code> mod cuts stutter: fewer shaders to prepare while you play.</p>
+<ol class="steps">
+<li>{m('Add-Ons')} tab → {m('Import Mod from ZIP')}.</li>
+<li>Pick <code>ootrshaders.zip</code>, then the {m('RomFS')} type.</li>
+<li>Check that <strong>ootrshaders</strong> is ticked, then {m('Apply')}.</li>
+</ol>
+{fig('ocarina-addons', 'Add-Ons tab with ootrshaders, Max Resolution and Dynamic FPS ticked', 'The three add-ons ticked: <em>ootrshaders</em> (LayeredFS), and the two built into Erable, <em>Max Resolution</em> and <em>Dynamic FPS by Dark</em>.')}
+<div class="note"><strong>Max Resolution</strong> and <strong>Dynamic FPS</strong> already come with Erable: leave them ticked.</div>
+<div class="warn">Only take this zip from someone you trust, and scan it with Microsoft Defender before importing it. A shader mod never contains an <code>.exe</code>.</div>"""),
+        sec("memory", 3, "Raise the emulated memory", f"""<ol class="steps">
+<li>{m('System')} tab, <strong>Core</strong> section.</li>
+<li><strong>Memory Layout</strong>: <code>6GB DRAM</code> or <code>8GB DRAM</code>.</li>
+<li>{m('Apply')}.</li>
+</ol>
+{fig('ocarina-memory', 'System tab with Memory Layout set to 8GB DRAM', 'The <em>System</em> tab: <em>Memory Layout</em> on <em>8GB DRAM</em>.')}
+<div class="warn">Choose <strong>8GB</strong> only if your PC has at least <strong>16 GB</strong> of RAM, and <strong>6GB</strong> if it has 12 GB. Otherwise leave <em>4GB DRAM (Default)</em>: the PC would slow down instead of speeding up. To see your memory: {m('Ctrl + Shift + Esc → Performance → Memory')}.</div>"""),
+        sec("gpu", 4, "Choose Vulkan and your graphics card", """<ol class="steps">
+<li><span class="menu">Graphics</span> tab.</li>
+<li><strong>API</strong>: <code>Vulkan</code>.</li>
+<li><strong>Device</strong>: your graphics card (NVIDIA GeForce or AMD Radeon), not the graphics built into the processor.</li>
+<li><strong>Resolution</strong>: <code>1X (720p/1080p)</code>.</li>
+</ol>"""),
+        sec("dlss", 5, "Turn on DLSS", f"""<p>Ocarina of Time upscales its image with its own "DLSS" network. Depending on your card:</p>
+<ol class="steps">
+<li><strong>NVIDIA card (GeForce RTX)</strong>: tick {m("Use NVIDIA DLSS in place of a game's DLSS")}. The <em>Ready</em> line should appear in green; if not, open the NVIDIA app so it downloads the DLSS files, then reopen this window.</li>
+<li><strong>Other card (AMD, Intel)</strong>: tick {m("Use the game's own DLSS")}.</li>
+<li>{m('Apply')}, then {m('OK')}.</li>
+</ol>
+{fig('ocarina-graphics', 'Graphics tab with Vulkan, an RTX card and NVIDIA DLSS ready', 'The <em>Graphics</em> tab on an NVIDIA card: Vulkan, 1X resolution and NVIDIA DLSS "Ready".')}
+<div class="note">NVIDIA DLSS replaces the game's <strong>only at 1X resolution</strong>: keep <em>Resolution</em> on <em>1X</em> and let DLSS upscale the image.</div>"""),
+        sec("precompile", 6, "Precompile the shaders", f"""<p>The first time you start the game, Erable offers to prepare the shaders before you play, which avoids most of the first session's stutter.</p>
+<ol class="steps">
+<li>Start the game, then choose {m('Précompiler maintenant')} (precompile now).</li>
+<li>Wait a few minutes: the game starts by itself at the end.</li>
+</ol>
+<div class="note">This only happens once. It runs again only after a graphics driver update.</div>"""),
+        sec("cache", 7, "Reuse another PC's cache", f"""<p>If you have already played on another PC, its shader cache avoids almost all stutter on this one.</p>
+<ol class="steps">
+<li>On the PC that has played: right-click the game → {m('Ouvrir le cache de pipelines transférable')} (open transferable pipeline cache).</li>
+<li>Close Erable, then copy the <code>0400486024dec000</code> folder to a USB stick.</li>
+<li>On the other PC: open the same place the same way, close Erable, then paste the folder there, replacing the existing one.</li>
+</ol>
+<div class="warn">Keep this folder to yourself: it contains parts of the game and must not be published online.</div>"""),
+        sec("next", "✓", "What next?", """<p>Start the game. In the first minutes, and in each new area, a few stutters are normal while the emulator prepares shaders; they go away afterwards. Don't clear the shader cache between sessions.</p>
+<p>A problem? <a href="../report.html">Report it here</a>.</p>"""),
+    ]),
+    "de": "\n".join([
+        sec("ready", 1, "Prüfen, ob das Spiel bereit ist", f"""<ol class="steps">
+<li>Ocarina of Time erscheint in der Spieleliste von Erable (siehe <a href="install.html#games">Spiele hinzufügen</a>).</li>
+<li>Rechtsklick auf das Spiel → {m('Configure Game')}.</li>
+</ol>
+<div class="note">Alle folgenden Einstellungen nimmst du in diesem Fenster vor, und sie gelten nur für Ocarina of Time: Deine anderen Spiele behalten ihre Einstellungen. Das Spiel muss geschlossen sein.</div>"""),
+        sec("shaders", 2, "Den Shader-Mod installieren", f"""<p>Der Mod <code>ootrshaders</code> verringert Ruckler: weniger Shader, die während des Spielens vorbereitet werden müssen.</p>
+<ol class="steps">
+<li>Reiter {m('Add-Ons')} → {m('Import Mod from ZIP')}.</li>
+<li>Wähle <code>ootrshaders.zip</code> und dann den Typ {m('RomFS')}.</li>
+<li>Prüfe, dass <strong>ootrshaders</strong> angehakt ist, dann {m('Apply')}.</li>
+</ol>
+{fig('ocarina-addons', 'Reiter Add-Ons mit ootrshaders, Max Resolution und Dynamic FPS angehakt', 'Die drei angehakten Add-ons: <em>ootrshaders</em> (LayeredFS) sowie die beiden in Erable enthaltenen, <em>Max Resolution</em> und <em>Dynamic FPS by Dark</em>.')}
+<div class="note"><strong>Max Resolution</strong> und <strong>Dynamic FPS</strong> sind bereits in Erable enthalten: Lass sie angehakt.</div>
+<div class="warn">Nimm diese ZIP-Datei nur von einer Person, der du vertraust, und prüfe sie vor dem Import mit Microsoft Defender. Ein Shader-Mod enthält nie eine <code>.exe</code>.</div>"""),
+        sec("memory", 3, "Emulierten Speicher erhöhen", f"""<ol class="steps">
+<li>Reiter {m('System')}, Bereich <strong>Core</strong>.</li>
+<li><strong>Memory Layout</strong>: <code>6GB DRAM</code> oder <code>8GB DRAM</code>.</li>
+<li>{m('Apply')}.</li>
+</ol>
+{fig('ocarina-memory', 'Reiter System, Memory Layout auf 8GB DRAM', 'Reiter <em>System</em>: <em>Memory Layout</em> auf <em>8GB DRAM</em>.')}
+<div class="warn">Wähle <strong>8GB</strong> nur, wenn dein PC mindestens <strong>16 GB</strong> Arbeitsspeicher hat, und <strong>6GB</strong> bei 12 GB. Sonst lass <em>4GB DRAM (Default)</em>: Der PC würde langsamer statt schneller. Deinen Speicher siehst du unter {m('Strg + Umschalt + Esc → Leistung → Arbeitsspeicher')}.</div>"""),
+        sec("gpu", 4, "Vulkan und deine Grafikkarte wählen", """<ol class="steps">
+<li>Reiter <span class="menu">Graphics</span>.</li>
+<li><strong>API</strong>: <code>Vulkan</code>.</li>
+<li><strong>Device</strong>: deine Grafikkarte (NVIDIA GeForce oder AMD Radeon), nicht die im Prozessor eingebaute Grafik.</li>
+<li><strong>Resolution</strong>: <code>1X (720p/1080p)</code>.</li>
+</ol>"""),
+        sec("dlss", 5, "DLSS einschalten", f"""<p>Ocarina of Time skaliert sein Bild mit einem eigenen „DLSS“-Netz hoch. Je nach Karte:</p>
+<ol class="steps">
+<li><strong>NVIDIA-Karte (GeForce RTX)</strong>: Hake {m("Use NVIDIA DLSS in place of a game's DLSS")} an. Die Zeile <em>Ready</em> sollte grün erscheinen; falls nicht, öffne die NVIDIA-App, damit sie die DLSS-Dateien lädt, und öffne dieses Fenster erneut.</li>
+<li><strong>Andere Karte (AMD, Intel)</strong>: Hake {m("Use the game's own DLSS")} an.</li>
+<li>{m('Apply')}, dann {m('OK')}.</li>
+</ol>
+{fig('ocarina-graphics', 'Reiter Graphics mit Vulkan, einer RTX-Karte und NVIDIA DLSS bereit', 'Reiter <em>Graphics</em> mit einer NVIDIA-Karte: Vulkan, Auflösung 1X und NVIDIA DLSS „Ready“.')}
+<div class="note">NVIDIA DLSS ersetzt das des Spiels <strong>nur bei Auflösung 1X</strong>: Lass <em>Resolution</em> auf <em>1X</em>, DLSS übernimmt das Hochskalieren.</div>"""),
+        sec("precompile", 6, "Shader vorkompilieren", f"""<p>Beim ersten Start des Spiels bietet Erable an, die Shader vor dem Spielen vorzubereiten. Das vermeidet die meisten Ruckler der ersten Runde.</p>
+<ol class="steps">
+<li>Starte das Spiel und wähle {m('Précompiler maintenant')} (jetzt vorkompilieren).</li>
+<li>Warte ein paar Minuten: Am Ende startet das Spiel von selbst.</li>
+</ol>
+<div class="note">Das passiert nur einmal – erneut nur nach einem Update des Grafiktreibers.</div>"""),
+        sec("cache", 7, "Den Cache eines anderen PCs übernehmen", f"""<p>Hast du schon auf einem anderen PC gespielt, vermeidet dessen Shader-Cache auf diesem fast alle Ruckler.</p>
+<ol class="steps">
+<li>Auf dem PC, auf dem schon gespielt wurde: Rechtsklick auf das Spiel → {m('Ouvrir le cache de pipelines transférable')} (übertragbaren Pipeline-Cache öffnen).</li>
+<li>Schließe Erable und kopiere den Ordner <code>0400486024dec000</code> auf einen USB-Stick.</li>
+<li>Auf dem anderen PC: Öffne denselben Ort auf dieselbe Weise, schließe Erable und füge den Ordner dort ein, wobei du den vorhandenen ersetzt.</li>
+</ol>
+<div class="warn">Behalte diesen Ordner für dich: Er enthält Teile des Spiels und darf nicht im Internet veröffentlicht werden.</div>"""),
+        sec("next", "✓", "Und dann?", """<p>Starte das Spiel. In den ersten Minuten und in jedem neuen Gebiet sind ein paar Ruckler normal, während der Emulator Shader vorbereitet; danach verschwinden sie. Leere den Shader-Cache nicht zwischen zwei Runden.</p>
+<p>Ein Problem? <a href="../report.html">Hier melden</a>.</p>"""),
+    ]),
+}
+ocarina_toc = {
+    "ids": ["ready", "shaders", "memory", "gpu", "dlss", "precompile", "cache"],
+    "fr": ["Jeu prêt", "Mod de shaders", "Mémoire émulée", "Vulkan et carte", "DLSS", "Précompiler", "Cache d'un autre PC"],
+    "en": ["Game ready", "Shader mod", "Emulated memory", "Vulkan and card", "DLSS", "Precompile", "Another PC's cache"],
+    "de": ["Spiel bereit", "Shader-Mod", "Emulierter Speicher", "Vulkan und Karte", "DLSS", "Vorkompilieren", "Cache eines anderen PCs"],
+}
+tutorial("guides/zelda-ocarina.html", "tuto.ocarinaTitle", "tutos.gamesTitle", "Zelda: Ocarina of Time", ocarina_toc, ocarina,
+         {"fr": "Zelda : Ocarina of Time", "en": "Zelda: Ocarina of Time", "de": "Zelda: Ocarina of Time"},
+         {"fr": "Moins de saccades et une image plus nette : les bons réglages, étape par étape.",
+          "en": "Less stutter and a sharper image: the right settings, step by step.",
+          "de": "Weniger Ruckler und ein schärferes Bild: die richtigen Einstellungen, Schritt für Schritt."})
+print("ok")
+
+
+# ---------------------------------------------------------------- saves
+SAVE_PATH = r"%APPDATA%\erable\nand\user\save"
+saves = {
+    "fr": "\n".join([
+        sec("where", 1, "Où sont vos sauvegardes", f"""<ol class="steps">
+<li>Dans la bibliothèque, faites un clic droit sur le jeu → {m("Ouvrir l'emplacement des données de sauvegarde")}.</li>
+<li>Le dossier qui s'ouvre contient toute la sauvegarde de ce jeu pour le profil choisi.</li>
+</ol>
+<p>Toutes les sauvegardes sont rangées dans <code>{SAVE_PATH}</code>, un dossier par profil, puis un dossier par jeu.</p>
+<div class="note">Chaque profil a ses propres sauvegardes. Changer de profil n'en efface aucune.</div>"""),
+        sec("backup", 2, "Faire une copie de sécurité", f"""<ol class="steps">
+<li>Fermez le jeu.</li>
 <li>En haut à gauche : {m('Outils → Gestionnaire de données')}, partie {m('Sauvegardes')}.</li>
 <li>Cliquez sur le bouton d'export (infobulle « Exporter toutes les données de ce répertoire ») et choisissez où enregistrer le fichier <code>.zip</code>.</li>
 </ol>
@@ -747,20 +1618,21 @@ saves = {
 <div class="note">Jedes Profil hat seine eigenen Spielstände. Ein Profilwechsel löscht keinen.</div>"""),
         sec("backup", 2, "Eine Sicherung anlegen", f"""<ol class="steps">
 <li>Schließe das Spiel.</li>
-<li>Oben links: {m('Tools → Data Manager')}, Bereich {m('Saves')}.</li>
-<li>Klicke auf die Export-Schaltfläche (Tooltip „Export all data in this directory“) und wähle, wo die <code>.zip</code> gespeichert wird.</li>
+<li>Oben links: {m('Tools → Saves')}.</li>
+<li>{m('Make a backup')} → {m('Back up...')}, dann wählen, wo die <code>.zip</code> gespeichert wird.</li>
 </ol>
-<div class="note">Bewahre diese Zip auf einem USB-Stick oder einer anderen Platte auf: Sie enthält die Spielstände aller Spiele und Profile.</div>"""),
+<div class="note">Diese Zip enthält die Spielstände aller Spiele und aller Profile. Bewahre sie auf einem USB-Stick oder einer anderen Platte auf.</div>"""),
         sec("restore", 3, "Wiederherstellen, auf diesem oder einem anderen PC", f"""<ol class="steps">
-<li>Installiere Erable, starte das Spiel einmal und schließe es wieder.</li>
-<li>{m('Tools → Data Manager')}, Bereich {m('Saves')}: die Import-Schaltfläche (Tooltip „Import data for this directory“), dann deine Zip wählen.</li>
+<li>Installiere Erable bei Bedarf auf dem anderen PC.</li>
+<li>{m('Tools → Saves')} → {m('Put a backup back')} → {m('Restore...')}, dann deine Zip wählen.</li>
 </ol>
-<div class="warn">Der Import ersetzt <strong>alle</strong> vorhandenen Spielstände. Für ein einzelnes Spiel kopiere lieber seinen Ordner (Schritt 1) an dieselbe Stelle auf dem anderen PC.</div>"""),
+<div class="note">Erable legt vorher automatisch eine Kopie deiner aktuellen Spielstände an und sagt, wo sie liegt (Schaltfläche {m('Automatic backups')}). Zips aus dem Data Manager gehen auch: sie landen im gewählten Profil.</div>"""),
         sec("other", 4, "Aus einem anderen Emulator übernehmen", f"""<ol class="steps">
-<li>Schließe den anderen Emulator (Eden, Lichii…).</li>
-<li>Beim ersten Start bietet Erable an, sein Profil zu importieren: wähle es und behalte {m('Copy')}, das das Original unverändert lässt.</li>
-<li>Sonst kopiere den Ordner des Spiels von Hand aus dem Ordner <code>nand\\user\\save</code> des anderen Emulators in den von Erable (Schritt 1).</li>
-</ol>"""),
+<li>Schließe die Spiele beider Emulatoren.</li>
+<li>{m('Tools → Saves')} → {m('Take them from another emulator')} → {m('Choose its folder...')}.</li>
+<li>Wähle den Ordner des anderen Emulators (den mit <code>nand</code>, zum Beispiel <code>%APPDATA%\\eden</code>), dann das Erable-Profil, das sie bekommt.</li>
+</ol>
+<div class="note">Die Spielstände des anderen Emulators bleiben unberührt, und von deinen wird vorher automatisch eine Kopie angelegt.</div>"""),
     ]),
 }
 saves_toc = {

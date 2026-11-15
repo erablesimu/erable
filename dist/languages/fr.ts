@@ -7585,6 +7585,10 @@ Message de débogage :</translation>
         <translation>&amp;Gestionnaire de données</translation>
     </message>
     <message>
+        <source>&amp;Saves...</source>
+        <translation>&amp;Sauvegardes...</translation>
+    </message>
+    <message>
         <location filename="../../src/erable/main.ui" line="571"/>
         <source>&amp;Tree View</source>
         <translation type="unfinished"/>
@@ -11247,6 +11251,189 @@ Code d&apos;erreur : %3</translation>
     <message>
         <source>Could not commit to file %1.</source>
         <translation>Impossible de finaliser le fichier %1.</translation>
+    </message>
+</context>
+<context>
+    <name>SavesDialog</name>
+    <message>
+        <source>Saves</source>
+        <translation>Sauvegardes</translation>
+    </message>
+    <message>
+        <source>Your saves</source>
+        <translation>Vos sauvegardes</translation>
+    </message>
+    <message>
+        <source>Back up...</source>
+        <translation>Copier...</translation>
+    </message>
+    <message>
+        <source>Make a backup</source>
+        <translation>Faire une copie de sécurité</translation>
+    </message>
+    <message>
+        <source>Every game and every profile in one zip. Keep it on a USB stick or another drive.</source>
+        <translation>Tous les jeux et tous les profils dans un seul zip. Gardez-le sur une clé USB ou un autre disque.</translation>
+    </message>
+    <message>
+        <source>Restore...</source>
+        <translation>Remettre...</translation>
+    </message>
+    <message>
+        <source>Put a backup back</source>
+        <translation>Remettre une copie</translation>
+    </message>
+    <message>
+        <source>On this PC or another. A copy of your current saves is made first.</source>
+        <translation>Sur ce PC ou un autre. Une copie de vos sauvegardes actuelles est faite avant.</translation>
+    </message>
+    <message>
+        <source>Choose its folder...</source>
+        <translation>Choisir son dossier...</translation>
+    </message>
+    <message>
+        <source>Take them from another emulator</source>
+        <translation>Reprendre celles d'un autre émulateur</translation>
+    </message>
+    <message>
+        <source>Eden, Lichii, Ryujinx... Copies its games' saves into one of your profiles; the other emulator's are left as they are.</source>
+        <translation>Eden, Lichii, Ryujinx… Copie les sauvegardes de ses jeux dans l'un de vos profils ; celles de l'autre émulateur restent intactes.</translation>
+    </message>
+    <message>
+        <source>Open the saves folder</source>
+        <translation>Ouvrir le dossier des sauvegardes</translation>
+    </message>
+    <message>
+        <source>Automatic backups</source>
+        <translation>Copies automatiques</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>No saves yet.</source>
+        <translation>Aucune sauvegarde pour l'instant.</translation>
+    </message>
+    <message>
+        <source>Backing up your current saves...</source>
+        <translation>Copie de vos sauvegardes actuelles...</translation>
+    </message>
+    <message>
+        <source>Your current saves could not be backed up, so nothing was changed.</source>
+        <translation>Vos sauvegardes actuelles n'ont pas pu être copiées, rien n'a donc été modifié.</translation>
+    </message>
+    <message>
+        <source>There are no saves to back up yet.</source>
+        <translation>Il n'y a encore aucune sauvegarde à copier.</translation>
+    </message>
+    <message>
+        <source>Save the backup as</source>
+        <translation>Enregistrer la copie sous</translation>
+    </message>
+    <message>
+        <source>Zip archives (*.zip)</source>
+        <translation>Archives zip (*.zip)</translation>
+    </message>
+    <message>
+        <source>Backing up your saves...</source>
+        <translation>Copie de vos sauvegardes...</translation>
+    </message>
+    <message>
+        <source>The backup could not be written. Check that you can write to that folder and try again.</source>
+        <translation>La copie n'a pas pu être écrite. Vérifiez que vous pouvez écrire dans ce dossier, puis réessayez.</translation>
+    </message>
+    <message>
+        <source>Your saves are backed up in:
+%1</source>
+        <translation>Vos sauvegardes sont copiées dans :
+%1</translation>
+    </message>
+    <message>
+        <source>Choose a saves backup</source>
+        <translation>Choisir une copie de sauvegardes</translation>
+    </message>
+    <message>
+        <source>The saves of every profile will be replaced by the ones in this backup.</source>
+        <translation>Les sauvegardes de tous les profils seront remplacées par celles de cette copie.</translation>
+    </message>
+    <message>
+        <source>The saves of this profile will be replaced by the ones in this backup.</source>
+        <translation>Les sauvegardes de ce profil seront remplacées par celles de cette copie.</translation>
+    </message>
+    <message>
+        <source>This file doesn't hold saves from Erable or another emulator.</source>
+        <translation>Ce fichier ne contient pas de sauvegardes d'Erable ou d'un autre émulateur.</translation>
+    </message>
+    <message>
+        <source>Close the game first. Your current saves are backed up before anything changes. Continue?</source>
+        <translation>Fermez d'abord le jeu. Vos sauvegardes actuelles sont copiées avant toute modification. Continuer ?</translation>
+    </message>
+    <message>
+        <source>Putting the backup back...</source>
+        <translation>Remise en place de la copie...</translation>
+    </message>
+    <message>
+        <source>Your previous saves are kept in:
+%1</source>
+        <translation>Vos anciennes sauvegardes sont gardées dans :
+%1</translation>
+    </message>
+    <message>
+        <source>The backup could not be put back completely.</source>
+        <translation>La copie n'a pas pu être remise entièrement.</translation>
+    </message>
+    <message>
+        <source>Your saves are back.</source>
+        <translation>Vos sauvegardes sont de retour.</translation>
+    </message>
+    <message>
+        <source>Choose the other emulator's folder (or its nand folder)</source>
+        <translation>Choisissez le dossier de l'autre émulateur (ou son dossier nand)</translation>
+    </message>
+    <message>
+        <source>No saves were found in this folder. Choose the other emulator's own folder (the one holding nand), or its nand folder.</source>
+        <translation>Aucune sauvegarde trouvée dans ce dossier. Choisissez le dossier de l'autre émulateur (celui qui contient nand), ou son dossier nand.</translation>
+    </message>
+    <message>
+        <source>That emulator has several profiles. Which one's saves?</source>
+        <translation>Cet émulateur a plusieurs profils. Les sauvegardes duquel ?</translation>
+    </message>
+    <message>
+        <source>Close both emulators' games first. Your current saves are backed up before anything changes. Continue?</source>
+        <translation>Fermez d'abord les jeux des deux émulateurs. Vos sauvegardes actuelles sont copiées avant toute modification. Continuer ?</translation>
+    </message>
+    <message>
+        <source>Copying the saves...</source>
+        <translation>Copie des sauvegardes...</translation>
+    </message>
+    <message>
+        <source>Not every save could be copied.</source>
+        <translation>Toutes les sauvegardes n'ont pas pu être copiées.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n game save(s)</source>
+        <translation><numerusform>%n jeu sauvegardé</numerusform><numerusform>%n jeux sauvegardés</numerusform><numerusform>%n jeux sauvegardés</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n profile(s)</source>
+        <translation><numerusform>%n profil</numerusform><numerusform>%n profils</numerusform><numerusform>%n profils</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>Profile %1 (%n game(s))</source>
+        <translation><numerusform>Profil %1 (%n jeu)</numerusform><numerusform>Profil %1 (%n jeux)</numerusform><numerusform>Profil %1 (%n jeux)</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n game save(s) will be copied into this profile.</source>
+        <translation><numerusform>La sauvegarde de %n jeu sera copiée dans ce profil.</numerusform><numerusform>Les sauvegardes de %n jeux seront copiées dans ce profil.</numerusform><numerusform>Les sauvegardes de %n jeux seront copiées dans ce profil.</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of them replace(s) a save you already have here.</source>
+        <translation><numerusform>%n d'entre elles remplace une sauvegarde déjà présente ici.</numerusform><numerusform>%n d'entre elles remplacent une sauvegarde déjà présente ici.</numerusform><numerusform>%n d'entre elles remplacent une sauvegarde déjà présente ici.</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n game save(s) copied. Start the game in Erable to continue where you left off.</source>
+        <translation><numerusform>%n sauvegarde copiée. Lancez le jeu dans Erable pour reprendre là où vous en étiez.</numerusform><numerusform>%n sauvegardes copiées. Lancez le jeu dans Erable pour reprendre là où vous en étiez.</numerusform><numerusform>%n sauvegardes copiées. Lancez le jeu dans Erable pour reprendre là où vous en étiez.</numerusform></translation>
     </message>
 </context>
 <context>

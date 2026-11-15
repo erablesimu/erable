@@ -34,6 +34,7 @@
 
 #include "about_dialog.h"
 #include "data_dialog.h"
+#include "erable/saves_dialog.h"
 #include "deps_dialog.h"
 #include "install_dialog.h"
 
@@ -1820,6 +1821,7 @@ void MainWindow::ConnectMenuEvents() {
             !Settings::values.recommended_settings_backup.GetValue().empty());
     });
     connect_menu(ui->action_Data_Manager, &MainWindow::OnDataDialog);
+    connect_menu(ui->action_Saves, &MainWindow::OnSavesDialog);
 
 #if defined(ENABLE_UPDATE_CHECKER) && (defined(__linux__) || defined(_WIN32))
     auto* restore_action = ui->menu_Help->addAction(tr("Restore Previous Version..."));
@@ -4813,6 +4815,11 @@ void MainWindow::OnDataDialog() {
     OnGameListRefresh();
 }
 
+void MainWindow::OnSavesDialog() {
+    SavesDialog dialog(this);
+    dialog.exec();
+}
+
 void MainWindow::OnToggleFilterBar() {
     game_list->SetFilterVisible(ui->action_Show_Filter_Bar->isChecked());
     if (ui->action_Show_Filter_Bar->isChecked())
@@ -6446,7 +6453,7 @@ void AdjustLinkColor() {
 } // namespace
 
 void MainWindow::UpdateMenuIcons() {
-    const std::array<std::pair<QAction*, const char*>, 55> icons{{
+    const std::array<std::pair<QAction*, const char*>, 56> icons{{
         {ui->action_Install_File_NAND, "download"},
         {ui->action_Load_File, "file"},
         {ui->action_Load_Folder, "folder"},
@@ -6480,6 +6487,7 @@ void MainWindow::UpdateMenuIcons() {
         {ui->action_Firmware_From_ZIP, "archive"},
         {ui->action_Verify_installed_contents, "check"},
         {ui->action_Data_Manager, "hdd"},
+        {ui->action_Saves, "archive"},
         {ui->menu_cabinet_applet->menuAction(), "star"},
         {ui->menu_Applets->menuAction(), "apps"},
         {ui->menu_Create_Shortcuts->menuAction(), "share"},

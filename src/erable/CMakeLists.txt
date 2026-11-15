@@ -259,6 +259,7 @@ add_executable(erable
     deps_dialog.cpp deps_dialog.h deps_dialog.ui
 
     data_dialog.h data_dialog.cpp data_dialog.ui
+    saves_dialog.h saves_dialog.cpp
     data_widget.ui
     ryujinx_dialog.h ryujinx_dialog.cpp ryujinx_dialog.ui
     main_window.h main_window.cpp main.ui
@@ -447,9 +448,8 @@ target_link_libraries(erable PRIVATE common core input_common frontend_common ne
 target_link_libraries(erable PRIVATE Boost::headers Qt6::Widgets Qt6::Concurrent Qt6::Network)
 # Unpacks NVIDIA's files from the Streamline release (nvidia_dlss_panel.cpp).
 target_link_libraries(erable PRIVATE ZLIB::ZLIB)
-if (WIN32)
-    target_link_libraries(erable PRIVATE QuaZip::QuaZip)
-endif()
+# Reads zips: NVIDIA's files and saves backups (saves_dialog.cpp).
+target_link_libraries(erable PRIVATE QuaZip::QuaZip)
 target_link_libraries(erable PRIVATE ${PLATFORM_LIBRARIES} Threads::Threads)
 if (ENABLE_OPENGL)
     target_link_libraries(erable PRIVATE glad)
