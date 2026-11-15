@@ -11330,8 +11330,8 @@ Code d&apos;erreur : %3</translation>
         <translation>Sur ce PC ou un autre, ou glissez le zip sur cette fenêtre. Une copie de vos sauvegardes actuelles est faite avant.</translation>
     </message>
     <message>
-        <source>Open the saves folder</source>
-        <translation>Ouvrir le dossier des sauvegardes</translation>
+        <source>Open the folder</source>
+        <translation>Ouvrir le dossier</translation>
     </message>
     <message>
         <source>Close</source>
@@ -11546,6 +11546,14 @@ Code d&apos;erreur : %3</translation>
     <message>
         <source>Your saves as they were just before a change, newest first. Which one?</source>
         <translation>Vos sauvegardes telles qu'elles étaient juste avant un changement, de la plus récente à la plus ancienne. Laquelle ?</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation>Continuer</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>

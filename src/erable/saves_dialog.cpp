@@ -25,6 +25,7 @@
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QLabel>
+#include <QListView>
 #include <QLocale>
 #include <QMessageBox>
 #include <QMimeData>
@@ -321,6 +322,37 @@ std::optional<fs::path> TargetProfile(const fs::path& source_profile) {
     return SavesFolder::Root() / user_id;
 }
 
+/// A choice from a list, in the saves window's look (the items shown at once, not in a combo box).
+QString ChooseItem(QWidget* parent, const QString& title, const QString& label,
+                   const QStringList& items, int current, bool, bool* ok) {
+    QInputDialog dialog{parent};
+    dialog.setWindowTitle(title);
+    dialog.setLabelText(label);
+    dialog.setComboBoxItems(items);
+    dialog.setTextValue(items.value(current));
+    dialog.setOption(QInputDialog::UseListViewForComboBoxItems);
+    dialog.setOkButtonText(SavesDialog::tr("Continue"));
+    dialog.setCancelButtonText(SavesDialog::tr("Cancel"));
+    dialog.setMinimumWidth(480);
+    if (auto* list = dialog.findChild<QListView*>()) {
+        // Every choice in view, up to seven
+        list->setMinimumHeight(static_cast<int>(std::min<qsizetype>(items.size(), 7)) * 46 + 8);
+    }
+    dialog.setStyleSheet(UpdateStyle::StyleSheet(QStringLiteral("QInputDialog")) +
+                         QStringLiteral("QInputDialog QListView { background: transparent;"
+                                        " border: none; font-size: 15px; outline: none; }"
+                                        "QInputDialog QListView::item { padding: 10px 12px;"
+                                        " border-radius: 10px; margin: 2px 0; }"
+                                        "QInputDialog QListView::item:selected {"
+                                        " background: palette(highlight);"
+                                        " color: palette(highlighted-text); }"));
+    const bool accepted = dialog.exec() == QDialog::Accepted;
+    if (ok) {
+        *ok = accepted;
+    }
+    return accepted ? dialog.textValue() : QString{};
+}
+
 QPushButton* ActionButton(QWidget* parent, const QString& text, bool primary = false) {
     auto* button = new QPushButton(text, parent);
     button->setCursor(Qt::PointingHandCursor);
@@ -342,6 +374,8 @@ void AddRow(QVBoxLayout* layout, QWidget* parent, const QString& title, const QS
     auto* text_label = new QLabel(text, parent);
     text_label->setObjectName(QStringLiteral("subtitle"));
     text_label->setWordWrap(true);
+    // A set width, so the window's height counts every wrapped line
+    text_label->setFixedWidth(400);
     labels->addWidget(title_label);
     labels->addWidget(text_label);
     row->addLayout(labels, 1);
@@ -406,10 +440,10 @@ std::vector<Emulator> FindEmulators() {
 SavesDialog::SavesDialog(QWidget* parent) : QDialog{parent} {
     setWindowTitle(tr("Saves"));
     setWindowFlag(Qt::WindowContextHelpButtonHint, false);
-    setMinimumWidth(580);
     setAcceptDrops(true);
 
     auto* layout = new QVBoxLayout(this);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
     layout->setContentsMargins(26, 22, 26, 20);
     layout->setSpacing(16);
 
@@ -443,7 +477,7 @@ SavesDialog::SavesDialog(QWidget* parent) : QDialog{parent} {
            restore);
 
     auto* footer = new QHBoxLayout;
-    auto* open = ActionButton(this, tr("Open the saves folder"));
+    auto* open = ActionButton(this, tr("Open the folder"));
     open->setObjectName(QStringLiteral("flat"));
     auto* recover = ActionButton(this, tr("Recover an automatic backup..."));
     recover->setObjectName(QStringLiteral("flat"));
@@ -487,8 +521,8 @@ void SavesDialog::Refresh() {
         summary_label->setText(tr("No saves yet."));
         return;
     }
-    const QString size =
-        QLocale{}.formattedDataSize(static_cast<qint64>(SizeOf(SavesFolder::Root())));
+    const QString size = QLocale{}.formattedDataSize(
+        static_cast<qint64>(SizeOf(SavesFolder::Root())), 1, QLocale::DataSizeTraditionalFormat);
     summary_label->setText(tr("%n game save(s)", nullptr, games) + QStringLiteral("  ·  ") +
                            tr("%n profile(s)", nullptr, profiles) + QStringLiteral("  ·  ") +
                            size);
@@ -647,12 +681,13 @@ void SavesDialog::RecoverAutomatic() {
         choices << QStringLiteral("%1  ·  %2  ·  %3")
                        .arg(locale.toString(when, QLocale::ShortFormat), reason,
                             locale.formattedDataSize(
-                                static_cast<qint64>(fs::file_size(backup, ec))));
+                                static_cast<qint64>(fs::file_size(backup, ec)), 1,
+                                QLocale::DataSizeTraditionalFormat));
     }
     const QString open_folder = tr("Open their folder");
     choices << open_folder;
     bool ok = false;
-    const QString choice = QInputDialog::getItem(
+    const QString choice = ChooseItem(
         this, tr("Recover an automatic backup"),
         tr("Your saves as they were just before a change, newest first. Which one?"), choices, 0,
         false, &ok);
@@ -679,7 +714,7 @@ void SavesDialog::TakeFromEmulator() {
         const QString other = tr("Another folder...");
         choices << other;
         bool ok = false;
-        const QString choice = QInputDialog::getItem(
+        const QString choice = ChooseItem(
             this, tr("Take them from another emulator"),
             tr("Emulators found on this PC. Whose saves do you want?"), choices, 0, false, &ok);
         if (!ok) {
@@ -718,7 +753,7 @@ void SavesDialog::TakeFromEmulator() {
                                   .arg(Name(profile).left(8)));
         }
         bool ok = false;
-        const QString choice = QInputDialog::getItem(
+        const QString choice = ChooseItem(
             this, tr("Take them from another emulator"),
             tr("That emulator has several profiles. Which one's saves?"), choices, 0, false, &ok);
         if (!ok) {
@@ -821,7 +856,7 @@ void SavesDialog::ImportGameSave(QWidget* parent, u64 program_id, const QString&
     const QString zip_file = tr("A zip file...");
     choices << other_folder << zip_file;
     bool ok = false;
-    const QString choice = QInputDialog::getItem(
+    const QString choice = ChooseItem(
         parent, window_title,
         sources.empty() ? tr("No other emulator on this PC has a save of this game. Where is it?")
                         : tr("Saves of this game found on this PC. Which one?"),
