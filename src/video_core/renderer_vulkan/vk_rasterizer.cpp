@@ -2374,7 +2374,10 @@ void RasterizerVulkan::DispatchCompute() {
     }
 
     u64 native_key{};
-    ComputePipeline* const pipeline{pipeline_cache.CurrentComputePipeline(native_key)};
+    ComputePipeline* const pipeline{[&] {
+        VideoCommon::Nx2Profile::Scope scope{VideoCommon::Nx2Profile::Zone::PipelineLookup};
+        return pipeline_cache.CurrentComputePipeline(native_key);
+    }()};
     if (!pipeline) {
         if (kepler_compute->IsNativeMode()) throw Shader::RuntimeError("Native compute pipeline unavailable");
         return;
@@ -2498,8 +2501,11 @@ void RasterizerVulkan::DispatchCompute() {
         if (Tegra::Nx2ListIndirect::Stats::g_check) {
             slots.CheckDispatch(*list_slot);
         }
-        buffer_cache.NoteWorkRecorded(true);
-        SubmitNx2ListCopies();
+        {
+            VideoCommon::Nx2Profile::Scope scope{VideoCommon::Nx2Profile::Zone::ComputeDownloads};
+            buffer_cache.NoteWorkRecorded(true);
+            SubmitNx2ListCopies();
+        }
         publish_collision_map();
         TryOcarinaUpscale(*pipeline, native_key, false);
         return;
@@ -2521,8 +2527,11 @@ void RasterizerVulkan::DispatchCompute() {
                 cmdbuf.DispatchIndirect(indirect_buffer, indirect_offset);
             });
         });
-        buffer_cache.NoteWorkRecorded(true);
-        SubmitNx2ListCopies();
+        {
+            VideoCommon::Nx2Profile::Scope scope{VideoCommon::Nx2Profile::Zone::ComputeDownloads};
+            buffer_cache.NoteWorkRecorded(true);
+            SubmitNx2ListCopies();
+        }
         publish_collision_map();
         return;
     }
@@ -2584,8 +2593,11 @@ void RasterizerVulkan::DispatchCompute() {
         // The deferred native binding may follow DLSS's command buffer bindings.
         scheduler.InvalidateState();
     }
-    buffer_cache.NoteWorkRecorded(true);
-    SubmitNx2ListCopies();
+    {
+        VideoCommon::Nx2Profile::Scope scope{VideoCommon::Nx2Profile::Zone::ComputeDownloads};
+        buffer_cache.NoteWorkRecorded(true);
+        SubmitNx2ListCopies();
+    }
     publish_collision_map();
 
     if (!can_replace) {
