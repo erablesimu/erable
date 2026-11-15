@@ -271,6 +271,14 @@ Ses sauvegardes restent sur le disque, mais plus aucun profil d&apos;Erable ne l
         <source>Ctrl + L  Library</source>
         <translation>Ctrl + L  Bibliothèque</translation>
     </message>
+    <message>
+        <source>Saves</source>
+        <translation>Sauvegardes</translation>
+    </message>
+    <message>
+        <source>Take your saves from another emulator, or back them up</source>
+        <translation>Récupérer vos sauvegardes d&apos;un autre émulateur, ou les copier</translation>
+    </message>
 </context>
 <context>
     <name>AboutDialog</name>

@@ -71,6 +71,8 @@ signals:
     void OpenSettings();
     void OpenWhatsNew();
     void OpenCaptures();
+    /// The dock's Saves button: the saves window, opened on taking another emulator's saves.
+    void OpenSaves();
     void ReportProblem();
     /// The music or the shelf style changed: saved at once, so a crash or a forced close keeps it.
     void HomeSettingsChanged();

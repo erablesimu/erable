@@ -157,7 +157,7 @@ QPainterPath MapleLeaf(QPointF centre, double size) {
     return path;
 }
 
-enum class Icon { Library, News, Folder, Captures, Debug, Settings };
+enum class Icon { Library, News, Folder, Captures, Saves, Debug, Settings };
 
 /// The dock's line icons, drawn on a 24-unit grid in `box`.
 void DrawIcon(QPainter& painter, Icon icon, const QRectF& box, const QColor& color) {
@@ -196,6 +196,20 @@ void DrawIcon(QPainter& painter, Icon icon, const QRectF& box, const QColor& col
         folder.quadTo(3, 19, 3, 17);
         folder.closeSubpath();
         painter.drawPath(folder);
+        break;
+    }
+    case Icon::Saves: {
+        // An arrow coming down into a tray: saves brought in
+        painter.drawLine(QPointF{12, 3}, QPointF{12, 14});
+        painter.drawPolyline(QPolygonF{{QPointF{7.5, 9.5}, QPointF{12, 14}, QPointF{16.5, 9.5}}});
+        QPainterPath tray;
+        tray.moveTo(3, 14);
+        tray.lineTo(3, 18);
+        tray.quadTo(3, 21, 6, 21);
+        tray.lineTo(18, 21);
+        tray.quadTo(21, 21, 21, 18);
+        tray.lineTo(21, 14);
+        painter.drawPath(tray);
         break;
     }
     case Icon::Captures:
@@ -666,6 +680,9 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
             &HomeScreen::OpenGamesFolder);
     connect(add_dock(Icon::Captures, tr("Captures")), &QAbstractButton::clicked, this,
             &HomeScreen::OpenCaptures);
+    DockButton* const saves = add_dock(Icon::Saves, tr("Saves"));
+    saves->setToolTip(tr("Take your saves from another emulator, or back them up"));
+    connect(saves, &QAbstractButton::clicked, this, &HomeScreen::OpenSaves);
     DockButton* const debug = add_dock(Icon::Debug, tr("Debug mode"));
     connect(debug, &QAbstractButton::clicked, this, [this, debug] {
         if (debug_menu) {

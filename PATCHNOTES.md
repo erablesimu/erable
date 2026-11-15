@@ -20,6 +20,8 @@ version. Les sections suivantes gardent l'historique.
   20 secondes, il se ferme de lui-même (cela bloquait le journal et la mémoire du PC).
 
 **Sauvegardes**
+- Nouveau bouton « Sauvegardes » en bas de l'accueil : il récupère en un clic les sauvegardes d'un
+  autre émulateur du PC.
 - Nouvelle fenêtre Outils > Sauvegardes : les autres émulateurs du PC (Eden, Lichii, yuzu…) sont
   trouvés tout seuls, et leurs sauvegardes reprises en un clic. Aussi : une copie de sécurité de
   tous les jeux et profils en un zip, et sa remise en place (on peut glisser le zip sur la fenêtre).

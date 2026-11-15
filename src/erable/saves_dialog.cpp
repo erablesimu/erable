@@ -469,6 +469,10 @@ SavesDialog::SavesDialog(QWidget* parent) : QDialog{parent} {
     Refresh();
 }
 
+void SavesDialog::StartWithImport() {
+    QMetaObject::invokeMethod(this, &SavesDialog::TakeFromEmulator, Qt::QueuedConnection);
+}
+
 void SavesDialog::Refresh() {
     int profiles = 0;
     int games = 0;

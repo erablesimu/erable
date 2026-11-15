@@ -27,6 +27,9 @@ public:
     /// another folder or a zip.
     static void ImportGameSave(QWidget* parent, u64 program_id, const QString& game_name);
 
+    /// Starts on taking another emulator's saves once the window shows (the home's Saves button).
+    void StartWithImport();
+
 protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;

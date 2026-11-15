@@ -710,7 +710,7 @@ saves = {
 <div class="note">Erable fait d'abord une copie automatique de vos sauvegardes actuelles et vous dit où elle est. En cas d'erreur, {m('Récupérer une copie automatique...')} en bas de la fenêtre remet vos sauvegardes comme avant. Les zips faits avec le Gestionnaire de données marchent aussi : ils vont dans le profil que vous choisissez.</div>"""),
         sec("other", 4, "Reprendre celles d'un autre émulateur", f"""<ol class="steps">
 <li>Fermez les jeux des deux émulateurs.</li>
-<li>{m('Outils → Sauvegardes')} → {m("Reprendre celles d'un autre émulateur")} → {m('Importer...')}.</li>
+<li>Sur l'accueil, cliquez sur {m('Sauvegardes')} dans les boutons du bas (ou {m('Outils → Sauvegardes')} → {m('Importer...')}).</li>
 <li>Erable liste les émulateurs trouvés sur ce PC (Eden, Lichii, yuzu…) : choisissez-en un, puis le profil Erable qui reçoit ses sauvegardes. S'il n'est pas dans la liste, prenez {m('Un autre dossier...')}.</li>
 </ol>
 <p>Pour un seul jeu : dans la bibliothèque, clic droit sur le jeu → {m('Importer une sauvegarde...')}. Erable cherche ce jeu chez les autres émulateurs du PC, et accepte aussi un dossier ou un zip.</p>
@@ -1031,7 +1031,7 @@ saves = {
 <div class="note">Erable first makes an automatic copy of your current saves and tells you where it is. If something goes wrong, {m('Recover an automatic backup...')} at the bottom of the window puts your saves back as they were. Zips made with the Data Manager work too: they go into the profile you choose.</div>"""),
         sec("other", 4, "Take them from another emulator", f"""<ol class="steps">
 <li>Close both emulators' games.</li>
-<li>{m('Tools → Saves')} → {m('Take them from another emulator')} → {m('Import...')}.</li>
+<li>On the home, click {m('Saves')} in the bottom buttons (or {m('Tools → Saves')} → {m('Import...')}).</li>
 <li>Erable lists the emulators found on this PC (Eden, Lichii, yuzu…): pick one, then the Erable profile that gets its saves. If it isn't listed, choose {m('Another folder...')}.</li>
 </ol>
 <p>For a single game: in the library, right-click the game → {m('Import Save Data...')}. Erable looks for that game in the PC's other emulators, and also takes a folder or a zip.</p>
@@ -1631,7 +1631,7 @@ saves = {
 <div class="note">Erable legt vorher automatisch eine Kopie deiner aktuellen Spielstände an und sagt, wo sie liegt. Geht etwas schief, stellt {m('Recover an automatic backup...')} unten im Fenster deine Spielstände wie vorher wieder her. Zips aus dem Data Manager gehen auch: sie landen im gewählten Profil.</div>"""),
         sec("other", 4, "Aus einem anderen Emulator übernehmen", f"""<ol class="steps">
 <li>Schließe die Spiele beider Emulatoren.</li>
-<li>{m('Tools → Saves')} → {m('Take them from another emulator')} → {m('Import...')}.</li>
+<li>Auf dem Startbildschirm unten auf {m('Saves')} klicken (oder {m('Tools → Saves')} → {m('Import...')}).</li>
 <li>Erable listet die auf diesem PC gefundenen Emulatoren (Eden, Lichii, yuzu…): wähle einen und dann das Erable-Profil, das seine Spielstände bekommt. Fehlt er, nimm {m('Another folder...')}.</li>
 </ol>
 <p>Für ein einzelnes Spiel: in der Bibliothek Rechtsklick auf das Spiel → {m('Import Save Data...')}. Erable sucht das Spiel bei den anderen Emulatoren des PCs und nimmt auch einen Ordner oder eine Zip.</p>

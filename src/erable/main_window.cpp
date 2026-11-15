@@ -1006,6 +1006,11 @@ void MainWindow::InitializeWidgets() {
         OnSaveConfig();
     });
     connect(home_screen, &HomeScreen::OpenWhatsNew, this, &MainWindow::OnWhatsNew);
+    connect(home_screen, &HomeScreen::OpenSaves, this, [this] {
+        SavesDialog dialog(this);
+        dialog.StartWithImport();
+        dialog.exec();
+    });
     connect(home_screen, &HomeScreen::OpenCaptures, this, [] {
         const auto path = QString::fromStdString(
             Common::FS::GetEdenPathString(Common::FS::EdenPath::ScreenshotsDir));
