@@ -259,6 +259,7 @@ Frame* PresentManager::GetRenderFrame() {
     frame->present_done.Reset();
     frame->color_space = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     frame->present_spacing = {};
+    frame->game_frame_presents = 1;
 #ifdef EGLANTINE_STREAMLINE
     frame->frame_gen = false;
 #endif
@@ -618,7 +619,7 @@ void PresentManager::CopyToSwapchainImpl(Frame* frame) {
         return;
     }
 
-    while (swapchain.AcquireNextImage(!use_present_thread)) {
+    while (swapchain.AcquireNextImage(!use_present_thread, frame->game_frame_presents)) {
         if (!RecreateSwapchain(frame)) {
             return;
         }
