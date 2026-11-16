@@ -102,6 +102,36 @@ public:
         return true;
     }
 
+    /// For a lookup that may skip its draw: true while the pipeline of `key` is still queued or
+    /// building. It then goes to the front of the queue and is waited for up to `budget`
+    /// (`spent` gets how long); still not built, it stays here for a later lookup, so the draw is
+    /// skipped instead of the frame waiting for it to be built on the GPU thread.
+    bool StillBuilding(const Key& key, std::chrono::microseconds budget,
+                       std::chrono::microseconds& spent) {
+        spent = {};
+        std::shared_ptr<Entry> entry;
+        {
+            std::scoped_lock lock{mutex};
+            const auto it = entries.find(key);
+            if (it == entries.end()) {
+                return false;
+            }
+            entry = it->second;
+        }
+        if (entry->job.Ready()) {
+            return false;
+        }
+        jobs.Promote(entry->job, VideoCommon::ShaderJobPriority::NeedNow);
+        if (budget.count() <= 0) {
+            return true;
+        }
+        const auto begin = std::chrono::steady_clock::now();
+        const bool ready = entry->job.WaitFor(budget);
+        spent = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::steady_clock::now() - begin);
+        return !ready;
+    }
+
     /// The pipeline of `key`, built here or waited for while it builds (`waited` gets how long
     /// when it was still queued or building); null when there is none or it didn't build
     std::unique_ptr<Pipeline> Take(

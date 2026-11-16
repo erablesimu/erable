@@ -2362,6 +2362,22 @@ GraphicsPipeline* PipelineCache::CurrentGraphicsPipelineSlowPath() {
             adopted = true;
         }
     }
+    if (is_new && scheduled_prebuild && CanSkipNativeDraw()) {
+        // Still in the background prebuild (the game started at "Play now"): moved to the front
+        // of its queue and skipped while it builds. Built on the GPU thread instead, a zone entry
+        // that needed hundreds of them froze a frame for 17 s (build-39, Ocarina of Time).
+        std::chrono::microseconds spent{};
+        const bool building = scheduled_prebuild->StillBuilding(
+            graphics_key, std::chrono::microseconds{std::max<s64>(native_wait_budget_us, 0)},
+            spent);
+        native_wait_budget_us -= spent.count();
+        native_wait_used_us += spent.count();
+        if (building) {
+            graphics_cache.erase(graphics_key);
+            ++prebuild_skipped_lookups;
+            return nullptr;
+        }
+    }
     if (is_new) {
         ReportNewPipelineKey(graphics_key);
         if (scheduled_prebuild) {
@@ -2440,12 +2456,12 @@ void PipelineCache::TickFrame() {
             LOG_INFO(Render_Vulkan,
                      "Background prebuild done {:.1f} s after the boot load began: {} built, {} "
                      "failed, {} taken by draws before they finished, {} built ones no draw has "
-                     "taken yet",
+                     "taken yet, {} draws skipped while theirs was still building",
                      std::chrono::duration<double>(std::chrono::steady_clock::now() -
                                                    *prebuild_load_begin)
                          .count(),
                      outcome->built, outcome->failed, outcome->taken_unfinished,
-                     outcome->unclaimed);
+                     outcome->unclaimed, prebuild_skipped_lookups);
             prebuild_load_begin.reset();
         }
     }

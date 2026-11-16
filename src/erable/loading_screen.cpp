@@ -191,6 +191,8 @@ LoadingScreen::LoadingScreen(QWidget* parent)
     });
     connect(play_now_button, &QPushButton::clicked, this, [this] {
         VideoCommon::ShaderWarm::RequestPlayNow();
+        // The precache that may follow the boot load is skipped too: the player chose to play
+        VideoCommon::ShaderWarm::RequestSkipWarm();
         play_now_button->setEnabled(false);
         play_now_button->setText(tr("Starting..."));
     });

@@ -18,8 +18,10 @@ version. Les sections suivantes gardent l'historique.
   anneau qui tourne (« Lancement du jeu… »), et le curseur d'attente de Windows pendant les
   secondes où Erable ouvre le jeu et démarre Vulkan : on voit que ça charge, pas que ça a planté.
 - Dès que 60 % des shaders sont prêts, l'écran de chargement propose « Jouer maintenant » : le jeu
-  démarre tout de suite et le reste se termine en arrière-plan pendant la partie, avec des
-  saccades le temps que ça finisse. Sans cliquer, le chargement va jusqu'au bout comme avant.
+  démarre tout de suite (la précompilation qui suit est sautée aussi) et le reste se termine en
+  arrière-plan pendant la partie. Les objets dont le shader n'est pas encore prêt apparaissent un
+  instant plus tard au lieu de figer l'image (jusqu'à 19 s d'arrêt en entrant dans une zone avant).
+  Sans cliquer, le chargement va jusqu'au bout comme avant.
 - Le record du petit jeu des feuilles est enfin gardé d'une session à l'autre.
 - Erable ne reste plus en arrière-plan après sa fermeture : si quelque chose l'y retient plus de
   20 secondes, il se ferme de lui-même (cela bloquait le journal et la mémoire du PC).
@@ -89,6 +91,8 @@ version. Les sections suivantes gardent l'historique.
   blocages de la carte.
 - Mode debug : « Arrêter et enregistrer ma session » fonctionne aussi pendant une partie ou le
   chargement des shaders, et garde le journal jusqu'à ce moment.
+- Mode debug : si le jeu se bloque à l'arrêt et qu'Erable doit fermer d'urgence, la session est
+  quand même enregistrée tout de suite, au lieu d'attendre le lancement suivant.
 - Jeux un peu plus rapides à ouvrir : leurs fichiers ne sont lus qu'au moment où ils servent.
 - Le gyroscope de la manette marche toujours après l'avoir rebranchée.
 - Le journal est écrit sur le disque chaque seconde : un plantage n'en perd plus la fin.

@@ -2874,6 +2874,16 @@ void MainWindow::ExitIfEmulationThreadStuck() {
     hotkey_registry.SaveHotkeys();
     config->SaveAllValues();
     LOG_INFO(Frontend, "Settings saved; exiting without emulation cleanup");
+    // A recording is saved now, not at the next launch (which can be much later, or never)
+    if (DebugSession::IsRecording()) {
+        if (const auto zip = DebugSession::Finish(true)) {
+#ifdef _WIN32
+            QProcess::startDetached(QStringLiteral("explorer.exe"),
+                                    {QStringLiteral("/select,") +
+                                     QDir::toNativeSeparators(QString::fromStdWString(zip->wstring()))});
+#endif
+        }
+    }
     Common::Log::Stop();
     EndProcessNow(0);
 }
