@@ -46,6 +46,8 @@ version. Les sections suivantes gardent l'historique.
   compilent bien plus vite sur les cartes Intel.
 - Les anciennes cibles de rendu qui se chevauchent sont libérées plus tôt : moins de mémoire vidéo
   occupée dans les lieux comme la Maison des Skulltulas.
+- Le réglage « Sans netteté » de l'image s'applique bien, et la fin de la vidéo d'introduction ne
+  produit plus d'erreur.
 
 **Mario Kart World**
 - Mode 60 FPS partout à vitesse normale (Configurer > jeu), avec un repli automatique à 30 FPS
@@ -79,6 +81,14 @@ version. Les sections suivantes gardent l'historique.
 - Le volume réglé dans Erable n'est plus figé au démarrage du jeu.
 - Le plein écran sans bordure se place correctement depuis une fenêtre agrandie.
 - Donkey Kong Bananza : un réglage du processeur dont le jeu a besoin reste actif.
+- Moins de plantages quand la mémoire vidéo est pleine : Erable libère de la place et réessaie.
+- Une liste interne du GPU qui grossissait sans fin pendant les longues parties est corrigée.
+- Arrêter un jeu est plus sûr (codes de triche, objets du système), et Annuler dans Configurer
+  annule aussi les changements de manette non appliqués.
+- Cartes AMD RX 6000 : nouveau réglage « Mesh shaders » (Automatique par défaut) qui évite les
+  blocages de la carte.
+- Mode debug : « Arrêter et enregistrer ma session » fonctionne aussi pendant une partie ou le
+  chargement des shaders, et garde le journal jusqu'à ce moment.
 - Jeux un peu plus rapides à ouvrir : leurs fichiers ne sont lus qu'au moment où ils servent.
 - Le gyroscope de la manette marche toujours après l'avoir rebranchée.
 - Le journal est écrit sur le disque chaque seconde : un plantage n'en perd plus la fin.

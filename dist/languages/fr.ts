@@ -2455,6 +2455,26 @@ L’activer permet de contourner ces confirmations et de quitter directement l�
         <source>Grid View</source>
         <translation>Vue en grille</translation>
     </message>
+    <message>
+        <source>Mesh Shaders</source>
+        <translation>Mesh shaders</translation>
+    </message>
+    <message>
+        <source>How Switch 2 games' mesh shader geometry is drawn.
+Native uses the GPU's mesh shaders. Compute Fallback emulates them with compute shaders: it can be slower in scenes with a lot of foliage, and it can't draw every kind of mesh program.
+Automatic uses the compute fallback on AMD RDNA2 GPUs (RX 6000 series), where native mesh shaders hang the GPU, and native mesh shaders everywhere else.</source>
+        <translation>Comment la géométrie « mesh shader » des jeux Switch 2 est dessinée.
+Natif utilise les mesh shaders de la carte graphique. Repli en compute les émule avec des compute shaders : ça peut être plus lent dans les scènes avec beaucoup de végétation, et tous les programmes mesh ne peuvent pas être dessinés.
+Automatique utilise le repli en compute sur les cartes AMD RDNA2 (série RX 6000), où les mesh shaders natifs bloquent la carte, et les mesh shaders natifs partout ailleurs.</translation>
+    </message>
+    <message>
+        <source>Native</source>
+        <translation>Natif</translation>
+    </message>
+    <message>
+        <source>Compute Fallback</source>
+        <translation>Repli en compute</translation>
+    </message>
 </context>
 <context>
     <name>ConfigureApplets</name>
