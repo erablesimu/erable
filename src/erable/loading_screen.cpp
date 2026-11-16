@@ -166,6 +166,34 @@ LoadingScreen::LoadingScreen(QWidget* parent)
     skip_button->setToolTip(tr("Start the game now. The shaders not precached yet are precached "
                                "on a later launch."));
     skip_button->hide();
+    play_now_button = new QPushButton(tr("Play now"), this);
+    play_now_button->setObjectName(QStringLiteral("skip"));
+    play_now_button->setCursor(Qt::PointingHandCursor);
+    play_now_button->hide();
+    play_now_note = new QLabel(
+        tr("The game can start now, but it will stutter until the shaders are done: they finish "
+           "in the background while you play. Otherwise loading goes on to the end."),
+        this);
+    play_now_note->setObjectName(QStringLiteral("tip"));
+    play_now_note->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    play_now_note->setWordWrap(true);
+    play_now_note->setFixedWidth(BarWidth + 80);
+    play_now_note->hide();
+    // The boot load says when the game could start: shown while shaders load, until then hidden
+    play_now_timer.setInterval(250);
+    connect(&play_now_timer, &QTimer::timeout, this, [this] {
+        const bool offered = previous_stage == VideoCore::LoadCallbackStage::Build &&
+                             VideoCommon::ShaderWarm::IsPlayNowOffered();
+        if (offered != play_now_button->isVisible()) {
+            play_now_button->setVisible(offered);
+            play_now_note->setVisible(offered);
+        }
+    });
+    connect(play_now_button, &QPushButton::clicked, this, [this] {
+        VideoCommon::ShaderWarm::RequestPlayNow();
+        play_now_button->setEnabled(false);
+        play_now_button->setText(tr("Starting..."));
+    });
     leaf_catcher = new LeafCatcher(this);
     leaf_catcher->SetControllers(&QtCommon::system->HIDCore());
     leaf_catcher->hide();
@@ -197,6 +225,9 @@ LoadingScreen::LoadingScreen(QWidget* parent)
     column->addWidget(tip, 0, Qt::AlignHCenter);
     column->addSpacing(18);
     column->addWidget(skip_button, 0, Qt::AlignHCenter);
+    column->addWidget(play_now_button, 0, Qt::AlignHCenter);
+    column->addSpacing(8);
+    column->addWidget(play_now_note, 0, Qt::AlignHCenter);
     column->addSpacing(18);
     column->addWidget(leaf_catcher, 0, Qt::AlignHCenter);
     column->addStretch(1);
@@ -321,6 +352,7 @@ void LoadingScreen::Prepare(Loader::AppLoader& loader) {
 }
 
 void LoadingScreen::OnLoadComplete() {
+    play_now_timer.stop();
     leaf_catcher->SetRunning(false);
     fadeout_animation->start(QPropertyAnimation::KeepWhenStopped);
 }
@@ -354,6 +386,15 @@ void LoadingScreen::OnLoadProgress(VideoCore::LoadCallbackStage stage, std::size
             tip_timer.stop();
         }
         skip_button->setEnabled(true);
+        play_now_button->setEnabled(true);
+        play_now_button->setText(tr("Play now"));
+        if (stage == VideoCore::LoadCallbackStage::Build) {
+            play_now_timer.start();
+        } else {
+            play_now_timer.stop();
+            play_now_button->hide();
+            play_now_note->hide();
+        }
         const bool building = stage == VideoCore::LoadCallbackStage::Build ||
                               stage == VideoCore::LoadCallbackStage::Warm;
         leaf_catcher->setVisible(building);
@@ -520,6 +561,9 @@ void LoadingScreen::paintEvent(QPaintEvent* event) {
 }
 
 void LoadingScreen::Clear() {
+    play_now_timer.stop();
+    play_now_button->hide();
+    play_now_note->hide();
 #ifndef ERABLE_QT_MOVIE_MISSING
     animation.reset();
     backing_buf.reset();

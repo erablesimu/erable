@@ -410,6 +410,32 @@ bool TakeWarmBeforeStart() {
     return warm_before_start.exchange(false, std::memory_order_relaxed);
 }
 
+namespace {
+std::atomic<bool> play_now_offered{false};
+std::atomic<bool> play_now{false};
+} // Anonymous namespace
+
+void SetPlayNowOffered(bool offered) {
+    play_now_offered.store(offered, std::memory_order_relaxed);
+}
+
+bool IsPlayNowOffered() {
+    return play_now_offered.load(std::memory_order_relaxed);
+}
+
+void RequestPlayNow() {
+    play_now.store(true, std::memory_order_relaxed);
+}
+
+bool TakePlayNow() {
+    return play_now.exchange(false, std::memory_order_relaxed);
+}
+
+void ResetPlayNow() {
+    play_now_offered.store(false, std::memory_order_relaxed);
+    play_now.store(false, std::memory_order_relaxed);
+}
+
 void RequestSkipWarm() {
     skip_warm.store(true, std::memory_order_relaxed);
 }

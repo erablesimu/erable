@@ -109,6 +109,16 @@ bool TakeWarmBeforeStart();
 void RequestSkipWarm();
 bool TakeSkipWarm();
 
+/// "Play now" of the loading screen. The boot load offers it once the game could start (60% of
+/// its pipelines built, all compute ones): `SetPlayNowOffered(true)` until the load ends. The
+/// player's click is taken (and cleared) by the renderer, which then starts the game and builds
+/// the rest in the background. A new boot load clears both.
+void SetPlayNowOffered(bool offered);
+bool IsPlayNowOffered();
+void RequestPlayNow();
+bool TakePlayNow();
+void ResetPlayNow();
+
 /// Removes the title's precache file, its marker and count, the list of precached graphics
 /// pipelines older builds kept and a leftover temporary file (rebuild or delete from the UI). Returns false when a file exists but cannot be removed, with
 /// the reason in `error` when given.

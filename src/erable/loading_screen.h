@@ -104,6 +104,10 @@ private:
 
     QGraphicsOpacityEffect* opacity_effect = nullptr;
     QPushButton* skip_button = nullptr;
+    /// Shown once the game could start before every shader is built (the boot load offers it)
+    QPushButton* play_now_button = nullptr;
+    QLabel* play_now_note = nullptr;
+    QTimer play_now_timer;
     QLabel* game_icon = nullptr;
     QLabel* game_title = nullptr;
     QLabel* percent = nullptr;

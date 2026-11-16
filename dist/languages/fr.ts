@@ -7131,6 +7131,18 @@ Message de débogage :</translation>
         <source>Tip: Debug mode &gt; Record my session saves a log to attach to a report.</source>
         <translation>Astuce : Mode debug &gt; Enregistrer ma session crée un journal à joindre à un rapport.</translation>
     </message>
+    <message>
+        <source>Play now</source>
+        <translation>Jouer maintenant</translation>
+    </message>
+    <message>
+        <source>The game can start now, but it will stutter until the shaders are done: they finish in the background while you play. Otherwise loading goes on to the end.</source>
+        <translation>Le jeu peut démarrer tout de suite, mais il saccadera tant que les shaders ne sont pas finis : ils se terminent en arrière-plan pendant que vous jouez. Sinon, le chargement continue jusqu&apos;au bout.</translation>
+    </message>
+    <message>
+        <source>Starting...</source>
+        <translation>Lancement...</translation>
+    </message>
 </context>
 <context>
     <name>Lobby</name>

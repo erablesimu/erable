@@ -1816,15 +1816,17 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
                  "Unused graphics pipelines are destroyed only past {} built{}", kept_pipelines,
                  build_all ? "; all cached ones are built at boot up to that" : "");
     }
+    VideoCommon::ShaderWarm::ResetPlayNow();
     {
         std::scoped_lock lock{state.mutex};
         callback(VideoCore::LoadCallbackStage::Build, state.built, state.total);
         state.has_loaded = true;
     }
-    // The game starts once most of the boot pipelines are built (60%, EDEN_NX2_PLAYABLE_SHARE
-    // in percent, 100 = all), every compute one among them: the rest are built by the background
-    // prebuild while it plays, a draw that needs one first building it at once. A boot load the
-    // driver had to compile in full took 11 minutes (build-36, Ocarina of Time).
+    // Once most of the boot pipelines are built (60%, EDEN_NX2_PLAYABLE_SHARE in percent, 100 =
+    // never), every compute one among them, the loading screen offers "Play now": the game then
+    // starts and the background prebuild builds the rest while it plays, a draw that needs one
+    // first building it at once (stutters until it is done). Without the click the load runs to
+    // the end. A boot load the driver had to compile in full took 11 minutes (build-36, Ocarina).
     static const size_t playable_percent = [] {
         const char* const value = std::getenv("EDEN_NX2_PLAYABLE_SHARE");
         const unsigned long percent = value != nullptr ? std::strtoul(value, nullptr, 10) : 60;
@@ -1838,7 +1840,8 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
             const size_t compute_done = state.built - state.graphics_done;
             if (compute_done >= compute_total && state.built * 100 >= state.total * playable_percent &&
                 state.graphics_done < queued_graphics) {
-                handed_off = true;
+                VideoCommon::ShaderWarm::SetPlayNowOffered(true);
+                handed_off = VideoCommon::ShaderWarm::TakePlayNow();
             }
         }
         if (handed_off) {
@@ -1848,6 +1851,7 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
         std::this_thread::sleep_for(std::chrono::milliseconds{50});
     }
     boot.Wait();
+    VideoCommon::ShaderWarm::ResetPlayNow();
     size_t handed_pipelines = 0;
     if (handed_off && !stop_loading.stop_requested()) {
         // The boot pipelines a cancelled job never built, for the background prebuild
@@ -1876,7 +1880,7 @@ void PipelineCache::LoadPipelinesV2(u64 title_id,
             prebuild_load_begin = load_begin;
         }
         LOG_INFO(Render_Vulkan,
-                 "Shader cache v2 boot load: the game starts at {}% built, {} pipelines left "
+                 "Shader cache v2 boot load: Play now at {}% or more built, {} pipelines left "
                  "to the background prebuild",
                  playable_percent, handed_pipelines);
     }

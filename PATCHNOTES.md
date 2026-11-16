@@ -7,8 +7,8 @@ version. Les sections suivantes gardent l'historique.
 
 **À savoir**
 - Build 39 : le traducteur de shaders change, donc les shaders sont recompilés une fois au
-  premier lancement de chaque jeu (10 à 30 minutes pour Ocarina of Time, puis c'est fini). Le jeu
-  démarre dès 60 % ; le reste se fait pendant la partie.
+  premier lancement de chaque jeu (10 à 30 minutes pour Ocarina of Time, puis c'est fini). Dès
+  60 %, vous pouvez choisir « Jouer maintenant » (voir plus bas).
 
 **Accueil**
 - Bouton « Plein écran » en haut à droite de l'accueil (ou touche F11) : l'accueil et la
@@ -17,9 +17,9 @@ version. Les sections suivantes gardent l'historique.
 - Au lancement d'un jeu depuis l'accueil, son image et son nom s'affichent tout de suite avec un
   anneau qui tourne (« Lancement du jeu… »), et le curseur d'attente de Windows pendant les
   secondes où Erable ouvre le jeu et démarre Vulkan : on voit que ça charge, pas que ça a planté.
-- Le jeu démarre dès que 60 % des shaders sont prêts au chargement ; le reste se prépare en
-  arrière-plan pendant la partie (quelques saccades le temps que ça finisse). Après une mise à jour
-  qui oblige à tout recompiler, on n'attend plus 10 à 30 minutes devant l'écran de chargement.
+- Dès que 60 % des shaders sont prêts, l'écran de chargement propose « Jouer maintenant » : le jeu
+  démarre tout de suite et le reste se termine en arrière-plan pendant la partie, avec des
+  saccades le temps que ça finisse. Sans cliquer, le chargement va jusqu'au bout comme avant.
 - Le record du petit jeu des feuilles est enfin gardé d'une session à l'autre.
 - Erable ne reste plus en arrière-plan après sa fermeture : si quelque chose l'y retient plus de
   20 secondes, il se ferme de lui-même (cela bloquait le journal et la mémoire du PC).
