@@ -42,6 +42,7 @@ add_executable(tests
     core/keyblob_cmac.cpp
     core/aes_xts.cpp
     common/display_hdr.cpp
+    common/restore_eden_path.cpp
     common/dkb_cpu_trace.cpp
     common/dkb_frame_trace.cpp
     audio_core/nx2_sysmix.cpp
