@@ -293,6 +293,11 @@ size_t PresentManager::MaxExtraFrames() const {
     return image_count - 1;
 }
 
+size_t PresentManager::FreeFrames() {
+    std::scoped_lock lock{free_mutex};
+    return free_queue.size();
+}
+
 bool PresentManager::NeedsStorage(const Frame* frame, bool required) const {
     return required && frame->storage_capable && !frame->storage_view;
 }
@@ -521,8 +526,10 @@ void PresentManager::SetImageCount() {
 #ifdef HAS_LSFG
     const size_t generations = Settings::FrameGenMaxGenerations();
     const size_t queued_composites = Settings::values.frame_gen_queue_target.GetValue() + 1;
+    // One frame more than the presents of the queued composites, for the next game frame
+    // (GenerationsWithoutWaiting).
     image_count =
-        std::clamp<size_t>((generations + 1) * queued_composites, swapchain.GetImageCount(),
+        std::clamp<size_t>((generations + 1) * queued_composites + 1, swapchain.GetImageCount(),
                            MAX_FRAMES_IN_FLIGHT);
 #else
     image_count = std::min<size_t>(swapchain.GetImageCount(), MAX_FRAMES_IN_FLIGHT);

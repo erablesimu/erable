@@ -98,6 +98,9 @@ public:
     /// How many additional frames can be queued without stalling the render thread
     [[nodiscard]] size_t MaxExtraFrames() const;
 
+    /// Frames GetRenderFrame can take now without waiting for the present thread.
+    [[nodiscard]] size_t FreeFrames();
+
     [[nodiscard]] std::size_t SwapchainImageCount() const { return swapchain_image_count; }
     [[nodiscard]] VkFormat SwapchainImageFormat() const { return swapchain_image_format; }
 
