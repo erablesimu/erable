@@ -135,8 +135,8 @@ std::optional<VAddr> AppLoader_NSO::LoadModule(Kernel::KProcess& process, Core::
     }();
     const u64 aligned_extent =
         (u64{module_start} + segments_end + (pass_arguments ? NSO_ARGUMENT_DATA_ALLOCATION_SIZE : 0) +
-         nso_header.segments[2].bss_size + Core::Memory::LICHII_PAGEMASK) &
-        ~u64{Core::Memory::LICHII_PAGEMASK};
+         nso_header.segments[2].bss_size + Core::Memory::ERABLE_PAGEMASK) &
+        ~u64{Core::Memory::ERABLE_PAGEMASK};
     const u64 image_extent = aligned_extent + post_patch_size;
     if (image_extent > std::numeric_limits<u32>::max()) {
         LOG_ERROR(Loader, "{}: segments end at {:#x}, past a 32-bit image", nso_file.GetName(),
