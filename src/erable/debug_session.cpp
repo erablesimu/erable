@@ -243,15 +243,18 @@ bool RestartRequested() {
     return restart_requested;
 }
 
-std::optional<fs::path> Finish() {
+std::optional<fs::path> Finish(bool during_game) {
     if (!recording) {
         return std::nullopt;
     }
-    LOG_INFO(Frontend, "Debug session: recording ends");
+    LOG_INFO(Frontend, "Debug session: recording ends{}", during_game ? " (game still running)" : "");
     Common::Log::Flush();
     recording = false;
     RemoveMarker();
-    const auto folder = Collect(Common::Log::FilePath(), started_at, "Recording stopped");
+    const auto folder =
+        Collect(Common::Log::FilePath(), started_at,
+                during_game ? "Recording stopped while the game was running or loading"
+                            : "Recording stopped");
     return folder ? Zip(*folder) : std::nullopt;
 }
 

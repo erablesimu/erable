@@ -34,7 +34,8 @@ void StartAtNextLaunch();
 [[nodiscard]] bool RestartRequested();
 
 /// Packs this process's session and stops recording. Returns the zip, if one could be written.
-std::optional<std::filesystem::path> Finish();
+/// `during_game`: a game is running or loading, so the log holds the session up to now.
+std::optional<std::filesystem::path> Finish(bool during_game = false);
 
 /// The zip packed from a recording the last run left unfinished, once.
 std::optional<std::filesystem::path> TakeInterruptedSession();

@@ -1941,15 +1941,8 @@ void MainWindow::UpdateDebugSessionUi() {
 
 void MainWindow::OnRecordSession() {
     if (DebugSession::IsRecording()) {
-        if (emulation_running) {
-            QMessageBox::information(
-                this, tr("Record my session"),
-                tr("Close the game first (Emulation > Stop), so the log holds the whole session. "
-                   "Then choose Debug mode > Stop and save my session."));
-            UpdateDebugSessionUi();
-            return;
-        }
-        const auto zip = DebugSession::Finish();
+        // During a game or its shader loading too: the log so far is saved, the game goes on.
+        const auto zip = DebugSession::Finish(emulation_running || boot_in_progress);
         UpdateDebugSessionUi();
         if (zip) {
             ShowSavedSession(*zip, false);
