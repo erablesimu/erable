@@ -48,6 +48,15 @@
 
 namespace VideoCommon {
 
+/// EDEN_NX2_TC_TRACE=1: log every image the cache creates, uploads and deletes.
+[[nodiscard]] inline bool TextureCacheTrace() {
+    static const bool enabled = [] {
+        const char* const v = std::getenv("EDEN_NX2_TC_TRACE");
+        return v != nullptr && v[0] == '1';
+    }();
+    return enabled;
+}
+
 /// EDEN_NATIVE_DRAW_DIAGNOSTICS is read once: getenv scans the whole environment block on Windows.
 [[nodiscard]] inline bool NativeDrawDiagnostics() {
     static const bool enabled = std::getenv("EDEN_NATIVE_DRAW_DIAGNOSTICS") != nullptr;
