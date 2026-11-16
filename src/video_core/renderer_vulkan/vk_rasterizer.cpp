@@ -1039,6 +1039,9 @@ void RasterizerVulkan::PrepareDraw(bool is_indexed, Func&& draw_func, bool is_in
         }
         return;
     }
+    if (VideoCommon::OotNetwork::BypassEnabled(Settings::GetCurrentProgramID())) {
+        TrackOotTonemappedImage();
+    }
     // Task/mesh pipelines: the draw's vertex count is the number of task workgroups.
     mesh_draw = pipeline->IsMeshPipeline();
     // EDEN_NX2_NO_MESH=1: skip task/mesh draws as before they were supported (A/B comparisons).
@@ -1834,6 +1837,23 @@ VideoCommon::OotNetwork::BypassState* RasterizerVulkan::OotNetworkBypass() {
         return nullptr;
     }
     return &oot_network_bypass;
+}
+
+void RasterizerVulkan::TrackOotTonemappedImage() {
+    const auto& target = maxwell3d->regs.rt[0];
+    auto& bypass = oot_network_bypass;
+    constexpr auto relaxed = std::memory_order_relaxed;
+    // The scene draws repeat one target; only a change of target takes the lock.
+    if (target.format != Tegra::RenderTargetFormat::B10G11R11_FLOAT ||
+        target.tile_mode.is_pitch_linear || bypass.latest_address.load(relaxed) == target.Address() ||
+        !VideoCommon::OotNetwork::IsTonemapCandidate(
+            target.Address(), target.width, target.height, bypass.input_width.load(relaxed),
+            bypass.input_height.load(relaxed), bypass.output_address.load(relaxed))) {
+        return;
+    }
+    std::scoped_lock lock{bypass.mutex};
+    bypass.latest_draw = target;
+    bypass.latest_address.store(target.Address(), relaxed);
 }
 
 void RasterizerVulkan::TraceDrawFailure(std::string_view reason) {
