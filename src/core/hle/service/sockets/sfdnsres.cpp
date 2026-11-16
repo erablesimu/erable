@@ -112,7 +112,9 @@ static bool IsBlockedHost(const std::string& host) {
 static void RememberRedirectedHost(const std::vector<Network::AddrInfo>& addresses,
                                    const std::string& host) {
     for (const auto& addrinfo : addresses) {
-        Nextendo::RememberHost(Network::IPv4AddressToString(addrinfo.addr.ip), host);
+        if (addrinfo.addr.family == Network::Domain::INET) {
+            Nextendo::RememberHost(Network::IPv4AddressToString(addrinfo.addr.ip), host);
+        }
     }
 }
 
@@ -281,29 +283,43 @@ void SFDNSRES::GetHostByNameRequestWithOptions(HLERequestContext& ctx) {
     });
 }
 
-static std::vector<u8> SerializeAddrInfo(const std::vector<Network::AddrInfo>& vec,
-                                         std::string_view host) {
+std::vector<u8> SerializeAddrInfo(const std::vector<Network::AddrInfo>& vec,
+                                  std::string_view host) {
     // Adapted from
     // https://github.com/switchbrew/libnx/blob/c5a9a909a91657a9818a3b7e18c9b91ff0cbb6e3/nx/source/runtime/resolver.c#L190
     std::vector<u8> data;
 
     for (const Network::AddrInfo& addrinfo : vec) {
+        const bool ipv6 = addrinfo.addr.family == Network::Domain::INET6;
+        const u8 addrlen = ipv6 ? sizeof(SockAddrIn6) : 16;
         // serialized addrinfo:
         Append<u32_be>(data, 0xBEEFCAFE);                                        // magic
         Append<u32_be>(data, 0);                                                 // ai_flags
         Append<u32_be>(data, static_cast<u32>(Translate(addrinfo.family)));      // ai_family
         Append<u32_be>(data, static_cast<u32>(Translate(addrinfo.socket_type))); // ai_socktype
         Append<u32_be>(data, static_cast<u32>(Translate(addrinfo.protocol)));    // ai_protocol
-        Append<u32_be>(data, 16); // ai_addrlen
+        Append<u32_be>(data, addrlen); // ai_addrlen
         // ^ *not* sizeof(SerializedSockAddrIn), not that it matters since they're the same size
 
-        // ai_addr:
-        Append<u16_be>(data, static_cast<u16>(Translate(addrinfo.addr.family))); // sin_family
+        // ai_addr, a BSD sockaddr_in or sockaddr_in6:
+        Append<u8>(data, addrlen);                                          // sin_len
+        Append<u8>(data, static_cast<u8>(Translate(addrinfo.addr.family))); // sin_family
         // On the Switch, the following fields are passed through htonl despite
         // already being big-endian, so they end up as little-endian.
-        Append<u16_le>(data, addrinfo.addr.portno);                            // sin_port
-        Append<u32_le>(data, Network::IPv4AddressToInteger(addrinfo.addr.ip)); // sin_addr
-        data.resize(data.size() + 8, 0);                                       // sin_zero
+        Append<u16_le>(data, addrinfo.addr.portno); // sin_port
+        if (ipv6) {
+            // As libnx's resolver.c serializes a sockaddr_in6: flowinfo and scope_id are
+            // swapped once more, the address is not.
+            Append<u32_le>(data, addrinfo.addr.flowinfo); // sin6_flowinfo
+            const size_t offset = data.size();
+            data.resize(offset + addrinfo.addr.ip6.size());
+            std::memcpy(data.data() + offset, addrinfo.addr.ip6.data(),
+                        addrinfo.addr.ip6.size());          // sin6_addr
+            Append<u32_be>(data, addrinfo.addr.scope_id); // sin6_scope_id
+        } else {
+            Append<u32_le>(data, Network::IPv4AddressToInteger(addrinfo.addr.ip)); // sin_addr
+            data.resize(data.size() + 8, 0);                                       // sin_zero
+        }
 
         if (addrinfo.canon_name.has_value()) {
             AppendNulTerminated(data, *addrinfo.canon_name);
@@ -311,13 +327,32 @@ static std::vector<u8> SerializeAddrInfo(const std::vector<Network::AddrInfo>& v
             data.push_back(0);
         }
 
-        LOG_INFO(Service, "Resolved host '{}' to IPv4 address {}", host,
-                 Network::IPv4AddressToString(addrinfo.addr.ip));
+        if (ipv6) {
+            LOG_INFO(Service, "Resolved host '{}' to IPv6 address {}", host,
+                     Network::IPv6AddressToString(addrinfo.addr.ip6));
+        } else {
+            LOG_INFO(Service, "Resolved host '{}' to IPv4 address {}", host,
+                     Network::IPv4AddressToString(addrinfo.addr.ip));
+        }
     }
 
     data.resize(data.size() + 4, 0); // 4-byte sentinel value
 
     return data;
+}
+
+Network::Domain HintsFamily(std::span<const u8> hints) {
+    // A serialized addrinfo: magic, ai_flags, ai_family, big-endian. Only AF_INET6 hints get
+    // IPv6 addresses; an unspecified family resolves IPv4 alone, as it always has.
+    std::array<u32_be, 3> header{};
+    if (hints.size() < sizeof(header)) {
+        return Network::Domain::INET;
+    }
+    std::memcpy(header.data(), hints.data(), sizeof(header));
+    if (header[0] == 0xBEEFCAFE && header[2] == static_cast<u32>(Domain::INET6)) {
+        return Network::Domain::INET6;
+    }
+    return Network::Domain::INET;
 }
 
 static std::pair<u32, GetAddrInfoError> GetAddrInfoRequestImpl(HLERequestContext& ctx,
@@ -345,6 +380,17 @@ static std::pair<u32, GetAddrInfoError> GetAddrInfoRequestImpl(HLERequestContext
     if (Common::Nextendo::OnlinePlayActive()) {
         host = Nextendo::ExpandNsdHost(std::move(host));
     }
+
+    std::optional<std::string> service = std::nullopt;
+    if (ctx.CanReadBuffer(1)) {
+        const std::span<const u8> service_buffer = ctx.ReadBuffer(1);
+        service = Common::StringFromBuffer(service_buffer);
+    }
+
+    const std::span<const u8> hints =
+        ctx.CanReadBuffer(2) ? ctx.ReadBuffer(2) : std::span<const u8>{};
+    const Network::Domain family = HintsFamily(hints);
+
     const auto redirect = Nextendo::RedirectAddress(host, program_id);
 
     // Prevent resolution of Nintendo servers
@@ -353,15 +399,9 @@ static std::pair<u32, GetAddrInfoError> GetAddrInfoRequestImpl(HLERequestContext
         return {0, GetAddrInfoError::AGAIN};
     }
 
-    std::optional<std::string> service = std::nullopt;
-    if (ctx.CanReadBuffer(1)) {
-        const std::span<const u8> service_buffer = ctx.ReadBuffer(1);
-        service = Common::StringFromBuffer(service_buffer);
-    }
+    // Serialized hints otherwise pick only the family.
 
-    // Serialized hints are also passed in a buffer, but are ignored for now.
-
-    auto res_v = Network::GetAddressInfo(redirect.value_or(host), service);
+    auto res_v = Network::GetAddressInfo(redirect.value_or(host), service, family);
     if (auto* res = std::get_if<std::vector<Network::AddrInfo>>(&res_v)) {
         if (redirect) {
             RememberRedirectedHost(*res, host);

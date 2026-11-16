@@ -51,6 +51,8 @@ enum class Errno {
     INPROGRESS,
     ISCONN,
     ADDRINUSE,
+    ADDRNOTAVAIL,
+    AFNOSUPPORT,
     OTHER,
 };
 
@@ -136,7 +138,15 @@ void SetDirectLanActive(bool active);
 std::string IPv4AddressToString(IPv4Address ip_addr);
 u32 IPv4AddressToInteger(IPv4Address ip_addr);
 
+std::string IPv6AddressToString(IPv6Address ip_addr);
+
+/// The address as text: a.b.c.d:port, or [v6]:port for INET6
+std::string SockAddrToString(const SockAddrIn& addr);
+
 // named to avoid name collision with Windows macro
-std::variant<std::vector<AddrInfo>, GetAddrInfoError> GetAddressInfo(const std::string& host, const std::optional<std::string>& service);
+/// Resolves host for family INET (A records) or INET6 (AAAA records).
+std::variant<std::vector<AddrInfo>, GetAddrInfoError> GetAddressInfo(
+    const std::string& host, const std::optional<std::string>& service,
+    Domain family = Domain::INET);
 
 } // namespace Network

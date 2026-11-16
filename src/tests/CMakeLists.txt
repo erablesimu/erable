@@ -254,6 +254,8 @@ add_executable(tests
     core/priority_queue.cpp
     core/internal_network/network.cpp
     core/bsd_sockopt_ipc.cpp
+    core/bsd_ipv6_ipc.cpp
+    core/ipv6_sockets.cpp
     core/numeric_name_info.cpp
     core/numeric_name_info_ipc.cpp
     core/prepo_async_context.cpp
