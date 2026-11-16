@@ -832,6 +832,14 @@ void TextureCache<P>::TickFrame() {
                             critical_memory = (std::max)(critical_memory, raised);
                             expected_memory =
                                 critical_memory - (std::min)(gap, critical_memory / 2);
+                            // The retention floor is compared with the same usage, so it gets the
+                            // same raise: without it the usage stayed past the floor, and images
+                            // went after the mode's age instead of MinEvictionAge.
+                            const u64 heap_room =
+                                heap_budget - (std::min)(room_margin, heap_budget / 2);
+                            retention_limit = (std::min)(
+                                (std::min)(retention_limit + other_memory, heap_room),
+                                host_critical);
                         }
                     }
                     // Log the first values and real changes (the budget moves by a few MiB all
