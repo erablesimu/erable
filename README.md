@@ -1,8 +1,6 @@
 <p align="center">
   <img src="dist/erable.png" alt="Erable" width="160">
 </p>
-
-# SPDX-FileCopyrightText: 2018 yuzu Emulator Project
 # Erable
 
 Erable est l'émulateur Nintendo Switch 2 de la famille, en français, avec ses propres
