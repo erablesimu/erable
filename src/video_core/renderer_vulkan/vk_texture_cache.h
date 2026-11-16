@@ -283,6 +283,8 @@ public:
 
     void BarrierFeedbackLoop();
 
+    VkImageView ResolveColorFeedback(const ImageView& sampled, const ImageView& attachment);
+
     bool IsFormatDitherable(VideoCore::Surface::PixelFormat format);
     bool IsFormatScalable(VideoCore::Surface::PixelFormat format);
 
@@ -422,6 +424,16 @@ public:
     u64 image_pool_given{};
     u64 image_pool_evicted{};
     void TrimImagePool(u64 max_bytes);
+    struct ColorFeedbackSnapshot {
+        vk::Image image;
+        vk::ImageView view;
+        VideoCommon::Extent3D size;
+        VkComponentMapping swizzle;
+        u64 tick{};
+        u32 unused_frames{};
+        bool used_this_frame{};
+    };
+    std::vector<ColorFeedbackSnapshot> color_feedback_snapshots;
 };
 
 class Framebuffer {
