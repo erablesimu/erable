@@ -160,7 +160,7 @@ Buffer::Buffer(BufferCacheRuntime& runtime, DAddr cpu_addr_, u64 size_bytes_,
                                    0, barrier);
         });
     }
-    if (runtime.device.HasDebuggingToolAttached()) {
+    if (runtime.device.NamesObjects()) {
         buffer.SetObjectNameEXT(fmt::format("Buffer {:#x}", CpuAddr()).c_str());
     }
     if (device->IsBufferDeviceAddressSupported()) {
@@ -248,7 +248,7 @@ public:
             .pQueueFamilyIndices = nullptr,
         };
         buffer = memory_allocator.CreateBuffer(buffer_ci, MemoryUsage::DeviceLocal);
-        if (device.HasDebuggingToolAttached()) {
+        if (device.NamesObjects()) {
             buffer.SetObjectNameEXT("Quad LUT");
         }
 
@@ -980,7 +980,7 @@ vk::Buffer BufferCacheRuntime::CreateNullBuffer() {
         create_info.usage |= VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
     }
     vk::Buffer ret = memory_allocator.CreateBuffer(create_info, MemoryUsage::DeviceLocal);
-    if (device.HasDebuggingToolAttached()) {
+    if (device.NamesObjects()) {
         ret.SetObjectNameEXT("Null buffer");
     }
 

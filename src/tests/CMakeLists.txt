@@ -56,6 +56,7 @@ add_executable(tests
     video_core/ampere_yoshi_title.cpp
     video_core/ampere_yoshi_compute.cpp
     video_core/scaled_image_fits.cpp
+    video_core/vulkan_address_map.cpp
     video_core/texture_rect_descriptor.cpp
     video_core/join_whole_copy.cpp
     video_core/padded_square.cpp
