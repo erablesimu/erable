@@ -453,6 +453,18 @@ TEST_CASE("Ampere constant banks 24-31 read the root tables from bank 17", "[vid
 
     // MOV R0, c[0x19][0x100] is past its 256-byte table.
     CHECK_FALSE(lower({{0x00007a02, 0x06404000, 0x00000f00, 0x040fc400}}));
+
+    // ULDC.U8 UR8, c[0x19][UR6-0x1] and c[0x18][UR6-0x1]: an indexed displacement is signed, so
+    // table 1's base wraps it to 0xff and bank 24 keeps 0xffff.
+    for (const auto& [bank, offset] : {std::pair{25U, 0xffU}, std::pair{24U, 0xffffU}}) {
+        const u32 address = (bank << 22) | (0xffffU << 6);
+        const auto indexed = lower({{0x06087abb, address, 0x08000000, 0x000fe400}});
+        INFO(indexed.error);
+        REQUIRE(static_cast<bool>(indexed));
+        const u64 ldc = FindMaxwell(indexed, 0xef9, 52);
+        CHECK(field(ldc, 36, 5) == 17);
+        CHECK(field(ldc, 20, 16) == offset);
+    }
 }
 
 TEST_CASE("Ampere Ocarina byte constant loads, ULEA carries to UP3 and two-source F2IP",
