@@ -31,6 +31,12 @@ EDEN_NX2_SPLIT=2
 # offers "Play now": the rest are then built in the background while it plays. =100 never offers it.
 #EDEN_NX2_PLAYABLE_SHARE=100
 
+# Windows NVIDIA: Erable keeps its own Vulkan pipeline cache beside the driver's, so an Erable
+# update doesn't rebuild every pipeline. =0 leaves it to the driver alone, as before. The file is
+# not saved past EDEN_NX2_VK_CACHE_MAX_MIB (3072 by default).
+#EDEN_NX2_NVIDIA_OWN_CACHE=0
+#EDEN_NX2_VK_CACHE_MAX_MIB=3072
+
 # Batch GPU fence syncpoints to reduce host driver overhead and smooth frametimes.
 EDEN_NX2_FENCE_BATCH=1
 

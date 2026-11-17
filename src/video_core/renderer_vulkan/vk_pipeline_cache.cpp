@@ -94,6 +94,25 @@
 namespace Vulkan {
 
 namespace {
+/// Windows NVIDIA keeps its own disk cache, and Erable kept no Vulkan one there: after each Erable
+/// update that cache missed (Ocarina of Time: 471 s to 60% instead of 12 s, build 40), while the
+/// driver accepts a cache it wrote as long as its own version holds. Erable keeps one there too.
+/// EDEN_NX2_NVIDIA_OWN_CACHE=0 leaves it to the driver alone, as before.
+bool KeepOwnCacheOnNvidia(const Vulkan::Device& device) {
+#ifdef _WIN32
+    if (device.GetDriverID() != VK_DRIVER_ID_NVIDIA_PROPRIETARY) {
+        return false;
+    }
+    const char* const own = std::getenv("EDEN_NX2_NVIDIA_OWN_CACHE");
+    return own == nullptr || own[0] != '0';
+#else
+    (void)device;
+    return false;
+#endif
+}
+} // Anonymous namespace
+
+namespace {
 using Shader::Backend::SPIRV::EmitSPIRV;
 using Shader::Maxwell::ConvertLegacyToGeneric;
 using Shader::Maxwell::GenerateGeometryPassthrough;
@@ -565,7 +584,7 @@ PipelineCache::PipelineCache(Tegra::MaxwellDeviceMemoryManager& device_memory_,
       buffer_cache{buffer_cache_}, texture_cache{texture_cache_}, shader_notify{shader_notify_},
       use_asynchronous_shaders{Settings::values.use_asynchronous_shaders.GetValue()},
       use_vulkan_pipeline_cache{Settings::values.use_vulkan_driver_pipeline_cache.GetValue() &&
-                                !device_.DriverCachesPipelines()},
+                                (!device_.DriverCachesPipelines() || KeepOwnCacheOnNvidia(device_))},
       serialization_thread(1, "VkPipelineSerialization", {}, Common::ThreadPlacement::Background) {
     // A sixty-fourth of the RAM (16 GB: 256 MB), about 25 KB per evicted pipeline
     const u64 ram = Common::GetMemInfo().TotalPhysicalMemory;
@@ -3986,6 +4005,24 @@ void PipelineCache::SerializeVulkanPipelineCache(const std::filesystem::path& fi
         std::vector<char> cache_data;
         if (pipeline_cache) {
             pipeline_cache.Read(&cache_size, nullptr);
+            // A cap, so a driver that stores large blobs never fills the disk (one NVIDIA driver
+            // gave ~7.8 MB of pipeline binary a pipeline): past it the file keeps its last copy.
+            // EDEN_NX2_VK_CACHE_MAX_MIB moves it (default 3072).
+            static const size_t max_bytes = [] {
+                const char* const value = std::getenv("EDEN_NX2_VK_CACHE_MAX_MIB");
+                const unsigned long long mib =
+                    value != nullptr ? std::strtoull(value, nullptr, 10) : 3072ULL;
+                return static_cast<size_t>(mib) << 20;
+            }();
+            if (cache_size > max_bytes) {
+                LOG_WARNING(Render_Vulkan,
+                            "Vulkan driver pipeline cache is {} MiB, over the {} MiB cap: not saved",
+                            cache_size >> 20, max_bytes >> 20);
+                file.close();
+                std::error_code remove_error;
+                std::filesystem::remove(temporary, remove_error);
+                return;
+            }
             cache_data.resize(cache_size);
             pipeline_cache.Read(&cache_size, cache_data.data());
         }
@@ -4017,8 +4054,10 @@ void PipelineCache::SerializeVulkanPipelineCache(const std::filesystem::path& fi
         return;
     }
 
-    LOG_INFO(Render_Vulkan, "Vulkan driver pipelines cached at: {}",
-             Common::FS::PathToUTF8String(filename));
+    std::error_code size_error;
+    const auto saved = std::filesystem::file_size(filename, size_error);
+    LOG_INFO(Render_Vulkan, "Vulkan driver pipelines cached at: {} ({} MiB)",
+             Common::FS::PathToUTF8String(filename), size_error ? 0 : saved >> 20);
 }
 
 vk::PipelineCache PipelineCache::LoadVulkanPipelineCache(const std::filesystem::path& filename,
