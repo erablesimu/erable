@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -22,6 +23,7 @@
 #include "common/fs/fs_util.h"
 #include "common/fs/path_util.h"
 #include "common/settings.h"
+#include "common/string_util.h"
 #include "core/core.h"
 #include "core/file_sys/card_image.h"
 #include "core/file_sys/content_archive.h"
@@ -622,6 +624,20 @@ void GameListWorker::run() {
         RecordEvent([=](GameListModel* model) { model->AddDirEntry(pending->release()); });
     };
 
+    // Files already listed through an earlier game folder. Folders can overlap: Erable's own
+    // games folder (Documents/Erable/Jeux, searched first) inside an older folder searched with
+    // its subfolders listed every game moved into it twice.
+    std::set<std::string> listed_files;
+    const auto file_key = [](const std::filesystem::path& path) {
+        std::error_code ec;
+        const auto canonical = std::filesystem::weakly_canonical(path, ec);
+        std::string key = Common::FS::PathToUTF8String(ec ? path : canonical);
+#ifdef _WIN32
+        key = Common::ToLower(key);
+#endif
+        return key;
+    };
+
     for (UISettings::GameDir& game_dir : game_dirs) {
         if (stop_requested) {
             break;
@@ -663,9 +679,20 @@ void GameListWorker::run() {
                      "Discovery: candidates={} directories={} skipped_romfs={} errors={} cancelled={}",
                      discovery.files.size(), discovery.directories.size(), discovery.skipped_romfs,
                      discovery.errors, stop_requested.load());
-            ScanFileSystem(ScanTarget::FillManualContentProvider, discovery.files, game_list_dir);
+            std::vector<std::filesystem::path> files;
+            files.reserve(discovery.files.size());
+            for (const auto& file : discovery.files) {
+                if (listed_files.insert(file_key(file)).second) {
+                    files.push_back(file);
+                }
+            }
+            if (files.size() != discovery.files.size()) {
+                LOG_INFO(Frontend, "Discovery: {} files already listed through another game folder",
+                         discovery.files.size() - files.size());
+            }
+            ScanFileSystem(ScanTarget::FillManualContentProvider, files, game_list_dir);
             patch_cache.Clear();
-            ScanFileSystem(ScanTarget::PopulateGameList, discovery.files, game_list_dir);
+            ScanFileSystem(ScanTarget::PopulateGameList, files, game_list_dir);
         } else {
             AddTitlesToGameList(game_list_dir, parent_type);
         }
