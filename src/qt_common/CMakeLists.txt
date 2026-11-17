@@ -43,7 +43,7 @@ add_library(qt_common STATIC
     render/context.h
     render/emu_thread.h render/emu_thread.cpp)
 
-if (LICHII_TESTS)
+if (ERABLE_TESTS)
     add_executable(game_list_patch_cache_tests
         ../../tools/integration/game_list_patch_cache_test.cpp)
     target_include_directories(game_list_patch_cache_tests PRIVATE ..)
