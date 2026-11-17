@@ -316,7 +316,9 @@ std::unique_ptr<TranslationMap> InitializeTranslations(QObject* parent) {
     INSERT(Settings, bg_blue, QString(), QString());
 
     INSERT(Settings, frame_gen, tr("Enable Frame Generation"),
-           tr("Paused while HDR output is active."));
+           tr("Generates intermediate frames for smoother motion. Requires Vulkan.\n"
+              "Optical Flow Interpolation is built in. LSFG requires Lossless.dll in the "
+              "user directory's lossless folder."));
     INSERT(Settings, frame_gen_type, tr("Frame Generation Type"),
            tr("Optical Flow Interpolation is built in and runs on any GPU.\nNVIDIA DLSS Frame "
               "Generation (Windows only) needs a GeForce RTX 40 series or newer GPU (3x and 4x need "
