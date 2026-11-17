@@ -93,6 +93,12 @@ version. Les sections suivantes gardent l'historique.
   chargement des shaders, et garde le journal jusqu'à ce moment.
 - Mode debug : si le jeu se bloque à l'arrêt et qu'Erable doit fermer d'urgence, la session est
   quand même enregistrée tout de suite, au lieu d'attendre le lancement suivant.
+- Au tout premier lancement, une seule fenêtre demande le nom du profil (il y en avait deux).
+- Erable démarre sur la carte graphique la plus puissante : une carte dédiée passe avant la puce
+  intégrée du processeur, quelle que soit la marque (avant, une puce AMD intégrée pouvait passer
+  devant une carte Intel Arc).
+- Cartes de 12 Go et plus : le cache de textures garde plus d'images, au lieu d'en supprimer des
+  centaines toutes les 10 secondes pour les recharger aussitôt (Mario Kart World).
 - Jeux un peu plus rapides à ouvrir : leurs fichiers ne sont lus qu'au moment où ils servent.
 - Le gyroscope de la manette marche toujours après l'avoir rebranchée.
 - Le journal est écrit sur le disque chaque seconde : un plantage n'en perd plus la fin.
