@@ -2470,6 +2470,22 @@ GraphicsPipeline* PipelineCache::CurrentGraphicsPipelineSlowPath() {
 
 void PipelineCache::TickFrame() {
     ++frame_count;
+    if (frame_count == 1 && shader_jobs) {
+        // The game is playing: the background prebuild (and other Background shader work) keeps
+        // to half the CPU's threads, so the game's own threads keep theirs. With all of them a
+        // build-40 Ocarina of Time session ran at 43-57 fps until the prebuild ended 15 minutes
+        // in. The loading screen, before this, used them all. EDEN_NX2_PREBUILD_THREADS sets the
+        // number (0: no limit).
+        static const size_t limit = [] {
+            if (const char* const value = std::getenv("EDEN_NX2_PREBUILD_THREADS")) {
+                return static_cast<size_t>(std::strtoull(value, nullptr, 10));
+            }
+            return std::max<size_t>(std::thread::hardware_concurrency() / 2, 2);
+        }();
+        shader_jobs->SetBackgroundLimit(limit);
+        LOG_INFO(Render_Vulkan, "Background shader work while playing: {} threads at most{}",
+                 limit, limit == 0 ? " (no limit)" : "");
+    }
     native_wait_budget_us =
         static_cast<s64>(Settings::values.native_pipeline_wait_ms.GetValue()) * 1000;
     while (!evicted_pipelines.empty() && scheduler.IsFree(evicted_pipelines.front().first)) {

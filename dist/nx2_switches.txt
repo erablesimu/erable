@@ -37,6 +37,11 @@ EDEN_NX2_SPLIT=2
 #EDEN_NX2_NVIDIA_OWN_CACHE=0
 #EDEN_NX2_VK_CACHE_MAX_MIB=3072
 
+# While a game plays, background shader work (the prebuild after "Play now", the precache's leftovers)
+# uses at most this many threads, half the CPU's by default, so the game keeps the others. =0 lifts
+# the limit. The loading screen always uses them all.
+#EDEN_NX2_PREBUILD_THREADS=0
+
 # Batch GPU fence syncpoints to reduce host driver overhead and smooth frametimes.
 EDEN_NX2_FENCE_BATCH=1
 

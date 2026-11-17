@@ -365,6 +365,12 @@ ShaderJobScheduler::JobPtr ShaderJobScheduler::Pick(bool driver, Clock::time_poi
                now - background->front()->submitted >= background_aging &&
                background->front()->submitted < soon->front()->submitted;
         entries = aged ? background : (soon ? soon : background);
+        // Background stages past the limit wait: a Soon job still goes, else nothing does
+        if (entries == background && background_limit != 0 &&
+            stats.priorities[Index(ShaderJobPriority::Background)].running >= background_limit) {
+            entries = soon;
+            aged = false;
+        }
     }
     if (!entries) {
         return nullptr;
@@ -445,6 +451,9 @@ void ShaderJobScheduler::RunCpu(const JobPtr& job, bool run_driver_here) {
             job->work.driver = std::move(driver);
             --counters.running;
             ++counters.queued;
+            if (background_limit != 0 && job->priority.load() == ShaderJobPriority::Background) {
+                cpu_condition.notify_one();
+            }
             if (run_driver_here) {
                 StartStage(*job, true, Clock::now());
                 run_driver = true;
@@ -489,9 +498,21 @@ void ShaderJobScheduler::RunDriver(const JobPtr& job) {
     Finish(*job, exception ? ShaderJobStatus::Failed : ShaderJobStatus::Done, dead);
 }
 
+void ShaderJobScheduler::SetBackgroundLimit(size_t limit) {
+    std::scoped_lock lock{mutex};
+    background_limit = limit;
+    cpu_condition.notify_all();
+    driver_condition.notify_all();
+}
+
 void ShaderJobScheduler::Finish(ShaderJobState& job, ShaderJobStatus status,
                                 std::vector<ShaderJob>& dead) {
     auto& counters{stats.priorities[Index(job.priority.load())]};
+    if (background_limit != 0 && job.priority.load() == ShaderJobPriority::Background) {
+        // A Background slot frees: a worker held by the limit may take the next one
+        cpu_condition.notify_one();
+        driver_condition.notify_one();
+    }
     if (IsQueued(job.status.load())) {
         --counters.queued;
     } else {

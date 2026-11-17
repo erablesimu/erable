@@ -157,6 +157,10 @@ public:
 
     ShaderJobBatch CreateBatch();
 
+    /// At most `limit` Background stages run at once (0: no limit). The game's own threads keep
+    /// the rest of the cores while a background prebuild runs during play.
+    void SetBackgroundLimit(size_t limit);
+
     /// Raises a job's priority, wherever it is queued or running. A lower priority is ignored.
     void Promote(const ShaderJobHandle& handle, ShaderJobPriority priority);
 
@@ -204,6 +208,7 @@ private:
     bool stopping{};
     /// A worker waits for in-flight bytes to drop.
     bool budget_held{};
+    size_t background_limit{};
     /// The queue's last Soon or Background pick was an aged Background job ahead of Soon jobs.
     bool cpu_aged_last{};
     bool driver_aged_last{};
