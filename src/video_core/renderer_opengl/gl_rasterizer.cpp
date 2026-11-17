@@ -1363,7 +1363,9 @@ void RasterizerOpenGL::SyncLineState() {
 void RasterizerOpenGL::SyncPolygonOffset() {
     auto& flags = maxwell3d->dirty.flags;
     const float slope_scale =
-        texture_cache.IsRescaling() ? Settings::values.resolution_info.up_factor : 1.0f;
+        texture_cache.IsRescaling() && maxwell3d->regs.viewport_scale_offset_enabled
+            ? Settings::values.resolution_info.up_factor
+            : 1.0f;
     if (!flags[Dirty::PolygonOffset] && slope_scale == polygon_offset_slope_scale) {
         return;
     }
