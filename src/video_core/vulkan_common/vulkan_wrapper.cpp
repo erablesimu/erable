@@ -47,19 +47,54 @@ bool IsMicrosoftDozen(const char* device_name) {
     return std::strstr(device_name, "Microsoft") != nullptr;
 }
 
+/// How much a device type is preferred: a discrete GPU first, then an integrated one, then the rest
+/// (virtual GPUs, then CPU renderers such as llvmpipe last).
+int TypeRank(VkPhysicalDeviceType type) {
+    switch (type) {
+    case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+        return 0;
+    case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+        return 1;
+    case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+        return 2;
+    case VK_PHYSICAL_DEVICE_TYPE_CPU:
+        return 4;
+    default:
+        return 3;
+    }
+}
+
+/// The largest device-local memory heap: the video memory of a discrete GPU
+VkDeviceSize LocalMemory(VkPhysicalDevice device, const InstanceDispatch& dld) {
+    VkPhysicalDeviceMemoryProperties properties{};
+    dld.vkGetPhysicalDeviceMemoryProperties(device, &properties);
+    VkDeviceSize largest = 0;
+    for (u32 i = 0; i < properties.memoryHeapCount; ++i) {
+        if ((properties.memoryHeaps[i].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT) != 0) {
+            largest = std::max(largest, properties.memoryHeaps[i].size);
+        }
+    }
+    return largest;
+}
+
 void SortPhysicalDevices(std::vector<VkPhysicalDevice>& devices, const InstanceDispatch& dld) {
     // Sort by name, this will set a base and make GPUs with higher numbers appear first
     // (e.g. GTX 1650 will intentionally be listed before a GTX 1080).
     SortPhysicalDevices(devices, dld, [](const auto& lhs, const auto& rhs) {
         return std::string_view{lhs.deviceName} > std::string_view{rhs.deviceName};
     });
-    // Prefer discrete over non-discrete
-    SortPhysicalDevices(devices, dld, [](const auto& lhs, const auto& rhs) {
-        return lhs.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
-               rhs.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
-    });
-    // Prefer Nvidia over AMD, AMD over Intel, Intel over the rest.
+    // Between equals, Nvidia over AMD, AMD over Intel, Intel over the rest.
     SortPhysicalDevicesPerVendor(devices, dld, {0x10DE, 0x1002, 0x8086});
+    // More video memory first: of two discrete GPUs, the bigger one.
+    std::stable_sort(devices.begin(), devices.end(),
+                     [&dld](VkPhysicalDevice lhs, VkPhysicalDevice rhs) {
+                         return LocalMemory(lhs, dld) > LocalMemory(rhs, dld);
+                     });
+    // The device type decides first. The vendor used to: a PC with an AMD processor's integrated
+    // GPU and an Intel Arc card started on the integrated one unless the player chose the card.
+    SortPhysicalDevices(devices, dld, [](const auto& lhs, const auto& rhs) {
+        return TypeRank(lhs.deviceType) < TypeRank(rhs.deviceType);
+    });
     // Demote Microsoft's Dozen devices to the bottom.
     SortPhysicalDevices(
         devices, dld,
