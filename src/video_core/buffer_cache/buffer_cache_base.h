@@ -442,10 +442,11 @@ public:
     void PopAsyncFlushes();
     void PopAsyncBuffers();
 
-    /// gpu_written: set when the copy moved GPU-written bytes, which the destination's guest
-    /// memory doesn't hold until they are downloaded
+    /// gpu_written_dest: the destination ranges that took GPU-written bytes, which guest memory
+    /// doesn't hold until they are downloaded
     bool DMACopy(GPUVAddr src_address, GPUVAddr dest_address, u64 amount,
-                 bool* gpu_written = nullptr);
+                 boost::container::small_vector<std::pair<DAddr, size_t>, 4>* gpu_written_dest =
+                     nullptr);
 
     bool DMAClear(GPUVAddr src_address, u64 amount, u32 value);
 
