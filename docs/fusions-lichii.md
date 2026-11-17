@@ -25,3 +25,6 @@ Règle :
 
 - build-39 (15 novembre 2026) : lot avec changement du traducteur (#1757, #1807, #1825, #1848,
   #1853). Prochain lot au plus tôt une semaine après.
+- build-41 (17 novembre 2026) : deuxième lot, avancé à la demande du propriétaire (#1914, #1915,
+  #1940, #2074, #2083, #2103 ; #1954 était déjà là). Un seul recompilage pour les joueurs, en
+  même temps que le cache Vulkan d'Erable sur NVIDIA.

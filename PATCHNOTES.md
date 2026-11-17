@@ -6,9 +6,10 @@ version. Les sections suivantes gardent l'historique.
 ## Nouveautés de cette version
 
 **À savoir**
-- Build 39 : le traducteur de shaders change, donc les shaders sont recompilés une fois au
-  premier lancement de chaque jeu (10 à 30 minutes pour Ocarina of Time, puis c'est fini). Dès
-  60 %, vous pouvez choisir « Jouer maintenant » (voir plus bas).
+- Build 41 : le traducteur de shaders change, donc les shaders sont recompilés une fois au
+  premier lancement de chaque jeu (10 à 30 minutes pour Ocarina of Time). Dès 60 %, vous pouvez
+  choisir « Jouer maintenant ». Sur les cartes NVIDIA, Erable garde maintenant son propre cache
+  de shaders : les mises à jour suivantes ne devraient plus tout recompiler.
 
 **Accueil**
 - Bouton « Plein écran » en haut à droite de l'accueil (ou touche F11) : l'accueil et la
