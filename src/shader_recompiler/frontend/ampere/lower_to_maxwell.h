@@ -392,14 +392,20 @@ inline LoweredProgram LowerToMaxwellWith(std::span<const Instruction> code, u32 
         u64 predicate = u64{guarded_uniform ? ((native_predicate & 8) | guard_slot) : native_predicate} << 16;
         const u64 dest = insn.Bits(16, 8);
         const auto base = [&](u64 opcode_bits) { return opcode_bits | predicate | dest; };
-        // NVN2 fullscreen vertex shaders read bank 24, which the game never binds (the console reads
-        // zeros from an unbound bank); Maxwell has 18, so read it from bank 17, also never bound.
+        // Banks 24-31 are NVN2's 256-byte root tables (Maxwell3D::RootTables). Maxwell has 18 banks,
+        // so they are read from bank 17, which games never bind, one after another: bank 24 + n at
+        // byte n * 256 (Cyberpunk 2077 reads banks 25 and 31). An offset past its table is rejected.
         const auto bank = [&]() -> u32 {
             const u32 value = insn.Bits(54, 5);
-            return value == 24 ? 17U : value;
+            if (value < 24) return value;
+            return insn.Bits(38, 16) < 256 ? 17U : 18U;
+        };
+        const auto cbuf_offset = [&]() -> u32 {
+            const u32 value = insn.Bits(54, 5);
+            return insn.Bits(38, 16) + (value >= 24 ? (value - 24) * 256 : 0U);
         };
         const auto cbuf = [&]() -> u64 {
-            return (u64{insn.Bits(38, 16) / 4} << 20) | (u64{bank()} << 34);
+            return (u64{cbuf_offset() / 4} << 20) | (u64{bank()} << 34);
         };
         const auto valid_cbuf = [&] {
             return !insn.Bits(91, 1) && bank() < 18 &&
@@ -1175,7 +1181,7 @@ inline LoweredProgram LowerToMaxwellWith(std::span<const Instruction> code, u32 
                 emit(0x4c98000000000000ULL | predicate | target | (u64{15} << 39) | cbuf());
             } else {
                 emit(0xef90000000000000ULL | predicate | target |
-                     (u64{index_target} << 8) | (u64{offset} << 20) |
+                     (u64{index_target} << 8) | (u64{cbuf_offset()} << 20) |
                      (u64{bank()} << 36) | (u64{width} << 48));
             }
             break;
@@ -1226,7 +1232,7 @@ inline LoweredProgram LowerToMaxwellWith(std::span<const Instruction> code, u32 
                 (width == 5 && ((dest & 1) || dest >= 254)))
                 return fail(index, "native indexed constant load mode");
             emit(base(0xef90000000000000ULL) | (u64{insn.Bits(24, 8)} << 8) |
-                 (u64{insn.Bits(38, 16)} << 20) | (u64{bank()} << 36) | (u64{mode} << 44) | (u64{width} << 48));
+                 (u64{cbuf_offset()} << 20) | (u64{bank()} << 36) | (u64{mode} << 44) | (u64{width} << 48));
             break;
         }
         case 0xf89: { // SHFL with immediate lane and segmentation/clamp mask, any mode.
