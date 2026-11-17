@@ -4506,15 +4506,17 @@ private:
         bool changed = false;
         manager.WithGuestValuesStable([&] {
             for (u32 id = 0; id < std::min(m_syncpt_count, HostSyncpoints); ++id) {
-                const u64 value = manager.GetGuestSyncpointValue(id);
+                const u32 value = manager.GetGuestSyncpointValue(id);
                 const u64 address = m_syncpt_ro + SyncptValuesOffset + id * 8;
                 if (m_syncpt_memory->Read64(address) != value) {
                     m_syncpt_memory->Write64(address, value);
                     changed = true;
-                    if (changed_ids != nullptr && id / 64 < changed_ids->size()) {
-                        (*changed_ids)[id / 64] |= u64{1} << (id % 64);
-                    }
                 }
+                if (changed_ids != nullptr && id / 64 < changed_ids->size() &&
+                    m_syncpt_polled_values[id] != value) {
+                    (*changed_ids)[id / 64] |= u64{1} << (id % 64);
+                }
+                m_syncpt_polled_values[id] = value;
             }
         });
         return changed;
@@ -5021,6 +5023,7 @@ private:
     u64 m_syncpt_rw{};
     u64 m_syncpt_ro{};
     u32 m_syncpt_count{};
+    std::array<u32, HostSyncpoints> m_syncpt_polled_values{};
     std::shared_ptr<Core::Timing::EventType> m_syncpt_poll;
 };
 
