@@ -52,7 +52,10 @@ constexpr char ACC_SAVE_AVATORS_BASE_PATH[] = "system/save/8000000000000010/su/a
 
 ProfileManager::ProfileManager() {
     ParseUserSaveFile();
+    OpenCurrentUser();
+}
 
+void ProfileManager::OpenCurrentUser() {
     // Create an user if none are present
     if (user_count == 0) {
         CreateNewUser(UUID::MakeRandom(), "Joueur");
@@ -485,6 +488,9 @@ void ProfileManager::ResetUserSaveFile()
 {
     RemoveAllProfiles();
     ParseUserSaveFile();
+    // ParseUserSaveFile adds every user closed: open the current one as the constructor does, or
+    // the eden-cli, which resets once the config names the NAND, left games no open user.
+    OpenCurrentUser();
 }
 
 std::vector<UUID> ProfileManager::FindExistingProfileUUIDs()

@@ -39,6 +39,7 @@ add_executable(tests
     core/perf_stats.cpp
     core/service_auto_stub.cpp
     core/key_derivation.cpp
+    core/profile_manager_reset.cpp
     core/eticket_title_key.cpp
     core/keyblob_cmac.cpp
     core/aes_xts.cpp

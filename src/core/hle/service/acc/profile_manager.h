@@ -120,6 +120,8 @@ public:
 
 private:
     void ParseUserSaveFile();
+    /// Makes the default user when there is none, and opens the current user.
+    void OpenCurrentUser();
     std::optional<std::size_t> AddToProfiles(const ProfileInfo& profile);
     void RemoveAllProfiles();
 
