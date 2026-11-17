@@ -6651,6 +6651,26 @@ Veuillez aller dans Configurer -&gt; Système -&gt; Réseau puis en choisir une.
         <source>Clear</source>
         <translation>Effacer</translation>
     </message>
+    <message>
+        <source>Convert to NX...</source>
+        <translation>Convertir en NX (un seul fichier)...</translation>
+    </message>
+    <message>
+        <source>Manage NX Archive</source>
+        <translation>Archive NX</translation>
+    </message>
+    <message>
+        <source>Add Update or DLC...</source>
+        <translation>Ajouter une mise à jour ou un DLC...</translation>
+    </message>
+    <message>
+        <source>Remove Update or DLC...</source>
+        <translation>Retirer une mise à jour ou un DLC...</translation>
+    </message>
+    <message>
+        <source>Edit Title and Icon...</source>
+        <translation>Modifier le titre et l'icône...</translation>
+    </message>
 </context>
 <context>
     <name>GameListItemCompat</name>
@@ -9690,6 +9710,18 @@ p, li { white-space: pre-wrap; }
         <source>Erable is already running but does not respond. Close erable.exe in the Task Manager (Ctrl + Shift + Esc), then start Erable again.</source>
         <translation>Erable est déjà ouvert mais ne répond plus. Fermez erable.exe dans le Gestionnaire des tâches (Ctrl + Maj + Échap), puis relancez Erable.</translation>
     </message>
+    <message>
+        <source>Click or drag to move the square. Zoom to keep a smaller part.</source>
+        <translation>Cliquez ou faites glisser pour déplacer le carré. Zoomez pour en garder une plus petite partie.</translation>
+    </message>
+    <message>
+        <source>Zoom:</source>
+        <translation>Zoom :</translation>
+    </message>
+    <message>
+        <source>Crop Icon</source>
+        <translation>Recadrer l'icône</translation>
+    </message>
 </context>
 <context>
     <name>QtAmiiboSettingsDialog</name>
@@ -11295,6 +11327,303 @@ Code d&apos;erreur : %3</translation>
     <message>
         <source>Could not commit to file %1.</source>
         <translation>Impossible de finaliser le fichier %1.</translation>
+    </message>
+</context>
+<context>
+    <name>NxTools</name>
+    <message>
+        <source>%1 cannot be decrypted: %2
+
+Check that your keys are installed.</source>
+        <translation>%1 ne peut pas être déchiffré : %2
+
+Vérifiez que vos clés sont installées.</translation>
+    </message>
+    <message>
+        <source>Convert to NX</source>
+        <translation>Convertir en NX</translation>
+    </message>
+    <message>
+        <source>Converting to NX</source>
+        <translation>Conversion en NX</translation>
+    </message>
+    <message>
+        <source>NX archive (*.nx)</source>
+        <translation>Archive NX (*.nx)</translation>
+    </message>
+    <message>
+        <source>The archive already exists:
+%1</source>
+        <translation>L'archive existe déjà :
+%1</translation>
+    </message>
+    <message>
+        <source>Updates and DLC of this game were found in the same folder.
+The checked ones are added to the NX archive:</source>
+        <translation>Des mises à jour et DLC de ce jeu sont dans le même dossier.
+Ceux qui sont cochés sont ajoutés à l'archive NX :</translation>
+    </message>
+    <message>
+        <source>The NX archive was created:
+%1</source>
+        <translation>L'archive NX a été créée :
+%1</translation>
+    </message>
+    <message>
+        <source>Add to NX</source>
+        <translation>Ajouter à l'archive NX</translation>
+    </message>
+    <message>
+        <source>This NX archive cannot be read.</source>
+        <translation>Cette archive NX ne peut pas être lue.</translation>
+    </message>
+    <message>
+        <source>Add an update or DLC to this NX archive. The archive is changed in place; the content it already holds is kept.</source>
+        <translation>Ajouter une mise à jour ou un DLC à cette archive NX. L'archive est modifiée sur place ; ce qu'elle contient déjà est conservé.</translation>
+    </message>
+    <message>
+        <source>Update Folder...</source>
+        <translation>Dossier de mise à jour...</translation>
+    </message>
+    <message>
+        <source>NSP or XCI Files...</source>
+        <translation>Fichiers NSP ou XCI...</translation>
+    </message>
+    <message>
+        <source>Adding to NX</source>
+        <translation>Ajout à l'archive NX</translation>
+    </message>
+    <message>
+        <source>Select the Update Folder</source>
+        <translation>Choisir le dossier de la mise à jour</translation>
+    </message>
+    <message>
+        <source>Version number of this update (for example 196608 for v196608):</source>
+        <translation>Numéro de version de cette mise à jour (par exemple 196608 pour v196608) :</translation>
+    </message>
+    <message>
+        <source>Select Updates or DLC</source>
+        <translation>Choisir des mises à jour ou des DLC</translation>
+    </message>
+    <message>
+        <source>Switch packages (*.nsp *.xci)</source>
+        <translation>Paquets Switch (*.nsp *.xci)</translation>
+    </message>
+    <message>
+        <source>The NX archive was updated.</source>
+        <translation>L'archive NX a été mise à jour.</translation>
+    </message>
+    <message>
+        <source>Remove from NX</source>
+        <translation>Retirer de l'archive NX</translation>
+    </message>
+    <message>
+        <source>This NX archive cannot be read: %1</source>
+        <translation>Cette archive NX ne peut pas être lue : %1</translation>
+    </message>
+    <message>
+        <source>This NX archive holds no update or DLC to remove.</source>
+        <translation>Cette archive NX ne contient aucune mise à jour ni DLC à retirer.</translation>
+    </message>
+    <message>
+        <source>Select the content to remove from the archive:</source>
+        <translation>Choisissez ce qu'il faut retirer de l'archive :</translation>
+    </message>
+    <message>
+        <source>DLC %1 (v%2)</source>
+        <translation>DLC %1 (v%2)</translation>
+    </message>
+    <message>
+        <source>Update %1 (v%2)</source>
+        <translation>Mise à jour %1 (v%2)</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Retirer</translation>
+    </message>
+    <message>
+        <source>Removing from NX</source>
+        <translation>Retrait de l'archive NX</translation>
+    </message>
+    <message>
+        <source>The selected content was removed from the NX archive.</source>
+        <translation>Le contenu choisi a été retiré de l'archive NX.</translation>
+    </message>
+    <message>
+        <source>Edit NX Metadata</source>
+        <translation>Modifier le titre et l'icône</translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation>Titre :</translation>
+    </message>
+    <message>
+        <source>Publisher:</source>
+        <translation>Éditeur :</translation>
+    </message>
+    <message>
+        <source>Choose Image...</source>
+        <translation>Choisir une image...</translation>
+    </message>
+    <message>
+        <source>256 x 256 (default)</source>
+        <translation>256 x 256 (par défaut)</translation>
+    </message>
+    <message>
+        <source>512 x 512</source>
+        <translation>512 x 512</translation>
+    </message>
+    <message>
+        <source>1024 x 1024</source>
+        <translation>1024 x 1024</translation>
+    </message>
+    <message>
+        <source>Size of the icon stored in the archive</source>
+        <translation>Taille de l'icône enregistrée dans l'archive</translation>
+    </message>
+    <message>
+        <source>This image cannot be converted.</source>
+        <translation>Cette image ne peut pas être convertie.</translation>
+    </message>
+    <message>
+        <source>This image cannot be read.</source>
+        <translation>Cette image ne peut pas être lue.</translation>
+    </message>
+    <message>
+        <source>Choose Image</source>
+        <translation>Choisir une image</translation>
+    </message>
+    <message>
+        <source>Images (*.png *.jpg *.jpeg *.bmp *.webp *.gif)</source>
+        <translation>Images (*.png *.jpg *.jpeg *.bmp *.webp *.gif)</translation>
+    </message>
+    <message>
+        <source>Restore Original Image</source>
+        <translation>Remettre l'image d'origine</translation>
+    </message>
+    <message>
+        <source>Icon:</source>
+        <translation>Icône :</translation>
+    </message>
+    <message>
+        <source>The new title and icon are shown in every language. The game itself is not changed.</source>
+        <translation>Le nouveau titre et la nouvelle icône s'affichent dans toutes les langues. Le jeu lui-même n'est pas modifié.</translation>
+    </message>
+    <message>
+        <source>Editing NX metadata</source>
+        <translation>Modification du titre et de l'icône</translation>
+    </message>
+    <message>
+        <source>The icon cannot be saved.</source>
+        <translation>L'icône ne peut pas être enregistrée.</translation>
+    </message>
+    <message>
+        <source>The NX archive metadata was updated.</source>
+        <translation>Le titre et l'icône de l'archive NX ont été mis à jour.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Cancelling...</source>
+        <translation>Annulation...</translation>
+    </message>
+    <message>
+        <source>Preparing...</source>
+        <translation>Préparation...</translation>
+    </message>
+    <message>
+        <source>Finishing...</source>
+        <translation>Finalisation...</translation>
+    </message>
+    <message>
+        <source>%1 left</source>
+        <translation>Reste %1</translation>
+    </message>
+    <message>
+        <source>%1
+Elapsed: %2</source>
+        <translation>%1
+Écoulé : %2</translation>
+    </message>
+    <message>
+        <source>Move the %1 original packages to the Recycle Bin</source>
+        <translation>Mettre les %1 paquets d'origine à la corbeille</translation>
+    </message>
+    <message>
+        <source>Move the original folder to the Recycle Bin:
+%1</source>
+        <translation>Mettre le dossier d'origine à la corbeille :
+%1</translation>
+    </message>
+    <message>
+        <source>Move the original game to the Recycle Bin:
+%1</source>
+        <translation>Mettre le jeu d'origine à la corbeille :
+%1</translation>
+    </message>
+    <message>
+        <source>%1 of the %2 original packages could not be moved to the Recycle Bin. They may be in use.</source>
+        <translation>%1 des %2 paquets d'origine n'ont pas pu être mis à la corbeille. Ils sont peut-être utilisés.</translation>
+    </message>
+    <message>
+        <source>The original could not be moved to the Recycle Bin:
+%1
+
+It may be in use. You can delete it yourself.</source>
+        <translation>L'original n'a pas pu être mis à la corbeille :
+%1
+
+Il est peut-être utilisé. Vous pouvez le supprimer vous-même.</translation>
+    </message>
+    <message>
+        <source>less than a minute</source>
+        <translation>moins d'une minute</translation>
+    </message>
+    <message>
+        <source>about %1 h %2 min</source>
+        <translation>environ %1 h %2 min</translation>
+    </message>
+    <message>
+        <source>Already added to the archive: %1</source>
+        <translation>Déjà ajouté à l'archive : %1</translation>
+    </message>
+    <message>
+        <source>Added: %1</source>
+        <translation>Ajouté : %1</translation>
+    </message>
+    <message>
+        <source>Already in the archive: %1</source>
+        <translation>Déjà dans l'archive : %1</translation>
+    </message>
+    <message>
+        <source>Cancelled.</source>
+        <translation>Annulé.</translation>
+    </message>
+    <message>
+        <source>Cancelled. Nothing was changed on disk.</source>
+        <translation>Annulé. Rien n'a été modifié sur le disque.</translation>
+    </message>
+    <message>
+        <source>The operation failed because the rebuild recipe could not be kept:
+%1
+
+Try again without the recipe? The game still runs from the NX archive, but the original package cannot be rebuilt exactly from it.</source>
+        <translation>L'opération a échoué, car la recette de reconstruction n'a pas pu être gardée :
+%1
+
+Réessayer sans la recette ? Le jeu fonctionnera toujours depuis l'archive NX, mais le paquet d'origine ne pourra pas être reconstruit à l'identique.</translation>
+    </message>
+    <message>
+        <source>The operation failed:
+%1</source>
+        <translation>L'opération a échoué :
+%1</translation>
+    </message>
+    <message numerus="yes">
+        <source>about %n minute(s)</source>
+        <translation><numerusform>environ %n minute</numerusform><numerusform>environ %n minutes</numerusform><numerusform>environ %n minutes</numerusform></translation>
     </message>
 </context>
 <context>
