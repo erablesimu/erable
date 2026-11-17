@@ -398,15 +398,15 @@ public:
         return std::exchange(churn, {});
     }
 
-    /// Mark images in a range as modified from the CPU
-    void WriteMemory(DAddr cpu_addr, size_t size);
+    /// Mark images in a range as modified from the CPU. keep_gpu_written leaves images the GPU
+    /// wrote, whose contents guest memory doesn't hold, as they are.
+    void WriteMemory(DAddr cpu_addr, size_t size, bool keep_gpu_written = false);
 
-    /// WriteMemory over every device range a GPU address range maps to
+    /// WriteMemory keeping GPU-written images over every device range a GPU address range maps to
     void WriteGpuMemory(GPUVAddr gpu_addr, size_t size);
 
-    /// DownloadMemory over every device range a GPU address range maps to that GPU-written
-    /// images cover
-    void DownloadGpuMemory(GPUVAddr gpu_addr, size_t size);
+    /// Whether GPU-written images cover any device range a GPU address range maps to
+    bool IsGpuMemoryGpuModified(GPUVAddr gpu_addr, size_t size);
 
     /// Download contents of host images to guest memory in a region
     void DownloadMemory(DAddr cpu_addr, size_t size);

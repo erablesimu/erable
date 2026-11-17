@@ -442,7 +442,10 @@ public:
     void PopAsyncFlushes();
     void PopAsyncBuffers();
 
-    bool DMACopy(GPUVAddr src_address, GPUVAddr dest_address, u64 amount);
+    /// gpu_written: set when the copy moved GPU-written bytes, which the destination's guest
+    /// memory doesn't hold until they are downloaded
+    bool DMACopy(GPUVAddr src_address, GPUVAddr dest_address, u64 amount,
+                 bool* gpu_written = nullptr);
 
     bool DMAClear(GPUVAddr src_address, u64 amount, u32 value);
 

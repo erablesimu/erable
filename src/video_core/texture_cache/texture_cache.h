@@ -1707,9 +1707,13 @@ FramebufferId TextureCache<P>::GetFramebufferId(const RenderTargets& key) {
 }
 
 template <class P>
-void TextureCache<P>::WriteMemory(DAddr cpu_addr, size_t size) {
+void TextureCache<P>::WriteMemory(DAddr cpu_addr, size_t size, bool keep_gpu_written) {
     ClearStale(cpu_addr, size);
-    ForEachImageInRegion(cpu_addr, size, [this, cpu_addr, size](ImageId image_id, Image& image) {
+    ForEachImageInRegion(cpu_addr, size, [this, cpu_addr, size, keep_gpu_written](ImageId image_id,
+                                                                               Image& image) {
+        if (keep_gpu_written && True(image.flags & ImageFlagBits::GpuModified)) {
+            return;
+        }
         VideoCommon::Nx2FastDraw::Break(VideoCommon::Nx2FastDraw::Reason::Invalidation);
         if (True(image.flags & ImageFlagBits::UnwrittenSparse)) {
             // Written at last: a backed image replaces it where it is used next.
@@ -1738,19 +1742,20 @@ template <class P>
 void TextureCache<P>::WriteGpuMemory(GPUVAddr gpu_addr, size_t size) {
     for (const auto& [piece_addr, piece_size] : gpu_memory->GetSubmappedRange(gpu_addr, size)) {
         if (const auto device_addr = gpu_memory->GpuToCpuAddress(piece_addr)) {
-            WriteMemory(*device_addr, piece_size);
+            WriteMemory(*device_addr, piece_size, true);
         }
     }
 }
 
 template <class P>
-void TextureCache<P>::DownloadGpuMemory(GPUVAddr gpu_addr, size_t size) {
+bool TextureCache<P>::IsGpuMemoryGpuModified(GPUVAddr gpu_addr, size_t size) {
     for (const auto& [piece_addr, piece_size] : gpu_memory->GetSubmappedRange(gpu_addr, size)) {
         const auto device_addr = gpu_memory->GpuToCpuAddress(piece_addr);
         if (device_addr && IsRegionGpuModified(*device_addr, piece_size)) {
-            DownloadMemory(*device_addr, piece_size);
+            return true;
         }
     }
+    return false;
 }
 
 template <class P>

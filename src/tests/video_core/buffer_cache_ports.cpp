@@ -2878,3 +2878,28 @@ TEST_CASE("A DMA clear finds buffers past the first quarter of its range", "[buf
     REQUIRE_FALSE(f.cache->DMAClear(0x200000, 0x200, 0x09090909));
     REQUIRE(f.cache->DMAClear(0x200000, 0x201, 0x09090909));
 }
+
+TEST_CASE("A DMA copy of GPU-written data says the destination's guest memory lacks it",
+          "[buffer_ports]") {
+    KeepFixture f{nullptr};
+    f.Draw(nullptr); // Binds the channel DMACopy uses.
+    auto& buffer = Access::Get(*f.cache, f.id);
+    // Guest memory holds older bytes than the GPU wrote to the source.
+    std::memset(f.bytes + 0x4000, 1, 0x20);
+    std::fill_n(buffer.bytes.begin() + 0x4000, 0x20, u8{9});
+    Access::MarkWritten(*f.cache, f.id, 0x14000, 0x20);
+    bool gpu_written = false;
+    REQUIRE(f.cache->DMACopy(0x104000, 0x106000, 0x20, &gpu_written));
+    REQUIRE(gpu_written);
+    // An image over the destination uploading now would take the older bytes.
+    REQUIRE(f.bytes[0x6000] == 1);
+    f.cache->DownloadMemory(0x16000, 0x20);
+    REQUIRE(std::all_of(f.bytes + 0x6000, f.bytes + 0x6020, [](u8 b) { return b == 9; }));
+
+    // A source only the CPU wrote: the destination's guest memory has its bytes at once.
+    std::memset(f.bytes + 0x5000, 7, 0x20);
+    f.cache->WriteMemory(0x15000, 0x20);
+    REQUIRE(f.cache->DMACopy(0x105000, 0x107000, 0x20, &gpu_written));
+    REQUIRE_FALSE(gpu_written);
+    REQUIRE(std::all_of(f.bytes + 0x7000, f.bytes + 0x7020, [](u8 b) { return b == 7; }));
+}

@@ -4213,19 +4213,21 @@ bool AccelerateDMA::BufferClear(GPUVAddr src_address, u64 amount, u32 value) {
 
 bool AccelerateDMA::BufferCopy(GPUVAddr src_address, GPUVAddr dest_address, u64 amount) {
     std::scoped_lock lock{buffer_cache.mutex, texture_cache.mutex};
-    // DMACopy writes guest memory without telling the texture cache. Images over the destination
-    // (pitch linear data textures such as Kirby Air Riders' vertex lighting) would keep their old
-    // contents, and stale pages would skip the upload of images made there later. Images the GPU
-    // wrote there land in guest memory first, so the bytes the copy leaves keep their contents
-    // when the image uploads again.
-    texture_cache.DownloadGpuMemory(dest_address, amount);
+    const bool source_images_written = texture_cache.IsGpuMemoryGpuModified(src_address, amount);
     buffer_cache.Nx2CollectListCopies(true);
-    const bool copied = buffer_cache.DMACopy(src_address, dest_address, amount);
+    bool gpu_written = false;
+    const bool copied = buffer_cache.DMACopy(src_address, dest_address, amount, &gpu_written);
     if (buffer_cache.Nx2CopyListPages(scheduler.CurrentTick())) {
         scheduler.Flush();
     }
     buffer_cache.Nx2CollectListCopies(false);
-    if (copied) {
+    // DMACopy copies guest memory without telling the texture cache. Images over the destination
+    // (pitch linear data textures such as Kirby Air Riders' vertex lighting) would keep their old
+    // contents, and stale pages would skip the upload of images made there later. Bytes the GPU
+    // wrote to the source, in the buffer cache or in images, reach guest memory only when they
+    // are downloaded: images uploading the copy of those would take older bytes, so they keep
+    // what they hold instead of waiting for a download here.
+    if (copied && !gpu_written && !source_images_written) {
         texture_cache.WriteGpuMemory(dest_address, amount);
     }
     return copied;
