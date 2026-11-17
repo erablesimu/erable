@@ -372,13 +372,42 @@ void TextureCache<P>::ClearStale(DAddr addr, size_t size) {
 }
 
 template <class P>
+std::shared_ptr<Tegra::MemoryManager> TextureCache<P>::WriteBackMemory(const ImageBase& image) {
+    // The garbage collector and CPU-side downloads reach images of every address space, so the
+    // bound channel's memory may map image.gpu_addr to other memory. The image's own address
+    // space writes it; once nvdrv has closed that one, another address space that still maps
+    // image.gpu_addr to the image's device memory does (FindImage shares images between them).
+    // The returned reference keeps the memory manager alive while the image is written.
+    boost::container::small_vector<std::shared_ptr<Tegra::MemoryManager>, 4> others;
+    {
+        std::scoped_lock lock{config_mutex};
+        for (const auto& [id, ref] : address_spaces) {
+            std::shared_ptr<Tegra::MemoryManager> memory = ref.owner.lock();
+            if (!memory) {
+                continue;
+            }
+            if (id == image.address_space) {
+                return memory;
+            }
+            others.push_back(std::move(memory));
+        }
+    }
+    if (True(image.flags & ImageFlagBits::Sparse)) {
+        return nullptr;
+    }
+    for (std::shared_ptr<Tegra::MemoryManager>& memory : others) {
+        if (memory->GpuToCpuAddress(image.gpu_addr) == image.cpu_addr) {
+            return std::move(memory);
+        }
+    }
+    return nullptr;
+}
+
+template <class P>
 bool TextureCache<P>::WriteBackImage(const ImageBase& image,
                                      std::span<const BufferImageCopy> copies,
                                      std::span<const u8> data) {
-    // The garbage collector and CPU-side downloads reach images of every address space, so the
-    // bound channel's memory may map image.gpu_addr to other memory. The lock keeps the image's
-    // memory manager alive while it is written, and fails once nvdrv has destroyed it.
-    const std::shared_ptr<Tegra::MemoryManager> memory = LockAddressSpace(image.address_space);
+    const std::shared_ptr<Tegra::MemoryManager> memory = WriteBackMemory(image);
     if (!memory) {
         return false;
     }

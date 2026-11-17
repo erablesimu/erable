@@ -732,8 +732,11 @@ private:
     /// Switch 2 titles only: the buffer cache feeds Nx2MayBeGpuWritten for them alone.
     void MarkStale(const ImageBase& image);
     void ClearStale(DAddr addr, size_t size);
-    /// Swizzles a downloaded image into guest memory through the address space it was registered
-    /// in and clears its stale pages. False, writing nothing, once that address space is gone.
+    /// The memory manager a downloaded image is written back through (see WriteBackMemory), or
+    /// null when no live address space maps it.
+    std::shared_ptr<Tegra::MemoryManager> WriteBackMemory(const ImageBase& image);
+    /// Swizzles a downloaded image into guest memory through WriteBackMemory's memory manager and
+    /// clears its stale pages. False, writing nothing, when there is none.
     bool WriteBackImage(const ImageBase& image, std::span<const BufferImageCopy> copies,
                         std::span<const u8> data);
     /// Clears every device range [gpu_addr, gpu_addr + size) maps to in memory.
