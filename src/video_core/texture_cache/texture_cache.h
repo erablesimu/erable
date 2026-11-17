@@ -217,9 +217,10 @@ void TextureCache<P>::RunGarbageCollector(bool out_of_memory) {
             const auto copies = FullDownloadCopies(image.info);
             image.DownloadMemory(map, copies);
             runtime.Finish();
-            SwizzleImage(*gpu_memory, image.gpu_addr, image.info, copies, map.mapped_span, swizzle_data_buffer);
             ++gc_download_deletes;
-            ClearStaleImage(image);
+            if (!WriteBackImage(image, copies, map.mapped_span)) {
+                MarkStale(image);
+            }
         } else {
             MarkStale(image); // before UntrackImage (see MarkStale)
         }
@@ -371,25 +372,36 @@ void TextureCache<P>::ClearStale(DAddr addr, size_t size) {
 }
 
 template <class P>
-void TextureCache<P>::ClearStaleImage(const ImageBase& image) {
+bool TextureCache<P>::WriteBackImage(const ImageBase& image,
+                                     std::span<const BufferImageCopy> copies,
+                                     std::span<const u8> data) {
+    // The garbage collector and CPU-side downloads reach images of every address space, so the
+    // bound channel's memory may map image.gpu_addr to other memory. The lock keeps the image's
+    // memory manager alive while it is written, and fails once nvdrv has destroyed it.
+    const std::shared_ptr<Tegra::MemoryManager> memory = LockAddressSpace(image.address_space);
+    if (!memory) {
+        return false;
+    }
+    SwizzleImage(*memory, image.gpu_addr, image.info, copies, data, swizzle_data_buffer);
     if (stale_pages.Count() == 0) {
-        return;
+        return true;
     }
     if (False(image.flags & ImageFlagBits::Sparse)) {
         ClearStale(image.cpu_addr, image.guest_size_bytes);
-        return;
+    } else {
+        ClearStaleGpu(*memory, image.gpu_addr, image.guest_size_bytes);
     }
-    ClearStaleGpu(image.gpu_addr, image.guest_size_bytes);
+    return true;
 }
 
 template <class P>
-void TextureCache<P>::ClearStaleGpu(GPUVAddr gpu_addr, size_t size) {
+void TextureCache<P>::ClearStaleGpu(Tegra::MemoryManager& memory, GPUVAddr gpu_addr, size_t size) {
     if (stale_pages.Count() == 0) {
         return;
     }
     // Each piece is contiguous in device memory (GetSubmappedRange splits where it is not).
-    for (const auto& [piece_addr, piece_size] : gpu_memory->GetSubmappedRange(gpu_addr, size)) {
-        if (const auto device_addr = gpu_memory->GpuToCpuAddress(piece_addr)) {
+    for (const auto& [piece_addr, piece_size] : memory.GetSubmappedRange(gpu_addr, size)) {
+        if (const auto device_addr = memory.GpuToCpuAddress(piece_addr)) {
             ClearStale(*device_addr, piece_size);
         }
     }
@@ -1764,10 +1776,7 @@ void TextureCache<P>::DownloadMemory(DAddr cpu_addr, size_t size) {
         }
         runtime.Finish();
         for (Pending& entry : pending) {
-            Image& image = slot_images[entry.image_id];
-            SwizzleImage(*gpu_memory, image.gpu_addr, image.info, entry.copies,
-                         entry.map.mapped_span, swizzle_data_buffer);
-            ClearStaleImage(image);
+            WriteBackImage(slot_images[entry.image_id], entry.copies, entry.map.mapped_span);
         }
         pending.clear();
         pending_bytes = 0;
@@ -2407,15 +2416,14 @@ void TextureCache<P>::PopAsyncFlushes() {
                 download_buffer.offset -= Common::AlignUp(image.unswizzled_size_bytes, 64);
                 std::span<u8> download_span =
                     download_buffer.mapped_span.subspan(download_buffer.offset);
-                SwizzleImage(*gpu_memory, image.gpu_addr, image.info, copies, download_span, swizzle_data_buffer);
-                ClearStaleImage(image);
+                WriteBackImage(image, copies, download_span);
             } else {
                 const BufferDownload& buffer_info = slot_buffer_downloads[download_info.object_id];
                 std::span<u8> download_span =
                     download_buffer.mapped_span.subspan(download_buffer.offset);
                 gpu_memory->WriteBlockUnsafe(buffer_info.address, download_span.data(),
                                              buffer_info.size);
-                ClearStaleGpu(buffer_info.address, buffer_info.size);
+                ClearStaleGpu(*gpu_memory, buffer_info.address, buffer_info.size);
                 slot_buffer_downloads.erase(download_info.object_id);
             }
         }
@@ -2457,8 +2465,7 @@ void TextureCache<P>::PopAsyncFlushes() {
             }
             const ImageBase& image = download_info.GetImage(slot_images);
             const auto copies = FullDownloadCopies(image.info);
-            SwizzleImage(*gpu_memory, image.gpu_addr, image.info, copies, download_span, swizzle_data_buffer);
-            ClearStaleImage(image);
+            WriteBackImage(image, copies, download_span);
             download_map.offset += image.unswizzled_size_bytes;
             download_span = download_span.subspan(image.unswizzled_size_bytes);
         }

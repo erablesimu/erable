@@ -732,9 +732,12 @@ private:
     /// Switch 2 titles only: the buffer cache feeds Nx2MayBeGpuWritten for them alone.
     void MarkStale(const ImageBase& image);
     void ClearStale(DAddr addr, size_t size);
-    void ClearStaleImage(const ImageBase& image);
-    /// Clears every device range [gpu_addr, gpu_addr + size) maps to.
-    void ClearStaleGpu(GPUVAddr gpu_addr, size_t size);
+    /// Swizzles a downloaded image into guest memory through the address space it was registered
+    /// in and clears its stale pages. False, writing nothing, once that address space is gone.
+    bool WriteBackImage(const ImageBase& image, std::span<const BufferImageCopy> copies,
+                        std::span<const u8> data);
+    /// Clears every device range [gpu_addr, gpu_addr + size) maps to in memory.
+    void ClearStaleGpu(Tegra::MemoryManager& memory, GPUVAddr gpu_addr, size_t size);
     StalePages stale_pages;
     u64 tc_stale_skips{};        ///< Uploads skipped (last 600 frames)
     u64 tc_stale_skip_bytes{};
