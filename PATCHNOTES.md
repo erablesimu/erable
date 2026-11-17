@@ -96,6 +96,9 @@ version. Les sections suivantes gardent l'historique.
 - Mode debug : si le jeu se bloque à l'arrêt et qu'Erable doit fermer d'urgence, la session est
   quand même enregistrée tout de suite, au lieu d'attendre le lancement suivant.
 - Au tout premier lancement, une seule fenêtre demande le nom du profil (il y en avait deux).
+- Accueil : clic droit sur un boîtier, touche X de la manette ou bouton « Options » : le menu du
+  jeu (réglages, import de sauvegarde, conversion en NX, dossiers…), qui n'existait que dans la
+  bibliothèque.
 - Un jeu déplacé dans le dossier de jeux d'Erable n'apparaît plus en double quand l'ancien dossier
   le contenait aussi.
 - Clic droit sur un jeu NSP ou XCI > « Convertir en NX (un seul fichier) » : le jeu, ses mises à
