@@ -175,9 +175,6 @@ void MultiRangeBufferCache::RetireEntry(Scheduler& scheduler, Entry& entry) {
     // Grows past MAX_RETIRED instead of waiting for the oldest: this runs while a draw binds its
     // buffers, and a wait on the current tick submits it, leaving the draw's earlier bindings in
     // the submitted command buffer and its stamped buffers free before the draw reads them.
-    if (retired.size() >= MAX_RETIRED) {
-        DrainRetired(scheduler);
-    }
     retired.push_back(Retired{
         .handle = std::move(entry.sparse_handle),
         .gathered = std::move(entry.gathered),
@@ -332,6 +329,7 @@ void MultiRangeBufferCache::DropOwner(Scheduler& scheduler, VkBuffer owner) {
         RetireEntry(scheduler, entry);
         it = entries.erase(it);
     }
+    DrainRetired(scheduler);
 }
 
 void MultiRangeBufferCache::Invalidate(u64 key) {
