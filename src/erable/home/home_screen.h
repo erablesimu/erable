@@ -128,6 +128,8 @@ private:
     int selected = 0;
     bool active = false;
     bool profile_checked = false;
+    /// The profile dialog is open: the home shown again meanwhile (first start) asks no second one
+    bool profile_prompt_open = false;
     Common::UUID shown_profile{}; ///< Whose picture the profile button shows
 
     PillButton* profile_button = nullptr;

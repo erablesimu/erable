@@ -1231,7 +1231,7 @@ void HomeScreen::ChooseProfile() {
 }
 
 void HomeScreen::EnsureProfile(bool requested) {
-    if (profile_checked) {
+    if (profile_checked || profile_prompt_open) {
         return;
     }
     auto& manager = system.GetProfileManager();
@@ -1283,7 +1283,10 @@ void HomeScreen::EnsureProfile(bool requested) {
         // A profile is required: closing the window does not skip it.
         dialog.setWindowFlag(Qt::WindowCloseButtonHint, false);
     }
-    if (dialog.exec() != QDialog::Accepted || !valid()) {
+    profile_prompt_open = true;
+    const int result = dialog.exec();
+    profile_prompt_open = false;
+    if (result != QDialog::Accepted || !valid()) {
         return;
     }
     const std::string text = name->text().trimmed().toStdString();
