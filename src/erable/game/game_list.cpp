@@ -755,6 +755,12 @@ void GameList::PopupContextMenu(const QPoint& menu_location) {
     context_menu.exec(m_currentView->viewport()->mapToGlobal(menu_location));
 }
 
+void GameList::ShowGameMenu(u64 program_id, const QString& path, const QPoint& global_pos) {
+    QMenu context_menu;
+    AddGamePopup(context_menu, program_id, path.toStdString());
+    context_menu.exec(global_pos);
+}
+
 void GameList::SetReportableProgramId(u64 program_id) {
     reportable_program_id = program_id;
 }

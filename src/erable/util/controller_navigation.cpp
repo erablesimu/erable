@@ -86,6 +86,8 @@ void ControllerNavigation::ControllerUpdateButton() {
         TriggerButton(Settings::NativeButton::Plus, Qt::Key_Plus);
         TriggerButton(Settings::NativeButton::Y, Qt::Key_Y);
         TriggerButton(Settings::NativeButton::Minus, Qt::Key_Minus);
+        // and the selected game's menu (the mouse's right-click)
+        TriggerButton(Settings::NativeButton::X, Qt::Key_Menu);
         break;
     case Core::HID::NpadStyleIndex::JoyconLeft:
         TriggerButton(Settings::NativeButton::DDown, Qt::Key_Enter);

@@ -57,6 +57,8 @@ public:
 signals:
     /// A case was clicked: the selected one to play it, another to select it.
     void Clicked(int index);
+    /// A case was right-clicked, at `global_pos`: the game's menu.
+    void MenuRequested(int index, QPoint global_pos);
     /// The wheel asks for the case `index`.
     void SelectionRequested(int index);
 

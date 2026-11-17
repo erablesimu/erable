@@ -279,6 +279,10 @@ Ses sauvegardes restent sur le disque, mais plus aucun profil d&apos;Erable ne l
         <source>Take your saves from another emulator, or back them up</source>
         <translation>Récupérer vos sauvegardes d&apos;un autre émulateur, ou les copier</translation>
     </message>
+    <message>
+        <source>Options</source>
+        <translation>Options</translation>
+    </message>
 </context>
 <context>
     <name>AboutDialog</name>

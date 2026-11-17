@@ -627,6 +627,15 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         }
     });
     connect(shelf, &CaseShelf::SelectionRequested, this, &HomeScreen::Select);
+    // Right-click: the library's menu for that game (settings, saves, NX conversion...)
+    connect(shelf, &CaseShelf::MenuRequested, this, [this](int index, QPoint global_pos) {
+        if (index < 0 || index >= static_cast<int>(games.size())) {
+            return;
+        }
+        Select(index);
+        const Game& game = games[static_cast<size_t>(index)];
+        game_list->ShowGameMenu(game.program_id, game.path, global_pos);
+    });
     layout->addWidget(shelf, 1);
     title = new QLabel(this);
     title->setFont(MakeFont(fonts.display, 40));
@@ -655,8 +664,17 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     connect(favorite_button, &QAbstractButton::clicked, this, &HomeScreen::ToggleFavorite);
     report_button = new PillButton(tr("Report a problem"), QStringLiteral("−"), false, this);
     connect(report_button, &QAbstractButton::clicked, this, &HomeScreen::ReportProblem);
+    auto* options_button = new PillButton(tr("Options"), QStringLiteral("X"), false, this);
+    connect(options_button, &QAbstractButton::clicked, this, [this, options_button] {
+        if (selected >= 0 && selected < static_cast<int>(games.size())) {
+            const Game& game = games[static_cast<size_t>(selected)];
+            game_list->ShowGameMenu(game.program_id, game.path,
+                                    options_button->mapToGlobal(options_button->rect().bottomLeft()));
+        }
+    });
     actions->addStretch();
-    for (PillButton* button : {play_button, settings_button, favorite_button, report_button}) {
+    for (PillButton* button :
+         {play_button, settings_button, favorite_button, options_button, report_button}) {
         actions->addWidget(button);
     }
     actions->addStretch();
@@ -1183,6 +1201,14 @@ void HomeScreen::keyPressEvent(QKeyEvent* event) {
         break;
     case Qt::Key_Minus:
         emit ReportProblem();
+        break;
+    case Qt::Key_Menu:
+        // X, or the keyboard's menu key: the selected game's menu, over its case
+        if (selected >= 0 && selected < static_cast<int>(games.size())) {
+            const Game& game = games[static_cast<size_t>(selected)];
+            game_list->ShowGameMenu(game.program_id, game.path,
+                                    shelf->mapToGlobal(shelf->rect().center()));
+        }
         break;
     default:
         QWidget::keyPressEvent(event);

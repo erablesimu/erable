@@ -581,7 +581,7 @@ void CaseShelf::paintEvent(QPaintEvent*) {
 }
 
 void CaseShelf::mousePressEvent(QMouseEvent* event) {
-    if (event->button() != Qt::LeftButton) {
+    if (event->button() != Qt::LeftButton && event->button() != Qt::RightButton) {
         QWidget::mousePressEvent(event);
         return;
     }
@@ -596,7 +596,11 @@ void CaseShelf::mousePressEvent(QMouseEvent* event) {
         const QRectF& shape = it->spine ? spine_flat : flat;
         if (it->opacity > 0.3 &&
             it->transform.map(QPolygonF(shape)).containsPoint(event->position(), Qt::OddEvenFill)) {
-            emit Clicked(it->index);
+            if (event->button() == Qt::RightButton) {
+                emit MenuRequested(it->index, event->globalPosition().toPoint());
+            } else {
+                emit Clicked(it->index);
+            }
             event->accept();
             return;
         }

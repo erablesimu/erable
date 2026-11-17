@@ -158,6 +158,10 @@ private:
     void ToggleFavorite(u64 program_id);
 
     void PopupContextMenu(const QPoint& menu_location);
+public:
+    /// The game's right-click menu at `global_pos`, as in the list (the home's cases use it).
+    void ShowGameMenu(u64 program_id, const QString& path, const QPoint& global_pos);
+private:
     void AddGamePopup(QMenu& context_menu, u64 program_id, const std::string& path);
     void AddCustomDirPopup(QMenu& context_menu, QModelIndex selected);
     void AddPermDirPopup(QMenu& context_menu, QModelIndex selected);
