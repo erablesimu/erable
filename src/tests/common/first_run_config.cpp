@@ -105,6 +105,7 @@ void CheckLegacyProfile() {
     CHECK(values.gpu_accuracy.GetValue() == Settings::GpuAccuracy::Low);
     CHECK(values.nvdec_emulation.GetValue() == Settings::NvdecEmulation::Gpu);
     CHECK(values.async_presentation.GetValue());
+    // Not waiting for shaders became every config's default, not only a seeded one.
     CHECK(values.use_asynchronous_shaders.GetValue());
 }
 
@@ -181,8 +182,8 @@ TEST_CASE("Absent global config receives the first-run profile and persists it",
                                std::istreambuf_iterator<char>{}};
     REQUIRE(saved.LoadData(contents) >= 0);
     file.close();
-    for (const char* key : {"scaling_filter", "gpu_accuracy", "nvdec_emulation",
-                            "async_presentation", "use_asynchronous_shaders"}) {
+    for (const char* key :
+         {"scaling_filter", "gpu_accuracy", "nvdec_emulation", "async_presentation"}) {
         CHECK_FALSE(saved.GetBoolValue("Renderer", (std::string{key} + "\\default").c_str(), true));
     }
     const auto filename = config->GetConfigFilePath();
