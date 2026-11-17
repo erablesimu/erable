@@ -55,6 +55,8 @@ version. Les sections suivantes gardent l'historique.
 - Mode 60 FPS partout à vitesse normale (Configurer > jeu), avec un repli automatique à 30 FPS
   quand le PC ne suit pas.
 - Horloge du GPU plus fidèle, et compteurs de synchronisation exacts.
+- Le décor ne s'éclaircit plus puis revient à sa couleur en boucle : le buffer des sondes de
+  lumière est lu en entier au lieu d'être coupé à 8 Mo.
 
 **Moins de mémoire vidéo, moins de grosses saccades**
 - Aux entrées de zone, les textures éparpillées dans la mémoire du jeu sont rassemblées sur
