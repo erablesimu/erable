@@ -42,6 +42,11 @@ EDEN_NX2_SPLIT=2
 # the limit. The loading screen always uses them all.
 #EDEN_NX2_PREBUILD_THREADS=0
 
+# The order pipelines were first used in during the last 4 sessions (pipeline_order.bin beside the
+# shader cache): a pipeline used now moves the 200 that followed it ahead in the background
+# prebuild, so the next place's are ready sooner. =0 records the order but doesn't use it.
+#EDEN_NX2_PLAY_ORDER=0
+
 # Batch GPU fence syncpoints to reduce host driver overhead and smooth frametimes.
 EDEN_NX2_FENCE_BATCH=1
 

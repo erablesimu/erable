@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <span>
+
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
@@ -98,8 +100,29 @@ public:
                 },
             },
             &batch);
+        by_hash.emplace(key.Hash(), key);
         entries.emplace(key, std::move(entry));
         return true;
+    }
+
+    /// Moves the builds of these key hashes still queued ahead of the other background ones
+    /// (Soon), for the pipelines the player is likely to need next. Returns how many moved.
+    size_t PromoteHashes(std::span<const u64> hashes) {
+        std::scoped_lock lock{mutex};
+        size_t moved = 0;
+        for (const u64 hash : hashes) {
+            const auto key = by_hash.find(hash);
+            if (key == by_hash.end()) {
+                continue;
+            }
+            const auto it = entries.find(key->second);
+            if (it == entries.end() || it->second->job.Ready()) {
+                continue;
+            }
+            jobs.Promote(it->second->job, VideoCommon::ShaderJobPriority::Soon);
+            ++moved;
+        }
+        return moved;
     }
 
     /// For a lookup that may skip its draw: true while the pipeline of `key` is still queued or
@@ -223,6 +246,7 @@ private:
 
     VideoCommon::ShaderJobScheduler& jobs;
     VideoCommon::ShaderJobBatch batch;
+    std::unordered_map<u64, Key> by_hash; ///< Key hash -> key, for PromoteHashes
     size_t translating{}; ///< Builds added and not translated yet
     Common::UniqueFunction<void> after_translations;
     size_t built{};

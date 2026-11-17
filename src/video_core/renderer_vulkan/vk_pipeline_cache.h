@@ -402,6 +402,22 @@ private:
     std::chrono::steady_clock::time_point used_pipelines_saved{};
     void SaveUsedPipelines();
 
+    /// The order the pipelines were first used in, per session (pipeline_order.bin beside the
+    /// cache, the last PlayOrderSessions sessions, newest first). A pipeline first used now
+    /// moves the ones that followed it in those sessions ahead in the background prebuild.
+    void LoadPlayOrder();
+    void SavePlayOrder();
+    void NotePlayOrder(u64 hash);
+    static constexpr size_t PlayOrderSessions = 4;
+    static constexpr size_t PlayOrderLookahead = 200;
+    std::filesystem::path play_order_filename;
+    std::vector<u64> play_order;            ///< This session's, in first-use order
+    size_t play_order_saved{};              ///< play_order.size() at the last save
+    std::vector<std::vector<u64>> past_play_orders;
+    std::vector<std::unordered_map<u64, u32>> past_play_positions;
+    std::unordered_set<u64> play_order_promoted;
+    size_t play_order_moved{};
+
     /// The cache pipeline_cache_filename names, and this session's Used record
     std::unique_ptr<VideoCommon::ShaderCacheV2::Cache> cache_v2;
     /// Its driver layer, where the device has VK_KHR_pipeline_binary

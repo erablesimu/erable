@@ -98,6 +98,8 @@ namespace {
 /// update that cache missed (Ocarina of Time: 471 s to 60% instead of 12 s, build 40), while the
 /// driver accepts a cache it wrote as long as its own version holds. Erable keeps one there too.
 /// EDEN_NX2_NVIDIA_OWN_CACHE=0 leaves it to the driver alone, as before.
+constexpr u32 PlayOrderMagic = 0x4F4C5045; // "EPLO"
+
 bool KeepOwnCacheOnNvidia(const Vulkan::Device& device) {
 #ifdef _WIN32
     if (device.GetDriverID() != VK_DRIVER_ID_NVIDIA_PROPRIETARY) {
@@ -1010,7 +1012,106 @@ PipelineCache::~PipelineCache() {
     }
 }
 
+void PipelineCache::LoadPlayOrder() {
+    past_play_orders.clear();
+    past_play_positions.clear();
+    std::ifstream file(play_order_filename, std::ios::binary);
+    u32 magic{}, sessions{};
+    if (!file || !file.read(reinterpret_cast<char*>(&magic), sizeof(magic)) ||
+        magic != PlayOrderMagic || !file.read(reinterpret_cast<char*>(&sessions), sizeof(sessions))) {
+        return;
+    }
+    for (u32 session = 0; session < std::min<u32>(sessions, PlayOrderSessions); ++session) {
+        u32 count{};
+        if (!file.read(reinterpret_cast<char*>(&count), sizeof(count)) || count > (1U << 20)) {
+            break;
+        }
+        std::vector<u64> order(count);
+        if (!file.read(reinterpret_cast<char*>(order.data()),
+                       static_cast<std::streamsize>(count * sizeof(u64)))) {
+            break;
+        }
+        std::unordered_map<u64, u32> positions;
+        positions.reserve(count);
+        for (u32 i = 0; i < count; ++i) {
+            positions.try_emplace(order[i], i);
+        }
+        past_play_positions.push_back(std::move(positions));
+        past_play_orders.push_back(std::move(order));
+    }
+    if (!past_play_orders.empty()) {
+        LOG_INFO(Render_Vulkan, "Play order: {} earlier sessions read", past_play_orders.size());
+    }
+}
+
+void PipelineCache::SavePlayOrder() {
+    // A session too short to say anything (a boot to the menu) keeps the earlier ones as they are
+    constexpr size_t MinimumUsed = 64;
+    if (play_order_filename.empty() || play_order.size() < MinimumUsed ||
+        play_order.size() == play_order_saved) {
+        return;
+    }
+    play_order_saved = play_order.size();
+    auto temporary = play_order_filename;
+    temporary += ".tmp";
+    {
+        std::ofstream file(temporary, std::ios::binary | std::ios::trunc);
+        if (!file) {
+            return;
+        }
+        const u32 sessions = static_cast<u32>(
+            std::min(past_play_orders.size() + 1, PlayOrderSessions));
+        file.write(reinterpret_cast<const char*>(&PlayOrderMagic), sizeof(PlayOrderMagic));
+        file.write(reinterpret_cast<const char*>(&sessions), sizeof(sessions));
+        const auto write = [&file](const std::vector<u64>& order) {
+            const u32 count = static_cast<u32>(order.size());
+            file.write(reinterpret_cast<const char*>(&count), sizeof(count));
+            file.write(reinterpret_cast<const char*>(order.data()),
+                       static_cast<std::streamsize>(order.size() * sizeof(u64)));
+        };
+        write(play_order);
+        for (size_t i = 0; i + 1 < sessions; ++i) {
+            write(past_play_orders[i]);
+        }
+        if (!file) {
+            return;
+        }
+    }
+    std::error_code error;
+    std::filesystem::rename(temporary, play_order_filename, error);
+}
+
+void PipelineCache::NotePlayOrder(u64 hash) {
+    play_order.push_back(hash);
+    // EDEN_NX2_PLAY_ORDER=0 records the order but builds in the prebuild's own order, as before
+    static const bool enabled = [] {
+        const char* const value = std::getenv("EDEN_NX2_PLAY_ORDER");
+        return value == nullptr || value[0] != '0';
+    }();
+    if (!enabled || !scheduled_prebuild || past_play_orders.empty()) {
+        return;
+    }
+    std::vector<u64> next;
+    for (size_t session = 0; session < past_play_orders.size(); ++session) {
+        const auto position = past_play_positions[session].find(hash);
+        if (position == past_play_positions[session].end()) {
+            continue;
+        }
+        const auto& order = past_play_orders[session];
+        const size_t end = std::min<size_t>(order.size(), position->second + 1 + PlayOrderLookahead);
+        for (size_t i = position->second + 1; i < end; ++i) {
+            if (play_order_promoted.insert(order[i]).second) {
+                next.push_back(order[i]);
+            }
+        }
+    }
+    if (!next.empty()) {
+        play_order_moved += scheduled_prebuild->PromoteHashes(next);
+    }
+}
+
 void PipelineCache::SaveUsedPipelines() {
+    SavePlayOrder();
     used_pipelines_saved = std::chrono::steady_clock::now();
     // A session too short to say what the game uses (a boot to the menu) keeps the old list.
     constexpr size_t MinimumUsed = 64;
@@ -1244,6 +1345,8 @@ void PipelineCache::LoadDiskResources(u64 title_id, std::stop_token stop_loading
     StutterTrace::BootMarker("shader_load_begin");
     const auto shader_dir{Common::FS::GetEdenPath(Common::FS::EdenPath::ShaderDir)};
     const auto base_dir{shader_dir / fmt::format("{:016x}", title_id)};
+    play_order_filename = base_dir / "pipeline_order.bin";
+    LoadPlayOrder();
     if (!Common::FS::CreateDirs(base_dir)) {
         LOG_ERROR(Render_Vulkan,
                   "Pipeline cache disabled for this session: failed to create the cache "
@@ -2456,9 +2559,11 @@ GraphicsPipeline* PipelineCache::CurrentGraphicsPipelineSlowPath() {
         return nullptr;
     }
     constexpr auto save_interval = std::chrono::seconds{15};
-    if (used_this_session.insert(pipeline.get()).second &&
-        std::chrono::steady_clock::now() - used_pipelines_saved > save_interval) {
-        SaveUsedPipelines();
+    if (used_this_session.insert(pipeline.get()).second) {
+        NotePlayOrder(graphics_key.Hash());
+        if (std::chrono::steady_clock::now() - used_pipelines_saved > save_interval) {
+            SaveUsedPipelines();
+        }
     }
     if (current_pipeline) {
         current_pipeline->AddTransition(pipeline.get());
@@ -2510,12 +2615,13 @@ void PipelineCache::TickFrame() {
             LOG_INFO(Render_Vulkan,
                      "Background prebuild done {:.1f} s after the boot load began: {} built, {} "
                      "failed, {} taken by draws before they finished, {} built ones no draw has "
-                     "taken yet, {} draws skipped while theirs was still building",
+                     "taken yet, {} draws skipped while theirs was still building, {} moved "
+                     "ahead by the play order",
                      std::chrono::duration<double>(std::chrono::steady_clock::now() -
                                                    *prebuild_load_begin)
                          .count(),
                      outcome->built, outcome->failed, outcome->taken_unfinished,
-                     outcome->unclaimed, prebuild_skipped_lookups);
+                     outcome->unclaimed, prebuild_skipped_lookups, play_order_moved);
             prebuild_load_begin.reset();
         }
     }

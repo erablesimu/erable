@@ -23,6 +23,10 @@ version. Les sections suivantes gardent l'historique.
   arrière-plan pendant la partie. Les objets dont le shader n'est pas encore prêt apparaissent un
   instant plus tard au lieu de figer l'image (jusqu'à 19 s d'arrêt en entrant dans une zone avant).
   Sans cliquer, le chargement va jusqu'au bout comme avant.
+- Pendant la partie, la préparation des shaders en arrière-plan ne prend plus que la moitié des
+  cœurs du processeur : le jeu garde les autres (Ocarina descendait à 43-57 images/s pendant les
+  15 premières minutes). Elle prépare aussi d'abord les shaders des lieux qui suivent d'habitude
+  celui où vous êtes, d'après vos dernières parties.
 - Le record du petit jeu des feuilles est enfin gardé d'une session à l'autre.
 - Erable ne reste plus en arrière-plan après sa fermeture : si quelque chose l'y retient plus de
   20 secondes, il se ferme de lui-même (cela bloquait le journal et la mémoire du PC).
