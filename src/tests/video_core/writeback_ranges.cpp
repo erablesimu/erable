@@ -231,6 +231,23 @@ TEST_CASE("A flush's snapshot is written whole without newer data over it",
     CHECK(keep.empty());
 }
 
+TEST_CASE("An explicit download keeps earlier landed bytes with no pending write-backs",
+          "[video_core][texture_cache][writeback]") {
+    const std::vector<LandedRecord> records{{0x1200, 0x1400, 30, false}};
+    std::vector<TickedRange> landed;
+    std::vector<Range> keep;
+    AppendNewerLanded(keep, records, 0x1000, 0x2000, 20,
+                      [](const LandedRecord&) { return false; });
+    REQUIRE(Kept(landed, 20).empty());
+    CHECK(keep == std::vector<Range>{{0x1200, 0x1400}});
+
+    AppendLanded(landed, 0x1800, 0x100, 40, std::vector<Range>{}, TickedRanges{});
+    const auto just_landed = Kept(landed, 20);
+    keep.insert(keep.end(), just_landed.begin(), just_landed.end());
+    MergeRanges(keep);
+    CHECK(keep == std::vector<Range>{{0x1200, 0x1400}, {0x1800, 0x1900}});
+}
+
 TEST_CASE("A page's write-back records drop the oldest past the hard limit",
           "[video_core][texture_cache][writeback]") {
     constexpr DAddr page = 0x1000;

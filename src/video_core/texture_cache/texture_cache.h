@@ -2629,6 +2629,7 @@ void TextureCache<P>::DownloadMemory(DAddr cpu_addr, size_t size) {
         for (Pending& entry : pending) {
             Image& image = slot_images[entry.image_id];
             KeepRanges keep;
+            KeepNewerLanded(image, image.modification_tick, keep);
             if (!landed.empty()) {
                 ForEachWrittenRange(image, [&](DAddr begin, DAddr end) {
                     for (const TickedRange& range : landed) {
