@@ -407,7 +407,13 @@ void TextureCache<P>::ApplyThresholdOverrides(bool log) {
     const u64 budget_expected = expected_memory;
     u64 max_critical = MaxCriticalMemory;
     if constexpr (requires { runtime.GetDeviceMemoryBudget(); }) {
-        max_critical = (std::max)(max_critical, runtime.GetDeviceMemoryBudget() / 8 * 5);
+        // 3/4 of the budget, not 5/8, from 10 GiB: on a 12 GB card (11.2 GB budget) Mario Kart World's races
+        // sat at the 6.25 GB expected threshold, and the collector deleted 250-560 images every
+        // 10 s that the next frames created and uploaded again (1.5 s of texture work per 10 s,
+        // 46-56 fps). The budget is the driver's, other programs' video memory already out of it.
+        // Cards under 10 GiB keep 5/8: an 8 GB card past its margin paged (see below).
+        const u64 budget = runtime.GetDeviceMemoryBudget();
+        max_critical = (std::max)(max_critical, budget >= 10_GiB ? budget / 4 * 3 : budget / 8 * 5);
     }
     critical_memory = (std::min)(critical_memory, max_critical);
     expected_memory =
