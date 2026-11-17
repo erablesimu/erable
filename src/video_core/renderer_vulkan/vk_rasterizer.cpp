@@ -4557,6 +4557,10 @@ void RasterizerVulkan::UpdateDepthBias(Tegra::Engines::Maxwell3D::Regs& regs) {
     }
     float clamp = regs.depth_bias_clamp;
     float factor = regs.slope_scale_depth_bias;
+    if (texture_cache.IsRescaling()) {
+        // The slope term is per pixel, so a rescaled target needs it scaled back to guest pixels.
+        factor *= Settings::values.resolution_info.up_factor;
+    }
     if (far_plane_draw) {
         const bool reversed =
             regs.viewport_scale_offset_enabled && regs.viewport_transform[0].scale_z < 0.0f;
