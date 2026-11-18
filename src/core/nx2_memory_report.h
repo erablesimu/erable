@@ -38,7 +38,7 @@ inline void Log(Core::System& system) {
     std::array<u64, 4> size{};
     for (size_t i = 0; i < pools.size(); ++i) {
         size[i] = manager.GetSize(pools[i]);
-        used[i] = size[i] - (std::min)(size[i], manager.GetFreeSize(pools[i]));
+        used[i] = size[i] - (std::min<u64>)(size[i], manager.GetFreeSize(pools[i]));
         used_total += used[i];
     }
     static u64 peak = 0;
