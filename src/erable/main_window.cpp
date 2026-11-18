@@ -141,12 +141,13 @@ static FileSys::VirtualFile VfsDirectoryCreateFileWrapper(const FileSys::Virtual
 #include "frontend_common/play_time_manager.h"
 #include "frontend_common/recommended_settings.h"
 
-#ifdef ENABLE_UPDATE_CHECKER
-#include "frontend_common/update_checker.h"
-#include "frontend_common/update_installer.h"
 #include "erable/debug_session.h"
 #include "erable/home/home_screen.h"
 #include "erable/local_report.h"
+
+#ifdef ENABLE_UPDATE_CHECKER
+#include "frontend_common/update_checker.h"
+#include "frontend_common/update_installer.h"
 #endif
 
 // Common //
