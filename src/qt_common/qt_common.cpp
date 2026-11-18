@@ -8,6 +8,7 @@
 #include "frontend_common/data_manager.h"
 #include "hid_core/hid_core.h"
 #include "network/network.h"
+#include "network/room_autojoin.h"
 #include "qt_common.h"
 
 #include "common/fs/fs.h"
@@ -232,6 +233,7 @@ void Init(QWidget* root) {
 #endif
 
     Network::Init();
+    Network::JoinRoomFromEnvironment();
 
     QtCommon::Meta::RegisterMetaTypes();
 
