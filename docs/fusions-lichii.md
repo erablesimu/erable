@@ -28,3 +28,8 @@ Règle :
 - build-41 (17 novembre 2026) : deuxième lot, avancé à la demande du propriétaire (#1914, #1915,
   #1940, #2074, #2083, #2103 ; #1954 était déjà là). Un seul recompilage pour les joueurs, en
   même temps que le cache Vulkan d'Erable sur NVIDIA.
+- build-44 (18 novembre 2026) : troisième lot, avancé à la demande du propriétaire (racines
+  NVN2 1-7, #2132, #2140 et quatre abaissements d'instructions), avec la réécriture des
+  write-back d'images de Lichii (« AIO-10 component #1501 », #2133, #2134). Laissés de côté :
+  #1445 (repose sur leurs traces d'upload) et la reprise de l'agrandissement d'Ocarina en
+  portable (#1866), qui demande leur passe FSR.

@@ -6,10 +6,17 @@ version. Les sections suivantes gardent l'historique.
 ## Nouveautés de cette version
 
 **À savoir**
-- Build 41 : le traducteur de shaders change, donc les shaders sont recompilés une fois au
-  premier lancement de chaque jeu (10 à 30 minutes pour Ocarina of Time). Dès 60 %, vous pouvez
-  choisir « Jouer maintenant ». Sur les cartes NVIDIA, Erable garde maintenant son propre cache
-  de shaders : les mises à jour suivantes ne devraient plus tout recompiler.
+- Cette version change de nouveau le traducteur de shaders : les shaders sont recompilés une
+  fois au premier lancement de chaque jeu. Dès 60 %, vous pouvez choisir « Jouer maintenant ».
+- Build 41 : sur les cartes NVIDIA, Erable garde son propre cache de shaders, pour que les mises
+  à jour suivantes ne recompilent plus tout.
+
+**Images et textures**
+- Les images que le GPU dessine et que le jeu relit ensuite sont mieux recopiées dans sa mémoire :
+  moins d'objets noirs, de motifs « arc-en-ciel » ou d'éléments périmés quand une image est
+  recréée (personnages de The Duskbloods notamment).
+- Les shaders de plusieurs jeux Switch 2 sont mieux pris en charge (nouvelles instructions,
+  tables de ressources), et ceux qui ne peuvent pas l'être sont écartés au lieu de dessiner faux.
 
 **Jeu en ligne (nouveau)**
 - Dans la fenêtre de profil (le bouton avec votre pseudo et votre image, en haut de l'accueil),
