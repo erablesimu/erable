@@ -11,6 +11,20 @@ version. Les sections suivantes gardent l'historique.
   choisir « Jouer maintenant ». Sur les cartes NVIDIA, Erable garde maintenant son propre cache
   de shaders : les mises à jour suivantes ne devraient plus tout recompiler.
 
+**Jeu en ligne (nouveau)**
+- Dans la fenêtre de profil (le bouton avec votre pseudo et votre image, en haut de l'accueil),
+  la nouvelle section « Jeu en ligne » permet de jouer en local sans fil avec d'autres joueurs :
+  - **Wi-Fi** : avec les personnes connectées au même Wi-Fi ou au même réseau que vous ;
+  - **Serveur externe** : avec des joueurs où qu'ils soient, via le serveur d'Erable. Choisissez
+    un des 16 salons ; tous les joueurs d'un même salon se voient comme s'ils étaient dans la
+    même pièce. Lancez ensuite le mode « sans fil local » du jeu.
+- Le serveur externe demande un **compte Erable** (pseudo, e-mail, mot de passe), créé depuis
+  la même fenêtre. Chaque compte reçoit un code ami. En cas d'oubli, la réponse à votre question
+  de sécurité et votre code de sécurité permettent de choisir un nouveau mot de passe.
+  « Supprimer mon compte » efface tout ; la notice de confidentialité dit ce qui est gardé.
+- Le mode « en ligne » des jeux (serveurs Nintendo) n'est pas concerné : c'est le jeu en local
+  sans fil qui passe par Erable.
+
 **Accueil**
 - Bouton « Plein écran » en haut à droite de l'accueil (ou touche F11) : l'accueil et la
   bibliothèque remplissent l'écran, sans menus. « Fenêtre » revient comme avant. Le choix est
