@@ -27,9 +27,8 @@ namespace {
 
 /// The Erable server, reached by its address (no domain name)
 constexpr char DefaultServer[] = "https://91.134.241.94:24870";
-/// SHA-256 of the server's self-signed certificate, in hex. Empty until the server's
-/// certificate exists; EDEN_NX2_ONLINE_PIN sets it meanwhile.
-constexpr char DefaultPin[] = "";
+/// SHA-256 of the server's self-signed certificate, in hex (EDEN_NX2_ONLINE_PIN overrides it)
+constexpr char DefaultPin[] = "3dfc8baf6a32e2a2df8b7bf6ac08cf91ddd1b637c9c631e3fe8b4e4409d54dee";
 
 constexpr int TimeoutMs = 15000;
 
