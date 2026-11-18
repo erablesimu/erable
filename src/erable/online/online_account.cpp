@@ -8,6 +8,7 @@
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -57,7 +58,7 @@ Account::Account(QObject* parent) : QObject{parent}, network{new QNetworkAccessM
 Account::~Account() = default;
 
 bool Account::Enabled() {
-    return qgetenv("EDEN_NX2_ONLINE") == "1";
+    return qgetenv("EDEN_NX2_ONLINE") != "0";
 }
 
 Account* Account::Shared() {
@@ -140,6 +141,9 @@ QString Account::ErrorText(const QString& code) {
     if (code == QStringLiteral("bad_answer")) {
         return tr("The answer is too short.");
     }
+    if (code == QStringLiteral("no_access")) {
+        return tr("Your Erable account doesn't have access to the online rooms.");
+    }
     if (code == QStringLiteral("no_session")) {
         return tr("Your session has ended. Sign in again.");
     }
@@ -220,6 +224,50 @@ void Account::Logout(Callback done) {
              ClearSession();
              done(result);
          });
+}
+
+void Account::DeleteAccount(const QString& password, Callback done) {
+    Send(QStringLiteral("POST"), QStringLiteral("/v1/account/delete"),
+         {{QStringLiteral("password"), password}}, true,
+         [this, done = std::move(done)](const Result& result) {
+             if (result.ok) {
+                 ClearSession();
+             }
+             done(result);
+         });
+}
+
+void Account::FetchRooms(Callback done) {
+    if (!session) {
+        rooms.clear();
+        done({.ok = false, .error = QStringLiteral("no_session"), .data = {}});
+        return;
+    }
+    Send(QStringLiteral("GET"), QStringLiteral("/v1/rooms"), {}, true,
+         [this, done = std::move(done)](const Result& result) {
+             if (result.ok) {
+                 rooms.clear();
+                 for (const auto& value : result.data.value(QStringLiteral("rooms")).toArray()) {
+                     const QJsonObject room = value.toObject();
+                     rooms.append(
+                         {.name = room.value(QStringLiteral("name")).toString(),
+                          .port = static_cast<unsigned>(room.value(QStringLiteral("port")).toInt()),
+                          .password = room.value(QStringLiteral("password")).toString()});
+                 }
+             } else if (result.error == QStringLiteral("no_session")) {
+                 ClearSession();
+             }
+             done(result);
+         });
+}
+
+QString Account::RoomPassword(unsigned port) const {
+    for (const Room& room : rooms) {
+        if (room.port == port) {
+            return room.password;
+        }
+    }
+    return {};
 }
 
 void Account::Send(const QString& method, const QString& path, const QJsonObject& body,
@@ -347,6 +395,7 @@ void Account::SaveSession() {
 
 void Account::ClearSession() {
     session.reset();
+    rooms.clear();
     QFile::remove(SessionPath());
     emit SessionChanged();
 }

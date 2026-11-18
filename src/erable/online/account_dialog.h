@@ -5,6 +5,7 @@
 
 #include <QDialog>
 
+class QCheckBox;
 class QComboBox;
 class QLabel;
 class QLineEdit;
@@ -36,6 +37,9 @@ private:
     void FetchQuestion();
     void Recover();
     void SignOut();
+    void DeleteAccount();
+    /// What the server keeps and why, before signing up
+    void ShowPrivacyNotice();
 
     /// Shows the account page when signed in, else the sign-in page
     void ShowCurrent();
@@ -63,6 +67,7 @@ private:
     QLineEdit* sign_up_answer;
     QLineEdit* sign_up_code;
     QLineEdit* sign_up_code_again;
+    QCheckBox* sign_up_privacy;
     QLabel* sign_up_message;
 
     // Recovery

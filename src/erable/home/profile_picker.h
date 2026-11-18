@@ -61,6 +61,8 @@ private:
     void MakeOnlineBar(QVBoxLayout* layout);
     void UpdateOnlineBar();
     void ChooseOnlineMode(bool wifi);
+    /// Fills the room list with the rooms the server gives signed-in players
+    void FetchRooms();
     [[nodiscard]] QRectF TileRect(int index) const;
     [[nodiscard]] int TileAt(QPointF point) const;
     [[nodiscard]] int Count() const; ///< Profiles, and the "Add" tile while there is room
@@ -78,8 +80,9 @@ private:
     QPushButton* wifi_button = nullptr;
     QPushButton* server_button = nullptr;
     QComboBox* room_box = nullptr;
-    QLineEdit* room_password = nullptr;
     QPushButton* account_button = nullptr;
+    bool fetching_rooms = false;
+    bool rooms_tried = false;
     QString display_family;
     QString body_family;
 };

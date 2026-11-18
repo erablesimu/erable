@@ -25,6 +25,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPointer>
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <QVBoxLayout>
@@ -200,10 +201,6 @@ void ProfilePicker::MakeOnlineBar(QVBoxLayout* layout) {
     for (int i = 0; i < Online::RoomCount; ++i) {
         room_box->addItem(tr("Room %1").arg(i + 1), Online::FirstRoomPort + i);
     }
-    room_password = new QLineEdit(this);
-    room_password->setEchoMode(QLineEdit::Password);
-    room_password->setPlaceholderText(tr("Room password"));
-    room_password->setMaximumWidth(160);
     account_button = new QPushButton(this);
     for (QPushButton* button : {wifi_button, server_button}) {
         button->setCheckable(true);
@@ -220,7 +217,6 @@ void ProfilePicker::MakeOnlineBar(QVBoxLayout* layout) {
     bar->addWidget(server_button);
     bar->addSpacing(10);
     bar->addWidget(room_box);
-    bar->addWidget(room_password);
     bar->addWidget(account_button);
     bar->addStretch();
     layout->addLayout(bar);
@@ -236,10 +232,6 @@ void ProfilePicker::MakeOnlineBar(QVBoxLayout* layout) {
     });
     connect(room_box, &QComboBox::currentIndexChanged, this, [this] {
         Settings::values.online_room_port = room_box->currentData().toUInt();
-        UpdateOnlineBar();
-    });
-    connect(room_password, &QLineEdit::editingFinished, this, [this] {
-        Settings::values.online_room_password = room_password->text().toStdString();
         UpdateOnlineBar();
     });
 }
@@ -263,26 +255,51 @@ void ProfilePicker::ChooseOnlineMode(bool wifi) {
     UpdateOnlineBar();
 }
 
+void ProfilePicker::FetchRooms() {
+    Online::Account* account = Online::Account::Shared();
+    if (!account || !account->CurrentSession() || fetching_rooms) {
+        return;
+    }
+    fetching_rooms = true;
+    rooms_tried = true; // Once per window: a server out of reach is not asked in a loop
+    QPointer<ProfilePicker> self{this};
+    account->FetchRooms([self, account](const Online::Account::Result&) {
+        if (!self) {
+            return;
+        }
+        self->fetching_rooms = false;
+        if (!account->Rooms().isEmpty()) {
+            const QSignalBlocker blocker{self->room_box};
+            self->room_box->clear();
+            for (const Online::Room& room : account->Rooms()) {
+                self->room_box->addItem(room.name, room.port);
+            }
+        }
+        self->UpdateOnlineBar();
+    });
+}
+
 void ProfilePicker::UpdateOnlineBar() {
     if (!wifi_button) {
         return;
     }
     Online::Account* account = Online::Account::Shared();
     const Online::Mode mode = Online::CurrentMode();
+    if (mode == Online::Mode::Server && account && account->CurrentSession() &&
+        account->Rooms().isEmpty() && !rooms_tried) {
+        // The rooms' passwords first; this comes back here once they are known
+        FetchRooms();
+        return;
+    }
     wifi_button->setChecked(mode == Online::Mode::WiFi);
     server_button->setChecked(mode == Online::Mode::Server);
     const bool server = mode == Online::Mode::Server;
     room_box->setVisible(server);
-    room_password->setVisible(server);
     account_button->setVisible(server);
     {
         const QSignalBlocker blocker{room_box};
         const int index = room_box->findData(Settings::values.online_room_port.GetValue());
         room_box->setCurrentIndex(std::max(index, 0));
-    }
-    if (room_password->text().toStdString() != Settings::values.online_room_password.GetValue()) {
-        room_password->setText(
-            QString::fromStdString(Settings::values.online_room_password.GetValue()));
     }
     const auto* session =
         account && account->CurrentSession() ? &*account->CurrentSession() : nullptr;

@@ -12155,6 +12155,10 @@ Réessayer sans la recette ? Le jeu fonctionnera toujours depuis l'archive NX, m
 <context>
     <name>Online::Account</name>
     <message>
+        <source>Your Erable account doesn&apos;t have access to the online rooms.</source>
+        <translation>Votre compte Erable n’a pas accès aux salons en ligne.</translation>
+    </message>
+    <message>
         <source>What was the name of your first pet?</source>
         <translation>Comment s’appelait votre premier animal de compagnie ?</translation>
     </message>
@@ -12241,6 +12245,42 @@ Réessayer sans la recette ? Le jeu fonctionnera toujours depuis l'archive NX, m
 </context>
 <context>
     <name>Online::AccountDialog</name>
+    <message>
+        <source>I have read the privacy notice</source>
+        <translation>J’ai lu la notice de confidentialité</translation>
+    </message>
+    <message>
+        <source>Read the privacy notice</source>
+        <translation>Lire la notice</translation>
+    </message>
+    <message>
+        <source>Read and accept the privacy notice first.</source>
+        <translation>Lisez et acceptez d’abord la notice de confidentialité.</translation>
+    </message>
+    <message>
+        <source>Delete my account</source>
+        <translation>Supprimer mon compte</translation>
+    </message>
+    <message>
+        <source>Privacy notice</source>
+        <translation>Notice de confidentialité</translation>
+    </message>
+    <message>
+        <source>This deletes your Erable account, its friend code and everything the server keeps about it. It can&apos;t be undone.
+
+Enter your password to confirm:</source>
+        <translation>Cela supprime votre compte Erable, son code ami et tout ce que le serveur garde sur vous. C’est définitif.
+
+Entrez votre mot de passe pour confirmer :</translation>
+    </message>
+    <message>
+        <source>Your account was deleted.</source>
+        <translation>Votre compte a été supprimé.</translation>
+    </message>
+    <message>
+        <source>&lt;h3&gt;Your Erable account&lt;/h3&gt;&lt;p&gt;&lt;b&gt;What the Erable server keeps:&lt;/b&gt; your nickname, your e-mail, your friend code, your password, the answer to your security question and your security code. The password, the answer and the code are stored scrambled (hashed): nobody can read them, not even us.&lt;/p&gt;&lt;p&gt;&lt;b&gt;While you use it:&lt;/b&gt; your sessions (one per device, 180 days at most) and, for 15 minutes, the network address of failed sign-ins, to stop password guessing.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Why:&lt;/b&gt; to sign you in, to let you choose a new password, and to let you play online in the Erable rooms. Nothing is sold, shared or used for advertising. No e-mail is sent to you.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Where:&lt;/b&gt; on Erable&apos;s server, hosted by OVHcloud. Online rooms relay the game&apos;s traffic between the players; they keep nothing.&lt;/p&gt;&lt;p&gt;&lt;b&gt;How long:&lt;/b&gt; until you delete your account: &quot;Delete my account&quot;, once signed in, removes everything at once.&lt;/p&gt;</source>
+        <translation>&lt;h3&gt;Votre compte Erable&lt;/h3&gt;&lt;p&gt;&lt;b&gt;Ce que garde le serveur Erable :&lt;/b&gt; votre pseudo, votre e-mail, votre code ami, votre mot de passe, la réponse à votre question de sécurité et votre code de sécurité. Le mot de passe, la réponse et le code sont enregistrés sous forme brouillée (hachée) : personne ne peut les lire, pas même nous.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Pendant l’utilisation :&lt;/b&gt; vos sessions (une par appareil, 180 jours au plus) et, pendant 15 minutes, l’adresse réseau des connexions ratées, pour empêcher qu’on devine les mots de passe.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Pourquoi :&lt;/b&gt; pour vous connecter, vous permettre de choisir un nouveau mot de passe et jouer en ligne dans les salons Erable. Rien n’est vendu, partagé ni utilisé pour de la publicité. Aucun e-mail ne vous est envoyé.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Où :&lt;/b&gt; sur le serveur d’Erable, hébergé chez OVHcloud. Les salons en ligne relaient les échanges du jeu entre les joueurs ; ils ne gardent rien.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Combien de temps :&lt;/b&gt; jusqu’à la suppression de votre compte : « Supprimer mon compte », une fois connecté, efface tout d’un coup.&lt;/p&gt;</translation>
+    </message>
     <message>
         <source>Erable account</source>
         <translation>Compte Erable</translation>

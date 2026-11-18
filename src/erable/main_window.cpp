@@ -503,8 +503,8 @@ MainWindow::MainWindow(bool has_broken_vulkan)
     game_list->PopulateAsync(UISettings::values.game_dirs);
     ShowHome(true);
 
-    // Online play and the Erable account, not offered yet: only with EDEN_NX2_ONLINE=1, in the
-    // profile window (and the account through Ctrl+Shift+O)
+    // Online play and the Erable account, in the profile window (the account also through
+    // Ctrl+Shift+O); EDEN_NX2_ONLINE=0 turns them off
     if (Online::Account* online_account = Online::Account::Shared()) {
         auto* account_shortcut = new QShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+O")), this);
         account_shortcut->setContext(Qt::ApplicationShortcut);
@@ -513,8 +513,10 @@ MainWindow::MainWindow(bool has_broken_vulkan)
             dialog.exec();
         });
         online_account->Refresh([online_account](const Online::Account::Result&) {
-            // The mode chosen last time, once the session is known
-            Online::ApplyMode(online_account, {});
+            // The mode chosen last time, once the session and the rooms are known
+            online_account->FetchRooms([online_account](const Online::Account::Result&) {
+                Online::ApplyMode(online_account, {});
+            });
         });
     }
 

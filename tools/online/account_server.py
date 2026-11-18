@@ -9,7 +9,10 @@ random tokens. Password recovery needs the e-mail, the security answer and the s
 together: nothing is sent by e-mail.
 
     account_server.py --db /var/lib/erable-accounts/accounts.db \
-        --cert cert.pem --key key.pem --port 24870
+        --cert cert.pem --key key.pem --port 24870 --rooms rooms.json
+
+rooms.json lists the rooms signed-in players may join, with their passwords:
+    [{"name": "Salon 1", "port": 24872, "password": "..."}, ...]
 """
 
 import argparse
@@ -33,6 +36,10 @@ MAX_BODY = 16 * 1024
 MAX_FAILURES = 5
 FAILURE_WINDOW = 15 * 60
 
+# Access to the rooms: free for every account while this is False. A paid access, later, sets it
+# to True; accounts then need access = "paid" with access_until in the future.
+REQUIRE_PAID_ACCESS = False
+
 SECURITY_QUESTIONS = (
     "first_pet",
     "birth_city",
@@ -55,7 +62,9 @@ CREATE TABLE IF NOT EXISTS accounts (
     question TEXT NOT NULL,
     answer_hash TEXT NOT NULL,
     code_hash TEXT NOT NULL,
-    created_at INTEGER NOT NULL
+    created_at INTEGER NOT NULL,
+    access TEXT NOT NULL DEFAULT 'free',
+    access_until INTEGER
 );
 CREATE TABLE IF NOT EXISTS sessions (
     token_hash TEXT PRIMARY KEY,
@@ -121,6 +130,12 @@ class Store:
         self.db.execute("PRAGMA foreign_keys = ON")
         self.db.execute("PRAGMA journal_mode = WAL")
         self.db.executescript(SCHEMA)
+        # Databases made before the access columns
+        columns = {row[1] for row in self.db.execute("PRAGMA table_info(accounts)")}
+        if "access" not in columns:
+            self.db.execute("ALTER TABLE accounts ADD COLUMN access TEXT NOT NULL DEFAULT 'free'")
+        if "access_until" not in columns:
+            self.db.execute("ALTER TABLE accounts ADD COLUMN access_until INTEGER")
         self.db.commit()
 
     # Failed attempts, by e-mail and by client address
@@ -146,10 +161,24 @@ class Store:
                         (token_hash(token), account_id, now, now + SESSION_DAYS * 86400))
         return token
 
-    def profile(self, account_id, token=None):
-        row = self.db.execute("SELECT nickname, email, friend_code FROM accounts WHERE id = ?",
+    def has_access(self, account_id):
+        """Whether the account may use the rooms. Free for everyone for now: a paid access
+        will set `access` ("paid") and `access_until` (a Unix time) and be checked here."""
+        row = self.db.execute("SELECT access, access_until FROM accounts WHERE id = ?",
                               (account_id,)).fetchone()
-        result = {"nickname": row[0], "email": row[1], "friend_code": row[2]}
+        if row is None:
+            return False
+        access, until = row
+        if REQUIRE_PAID_ACCESS:
+            return access == "paid" and until is not None and until > time.time()
+        return True
+
+    def profile(self, account_id, token=None):
+        row = self.db.execute("SELECT nickname, email, friend_code, access, access_until "
+                              "FROM accounts WHERE id = ?", (account_id,)).fetchone()
+        result = {"nickname": row[0], "email": row[1], "friend_code": row[2],
+                  "access": row[3], "access_until": row[4],
+                  "has_access": self.has_access(account_id)}
         if token:
             result["token"] = token
         return result
@@ -254,6 +283,29 @@ def recover(store, body, client):
     return HTTPStatus.OK, store.profile(row[0], token)
 
 
+def delete_account(store, account_id, body, client):
+    password = field(body, "password", 128)
+    store.check_throttle("delete:" + str(account_id), "client:" + client)
+    row = store.db.execute("SELECT password_hash FROM accounts WHERE id = ?",
+                           (account_id,)).fetchone()
+    if row is None or not check_secret(password, row[0]):
+        store.note_failure("delete:" + str(account_id), "client:" + client)
+        raise ApiError(HTTPStatus.UNAUTHORIZED, "wrong_credentials")
+    # The sessions go with it (ON DELETE CASCADE)
+    store.db.execute("DELETE FROM accounts WHERE id = ?", (account_id,))
+    store.db.commit()
+    return HTTPStatus.OK, {}
+
+
+def load_rooms(path):
+    if not path:
+        return []
+    with open(path, encoding="utf-8") as file:
+        rooms = json.load(file)
+    return [{"name": str(room["name"]), "port": int(room["port"]),
+             "password": str(room.get("password", ""))} for room in rooms]
+
+
 def session_account(store, headers):
     auth = headers.get("Authorization", "")
     if not auth.startswith("Bearer "):
@@ -274,7 +326,7 @@ ROUTES = {
 }
 
 
-def make_handler(store):
+def make_handler(store, rooms):
     class Handler(BaseHTTPRequestHandler):
         server_version = "ErableAccounts/1"
         sys_version = ""
@@ -302,6 +354,27 @@ def make_handler(store):
                     if (method, self.path) == ("GET", "/v1/me"):
                         account_id, _ = session_account(store, self.headers)
                         self.reply(HTTPStatus.OK, store.profile(account_id))
+                        return
+                    if (method, self.path) == ("GET", "/v1/rooms"):
+                        account_id, _ = session_account(store, self.headers)
+                        if not store.has_access(account_id):
+                            raise ApiError(HTTPStatus.PAYMENT_REQUIRED, "no_access")
+                        self.reply(HTTPStatus.OK, {"rooms": rooms})
+                        return
+                    if (method, self.path) == ("POST", "/v1/account/delete"):
+                        account_id, _ = session_account(store, self.headers)
+                        length = int(self.headers.get("Content-Length") or 0)
+                        if length <= 0 or length > MAX_BODY:
+                            raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body")
+                        try:
+                            body = json.loads(self.rfile.read(length))
+                        except ValueError:
+                            raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body") from None
+                        if not isinstance(body, dict):
+                            raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body")
+                        status, payload = delete_account(store, account_id, body,
+                                                         self.client_address[0])
+                        self.reply(status, payload)
                         return
                     if (method, self.path) == ("POST", "/v1/logout"):
                         _, hashed = session_account(store, self.headers)
@@ -345,10 +418,11 @@ def main():
     parser.add_argument("--key", required=True)
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=24870)
+    parser.add_argument("--rooms", default="", help="JSON list of the rooms and their passwords")
     args = parser.parse_args()
 
     store = Store(args.db)
-    server = ThreadingHTTPServer((args.host, args.port), make_handler(store))
+    server = ThreadingHTTPServer((args.host, args.port), make_handler(store, load_rooms(args.rooms)))
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.minimum_version = ssl.TLSVersion.TLSv1_2
     context.load_cert_chain(args.cert, args.key)

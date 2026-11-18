@@ -76,8 +76,13 @@ void ApplyMode(const Account* account, const QString& profile_name) {
     const QString name = session ? session->nickname : profile_name;
     const std::string nickname = Network::RoomNickname(name.toStdString());
     LOG_INFO(Network, "Online: joining the room {}:{} as {}", host, port, nickname);
+    // The server gives signed-in players the rooms' passwords
+    const QString fetched = account->RoomPassword(port);
+    const std::string password = fetched.isEmpty()
+                                     ? Settings::values.online_room_password.GetValue()
+                                     : fetched.toStdString();
     member->Join(nickname, host.c_str(), static_cast<u16>(port), 0, Network::NoPreferredIP,
-                 Settings::values.online_room_password.GetValue());
+                 password);
     joined = {host, port};
 }
 

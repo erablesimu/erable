@@ -4,12 +4,15 @@
 #include "erable/online/account_dialog.h"
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QClipboard>
 #include <QComboBox>
 #include <QFormLayout>
 #include <QHBoxLayout>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QPointer>
 #include <QPushButton>
 #include <QRegularExpression>
@@ -158,6 +161,13 @@ QWidget* AccountDialog::MakeSignUp() {
                                "if you forget yours: keep them somewhere safe."),
                             page);
     hint->setWordWrap(true);
+    sign_up_privacy = new QCheckBox(tr("I have read the privacy notice"), page);
+    auto* privacy = LinkButton(tr("Read the privacy notice"), page);
+    connect(privacy, &QPushButton::clicked, this, &AccountDialog::ShowPrivacyNotice);
+    auto* privacy_row = new QHBoxLayout;
+    privacy_row->addWidget(sign_up_privacy);
+    privacy_row->addStretch();
+    privacy_row->addWidget(privacy);
     sign_up_message = MessageLabel(page);
 
     auto* submit = new QPushButton(tr("Create the account"), page);
@@ -169,6 +179,7 @@ QWidget* AccountDialog::MakeSignUp() {
     layout->addWidget(title);
     layout->addLayout(form);
     layout->addWidget(hint);
+    layout->addLayout(privacy_row);
     layout->addWidget(sign_up_message);
     layout->addWidget(submit);
     layout->addWidget(back, 0, Qt::AlignLeft);
@@ -240,6 +251,10 @@ QWidget* AccountDialog::MakeSignedIn() {
     signed_in_message = MessageLabel(page);
     auto* sign_out = new QPushButton(tr("Sign out"), page);
     connect(sign_out, &QPushButton::clicked, this, &AccountDialog::SignOut);
+    auto* delete_account = LinkButton(tr("Delete my account"), page);
+    connect(delete_account, &QPushButton::clicked, this, &AccountDialog::DeleteAccount);
+    auto* privacy = LinkButton(tr("Privacy notice"), page);
+    connect(privacy, &QPushButton::clicked, this, &AccountDialog::ShowPrivacyNotice);
     auto* close = new QPushButton(tr("Close"), page);
     close->setDefault(true);
     connect(close, &QPushButton::clicked, this, &QDialog::accept);
@@ -257,6 +272,11 @@ QWidget* AccountDialog::MakeSignedIn() {
     layout->addLayout(form);
     layout->addWidget(signed_in_message);
     layout->addLayout(buttons);
+    auto* links = new QHBoxLayout;
+    links->addWidget(privacy);
+    links->addStretch();
+    links->addWidget(delete_account);
+    layout->addLayout(links);
     layout->addStretch();
     return page;
 }
@@ -309,6 +329,10 @@ void AccountDialog::SignUp() {
     }
     if (sign_up_code->text() != sign_up_code_again->text()) {
         ShowMessage(sign_up_message, tr("The two security codes differ."), true);
+        return;
+    }
+    if (!sign_up_privacy->isChecked()) {
+        ShowMessage(sign_up_message, tr("Read and accept the privacy notice first."), true);
         return;
     }
     SetBusy(true);
@@ -401,6 +425,54 @@ void AccountDialog::SignOut() {
             self->SetBusy(false);
         }
     });
+}
+
+void AccountDialog::DeleteAccount() {
+    bool ok = false;
+    const QString password = QInputDialog::getText(
+        this, tr("Delete my account"),
+        tr("This deletes your Erable account, its friend code and everything the server keeps "
+           "about it. It can't be undone.\n\nEnter your password to confirm:"),
+        QLineEdit::Password, {}, &ok);
+    if (!ok || password.isEmpty()) {
+        return;
+    }
+    SetBusy(true);
+    QPointer<AccountDialog> self{this};
+    account.DeleteAccount(password, [self](const Account::Result& result) {
+        if (!self) {
+            return;
+        }
+        self->SetBusy(false);
+        if (!result.ok) {
+            self->ShowMessage(self->signed_in_message, Account::ErrorText(result.error), true);
+            return;
+        }
+        self->ShowMessage(self->sign_in_message, tr("Your account was deleted."), false);
+    });
+}
+
+void AccountDialog::ShowPrivacyNotice() {
+    QMessageBox box{this};
+    box.setWindowTitle(tr("Privacy notice"));
+    box.setTextFormat(Qt::RichText);
+    box.setText(tr(
+        "<h3>Your Erable account</h3>"
+        "<p><b>What the Erable server keeps:</b> your nickname, your e-mail, your friend code, "
+        "your password, the answer to your security question and your security code. The "
+        "password, the answer and the code are stored scrambled (hashed): nobody can read them, "
+        "not even us.</p>"
+        "<p><b>While you use it:</b> your sessions (one per device, 180 days at most) and, for 15 "
+        "minutes, the network address of failed sign-ins, to stop password guessing.</p>"
+        "<p><b>Why:</b> to sign you in, to let you choose a new password, and to let you play "
+        "online in the Erable rooms. Nothing is sold, shared or used for advertising. No e-mail "
+        "is sent to you.</p>"
+        "<p><b>Where:</b> on Erable's server, hosted by OVHcloud. Online rooms relay the game's "
+        "traffic "
+        "between the players; they keep nothing.</p>"
+        "<p><b>How long:</b> until you delete your account: \"Delete my account\", once signed "
+        "in, removes everything at once.</p>"));
+    box.exec();
 }
 
 void AccountDialog::ShowCurrent() {

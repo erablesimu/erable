@@ -7,6 +7,7 @@
 #include <optional>
 
 #include <QJsonObject>
+#include <QList>
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -23,6 +24,13 @@ struct Session {
     QString nickname;
     QString email;
     QString friend_code;
+};
+
+/// A room of the Erable server that signed-in players may join
+struct Room {
+    QString name;
+    unsigned port{};
+    QString password;
 };
 
 /// Erable accounts on the Erable server: sign-up, sign-in, recovery with the security answer and
@@ -45,7 +53,7 @@ public:
     explicit Account(QObject* parent = nullptr);
     ~Account() override;
 
-    /// Whether the online features are enabled for this run (EDEN_NX2_ONLINE=1)
+    /// Whether the online features are enabled (EDEN_NX2_ONLINE=0 turns them off)
     static bool Enabled();
     /// The account shared by the windows, made on first use; null when not Enabled()
     static Account* Shared();
@@ -79,6 +87,16 @@ public:
     void Refresh(Callback done);
     /// Ends the session on the server and on this PC
     void Logout(Callback done);
+    /// Deletes the account and everything the server keeps about it, given its password
+    void DeleteAccount(const QString& password, Callback done);
+    /// Fetches the rooms signed-in players may join, with their passwords
+    void FetchRooms(Callback done);
+    /// The rooms last fetched (empty until then, or when signed out)
+    const QList<Room>& Rooms() const {
+        return rooms;
+    }
+    /// The password of the room on `port`, if it was fetched
+    QString RoomPassword(unsigned port) const;
 
 signals:
     /// The session was opened, refreshed or closed
@@ -97,6 +115,7 @@ private:
     QUrl server;
     QByteArray pinned_sha256;
     std::optional<Session> session;
+    QList<Room> rooms;
 };
 
 } // namespace Online
