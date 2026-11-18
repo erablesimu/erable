@@ -47,6 +47,12 @@ public:
 
     /// Whether the online features are enabled for this run (EDEN_NX2_ONLINE=1)
     static bool Enabled();
+    /// The account shared by the windows, made on first use; null when not Enabled()
+    static Account* Shared();
+    /// The Erable server's address, without scheme or port (for its rooms)
+    QString ServerHost() const {
+        return server.host();
+    }
 
     /// The security questions the server accepts, by key
     static QStringList QuestionKeys();

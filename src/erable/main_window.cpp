@@ -145,6 +145,7 @@ static FileSys::VirtualFile VfsDirectoryCreateFileWrapper(const FileSys::Virtual
 #include "erable/home/home_screen.h"
 #include "erable/online/account_dialog.h"
 #include "erable/online/online_account.h"
+#include "erable/online/online_mode.h"
 #include "erable/local_report.h"
 
 #ifdef ENABLE_UPDATE_CHECKER
@@ -502,16 +503,19 @@ MainWindow::MainWindow(bool has_broken_vulkan)
     game_list->PopulateAsync(UISettings::values.game_dirs);
     ShowHome(true);
 
-    // The Erable account, not offered yet: only with EDEN_NX2_ONLINE=1, through Ctrl+Shift+O
-    if (Online::Account::Enabled()) {
-        auto* online_account = new Online::Account(this);
+    // Online play and the Erable account, not offered yet: only with EDEN_NX2_ONLINE=1, in the
+    // profile window (and the account through Ctrl+Shift+O)
+    if (Online::Account* online_account = Online::Account::Shared()) {
         auto* account_shortcut = new QShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+O")), this);
         account_shortcut->setContext(Qt::ApplicationShortcut);
         connect(account_shortcut, &QShortcut::activated, this, [this, online_account] {
             Online::AccountDialog dialog(*online_account, this);
             dialog.exec();
         });
-        online_account->Refresh([](const Online::Account::Result&) {});
+        online_account->Refresh([online_account](const Online::Account::Result&) {
+            // The mode chosen last time, once the session is known
+            Online::ApplyMode(online_account, {});
+        });
     }
 
     if (whats_new_pending && !UISettings::values.first_start.GetValue() &&

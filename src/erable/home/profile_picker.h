@@ -12,8 +12,11 @@
 #include "common/uuid.h"
 
 class ControllerNavigation;
+class QComboBox;
 class QLabel;
+class QLineEdit;
 class QPushButton;
+class QVBoxLayout;
 
 namespace Core {
 class System;
@@ -54,6 +57,10 @@ private:
     void ChangePicture();
     void DeleteProfile();
     void UpdateButtons();
+    /// "Online play" above the profiles (only with the online features enabled)
+    void MakeOnlineBar(QVBoxLayout* layout);
+    void UpdateOnlineBar();
+    void ChooseOnlineMode(bool wifi);
     [[nodiscard]] QRectF TileRect(int index) const;
     [[nodiscard]] int TileAt(QPointF point) const;
     [[nodiscard]] int Count() const; ///< Profiles, and the "Add" tile while there is room
@@ -66,6 +73,13 @@ private:
     QPushButton* rename_button = nullptr;
     QPushButton* picture_button = nullptr;
     QPushButton* delete_button = nullptr;
+    // Online play
+    double top_offset = 0; ///< How far the heading and the profiles move down for it
+    QPushButton* wifi_button = nullptr;
+    QPushButton* server_button = nullptr;
+    QComboBox* room_box = nullptr;
+    QLineEdit* room_password = nullptr;
+    QPushButton* account_button = nullptr;
     QString display_family;
     QString body_family;
 };

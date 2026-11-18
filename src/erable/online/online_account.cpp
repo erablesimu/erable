@@ -5,12 +5,14 @@
 
 #include <memory>
 
+#include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QFile>
 #include <QJsonDocument>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QPointer>
 #include <QSaveFile>
 #include <QSslCertificate>
 #include <QSslConfiguration>
@@ -57,6 +59,17 @@ Account::~Account() = default;
 
 bool Account::Enabled() {
     return qgetenv("EDEN_NX2_ONLINE") == "1";
+}
+
+Account* Account::Shared() {
+    if (!Enabled()) {
+        return nullptr;
+    }
+    static QPointer<Account> shared;
+    if (!shared) {
+        shared = new Account(qApp);
+    }
+    return shared;
 }
 
 QStringList Account::QuestionKeys() {

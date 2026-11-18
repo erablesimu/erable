@@ -1091,6 +1091,12 @@ struct Values {
                                            Category::Network};
     SwitchableSetting<bool> airplane_mode{linkage, true, "airplane_mode", Category::Network};
     Setting<bool> lan_play{linkage, false, "lan_play", Category::Network};
+    // Online play from the profile window: "off", "wifi" (the same network, lan_play) or
+    // "server" (a room on the Erable server)
+    Setting<std::string> online_mode{linkage, "off", "online_mode", Category::Network};
+    Setting<u32> online_room_port{linkage, 24872, "online_room_port", Category::Network};
+    Setting<std::string> online_room_password{linkage, std::string(), "online_room_password",
+                                              Category::Network};
     Setting<bool> nextendo_enabled{linkage, false, "nextendo_enabled", Category::Network};
     Setting<std::string> nextendo_server_ip{linkage, "51.178.29.194", "nextendo_server_ip",
                                            Category::Network};

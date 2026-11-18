@@ -41,6 +41,8 @@ add_executable(erable
     online/account_dialog.h
     online/online_account.cpp
     online/online_account.h
+    online/online_mode.cpp
+    online/online_mode.h
     local_report.cpp
     local_report.h
     applets/qt_amiibo_settings.cpp

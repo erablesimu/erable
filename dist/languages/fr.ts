@@ -2,6 +2,46 @@
 <context>
     <name>ProfilePicker</name>
     <message>
+        <source>Online play</source>
+        <translation>Jeu en ligne</translation>
+    </message>
+    <message>
+        <source>Wi-Fi</source>
+        <translation>Wi-Fi</translation>
+    </message>
+    <message>
+        <source>Play with people on the same Wi-Fi or network as you.</source>
+        <translation>Jouez avec les personnes connectées au même Wi-Fi ou réseau que vous.</translation>
+    </message>
+    <message>
+        <source>External server</source>
+        <translation>Serveur externe</translation>
+    </message>
+    <message>
+        <source>Play with people anywhere, through the Erable server. Needs an Erable account.</source>
+        <translation>Jouez avec des personnes où qu’elles soient, via le serveur Erable. Nécessite un compte Erable.</translation>
+    </message>
+    <message>
+        <source>Room %1</source>
+        <translation>Salon %1</translation>
+    </message>
+    <message>
+        <source>Room password</source>
+        <translation>Mot de passe du salon</translation>
+    </message>
+    <message>
+        <source>Sign in</source>
+        <translation>Se connecter</translation>
+    </message>
+    <message>
+        <source>Your Erable account (friend code %1)</source>
+        <translation>Votre compte Erable (code ami %1)</translation>
+    </message>
+    <message>
+        <source>Sign in to your Erable account</source>
+        <translation>Connectez-vous à votre compte Erable</translation>
+    </message>
+    <message>
         <source>Who&apos;s playing?</source>
         <translation>Qui joue ?</translation>
     </message>

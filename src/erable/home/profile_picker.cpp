@@ -11,6 +11,7 @@
 #include <fmt/format.h>
 
 #include <QApplication>
+#include <QComboBox>
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFileDialog>
@@ -25,6 +26,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QVBoxLayout>
 
 #include "common/fs/fs.h"
@@ -33,13 +35,16 @@
 #include "common/string_util.h"
 #include "core/core.h"
 #include "core/hle/service/acc/profile_manager.h"
+#include "erable/online/account_dialog.h"
+#include "erable/online/online_account.h"
+#include "erable/online/online_mode.h"
 #include "erable/util/controller_navigation.h"
 
 namespace {
 
-constexpr double TileSize = 124;   ///< The avatar's diameter
+constexpr double TileSize = 124; ///< The avatar's diameter
 constexpr double TileGap = 34;
-constexpr double TileTop = 104;    ///< Below the heading
+constexpr double TileTop = 104; ///< Below the heading
 
 QString FamilyOf(const QString& file) {
     const int id = QFontDatabase::addApplicationFont(file);
@@ -94,8 +99,14 @@ QPixmap ProfilePicker::ProfilePicture(const Common::UUID& uuid) {
 
 QColor ProfilePicker::ProfileColour(const Common::UUID& uuid) {
     static constexpr std::array<QColor, 8> Colours{{
-        {0xe8, 0x62, 0x2a}, {0x3f, 0x9a, 0xd8}, {0x5e, 0xb4, 0x32}, {0xc0, 0x4f, 0x9b},
-        {0xe0, 0xa8, 0x2e}, {0x2f, 0xb3, 0xa3}, {0x8a, 0x6c, 0xe0}, {0xd9, 0x4b, 0x4b},
+        {0xe8, 0x62, 0x2a},
+        {0x3f, 0x9a, 0xd8},
+        {0x5e, 0xb4, 0x32},
+        {0xc0, 0x4f, 0x9b},
+        {0xe0, 0xa8, 0x2e},
+        {0x2f, 0xb3, 0xa3},
+        {0x8a, 0x6c, 0xe0},
+        {0xd9, 0x4b, 0x4b},
     }};
     return Colours[uuid.Hash() % Colours.size()];
 }
@@ -111,9 +122,12 @@ ProfilePicker::ProfilePicker(Core::System& system_, QWidget* parent)
 
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(28, 0, 28, 22);
+    if (Online::Account::Enabled()) {
+        MakeOnlineBar(layout);
+    }
     layout->addStretch(1);
-    auto* hint = new QLabel(tr("Each profile keeps its own saves. Switching never touches them."),
-                            this);
+    auto* hint =
+        new QLabel(tr("Each profile keeps its own saves. Switching never touches them."), this);
     hint->setAlignment(Qt::AlignHCenter);
     hint->setObjectName(QStringLiteral("hint"));
     layout->addWidget(hint);
@@ -137,16 +151,19 @@ ProfilePicker::ProfilePicker(Core::System& system_, QWidget* parent)
     connect(close_button, &QPushButton::clicked, this, &QDialog::reject);
 
     const QPalette colours = qApp->palette();
-    setStyleSheet(QStringLiteral(
-                      "ProfilePicker QLabel#hint { color: %1; font-family: \"%3\"; font-size: 13px; }"
-                      "ProfilePicker QPushButton { font-family: \"%3\"; font-size: 14px; color: %2;"
-                      " background: rgba(255,255,255,14); border: 1px solid rgba(255,255,255,40);"
-                      " border-radius: 17px; padding: 7px 20px; }"
-                      "ProfilePicker QPushButton:hover { border-color: %4; }"
-                      "ProfilePicker QPushButton:disabled { color: rgba(255,255,255,70); }")
-                      .arg(colours.color(QPalette::PlaceholderText).name(),
-                           colours.color(QPalette::WindowText).name(), body_family,
-                           colours.color(QPalette::Highlight).name()));
+    setStyleSheet(
+        QStringLiteral(
+            "ProfilePicker QLabel#hint { color: %1; font-family: \"%3\"; font-size: 13px; }"
+            "ProfilePicker QLabel#online { color: %2; font-family: \"%3\"; font-size: 15px; }"
+            "ProfilePicker QPushButton:checked { background: %4; border-color: %4; }"
+            "ProfilePicker QPushButton { font-family: \"%3\"; font-size: 14px; color: %2;"
+            " background: rgba(255,255,255,14); border: 1px solid rgba(255,255,255,40);"
+            " border-radius: 17px; padding: 7px 20px; }"
+            "ProfilePicker QPushButton:hover { border-color: %4; }"
+            "ProfilePicker QPushButton:disabled { color: rgba(255,255,255,70); }")
+            .arg(colours.color(QPalette::PlaceholderText).name(),
+                 colours.color(QPalette::WindowText).name(), body_family,
+                 colours.color(QPalette::Highlight).name()));
 
     // A controller picks too: the D-pad moves, A plays as the profile, B closes, Y renames
     controller = new ControllerNavigation(system.HIDCore(), this);
@@ -161,6 +178,123 @@ ProfilePicker::ProfilePicker(Core::System& system_, QWidget* parent)
     Reload();
     focused = current;
     UpdateButtons();
+    if (wifi_button) {
+        setMinimumSize(760, 400 + static_cast<int>(top_offset));
+        UpdateOnlineBar();
+    }
+}
+
+void ProfilePicker::MakeOnlineBar(QVBoxLayout* layout) {
+    top_offset = 70;
+    layout->setContentsMargins(28, 16, 28, 22);
+    auto* bar = new QHBoxLayout;
+    bar->setSpacing(8);
+    auto* title = new QLabel(tr("Online play"), this);
+    title->setObjectName(QStringLiteral("online"));
+    wifi_button = new QPushButton(tr("Wi-Fi"), this);
+    wifi_button->setToolTip(tr("Play with people on the same Wi-Fi or network as you."));
+    server_button = new QPushButton(tr("External server"), this);
+    server_button->setToolTip(tr("Play with people anywhere, through the Erable server. Needs "
+                                 "an Erable account."));
+    room_box = new QComboBox(this);
+    for (int i = 0; i < Online::RoomCount; ++i) {
+        room_box->addItem(tr("Room %1").arg(i + 1), Online::FirstRoomPort + i);
+    }
+    room_password = new QLineEdit(this);
+    room_password->setEchoMode(QLineEdit::Password);
+    room_password->setPlaceholderText(tr("Room password"));
+    room_password->setMaximumWidth(160);
+    account_button = new QPushButton(this);
+    for (QPushButton* button : {wifi_button, server_button}) {
+        button->setCheckable(true);
+    }
+    for (QPushButton* button : {wifi_button, server_button, account_button}) {
+        button->setFocusPolicy(Qt::NoFocus);
+        button->setCursor(Qt::PointingHandCursor);
+    }
+    room_box->setFocusPolicy(Qt::ClickFocus);
+    bar->addStretch();
+    bar->addWidget(title);
+    bar->addSpacing(6);
+    bar->addWidget(wifi_button);
+    bar->addWidget(server_button);
+    bar->addSpacing(10);
+    bar->addWidget(room_box);
+    bar->addWidget(room_password);
+    bar->addWidget(account_button);
+    bar->addStretch();
+    layout->addLayout(bar);
+
+    connect(wifi_button, &QPushButton::clicked, this, [this] { ChooseOnlineMode(true); });
+    connect(server_button, &QPushButton::clicked, this, [this] { ChooseOnlineMode(false); });
+    connect(account_button, &QPushButton::clicked, this, [this] {
+        if (Online::Account* account = Online::Account::Shared()) {
+            Online::AccountDialog dialog(*account, this);
+            dialog.exec();
+            UpdateOnlineBar();
+        }
+    });
+    connect(room_box, &QComboBox::currentIndexChanged, this, [this] {
+        Settings::values.online_room_port = room_box->currentData().toUInt();
+        UpdateOnlineBar();
+    });
+    connect(room_password, &QLineEdit::editingFinished, this, [this] {
+        Settings::values.online_room_password = room_password->text().toStdString();
+        UpdateOnlineBar();
+    });
+}
+
+void ProfilePicker::ChooseOnlineMode(bool wifi) {
+    Online::Account* account = Online::Account::Shared();
+    const Online::Mode mode = Online::CurrentMode();
+    Online::Mode chosen = wifi ? Online::Mode::WiFi : Online::Mode::Server;
+    if (chosen == mode) {
+        chosen = Online::Mode::Off; // A second click turns it off
+    }
+    if (chosen == Online::Mode::Server && account && !account->CurrentSession()) {
+        // The external server needs an Erable account
+        Online::AccountDialog dialog(*account, this);
+        dialog.exec();
+        if (!account->CurrentSession()) {
+            chosen = mode;
+        }
+    }
+    Online::SetMode(chosen);
+    UpdateOnlineBar();
+}
+
+void ProfilePicker::UpdateOnlineBar() {
+    if (!wifi_button) {
+        return;
+    }
+    Online::Account* account = Online::Account::Shared();
+    const Online::Mode mode = Online::CurrentMode();
+    wifi_button->setChecked(mode == Online::Mode::WiFi);
+    server_button->setChecked(mode == Online::Mode::Server);
+    const bool server = mode == Online::Mode::Server;
+    room_box->setVisible(server);
+    room_password->setVisible(server);
+    account_button->setVisible(server);
+    {
+        const QSignalBlocker blocker{room_box};
+        const int index = room_box->findData(Settings::values.online_room_port.GetValue());
+        room_box->setCurrentIndex(std::max(index, 0));
+    }
+    if (room_password->text().toStdString() != Settings::values.online_room_password.GetValue()) {
+        room_password->setText(
+            QString::fromStdString(Settings::values.online_room_password.GetValue()));
+    }
+    const auto* session =
+        account && account->CurrentSession() ? &*account->CurrentSession() : nullptr;
+    account_button->setText(session ? session->nickname : tr("Sign in"));
+    account_button->setToolTip(
+        session ? tr("Your Erable account (friend code %1)").arg(session->friend_code)
+                : tr("Sign in to your Erable account"));
+    const QString name = current >= 0 && current < static_cast<int>(profiles.size())
+                             ? profiles[current].name
+                             : QString{};
+    Online::ApplyMode(account, name);
+    update();
 }
 
 ProfilePicker::~ProfilePicker() {
@@ -204,7 +338,7 @@ void ProfilePicker::UpdateButtons() {
 QRectF ProfilePicker::TileRect(int index) const {
     const double total = Count() * TileSize + (Count() - 1) * TileGap;
     const double left = (width() - total) / 2;
-    return {left + index * (TileSize + TileGap), TileTop, TileSize, TileSize};
+    return {left + index * (TileSize + TileGap), TileTop + top_offset, TileSize, TileSize};
 }
 
 int ProfilePicker::TileAt(QPointF point) const {
@@ -226,14 +360,15 @@ void ProfilePicker::paintEvent(QPaintEvent*) {
     const QColor accent = colours.color(QPalette::Highlight);
     const QColor text = colours.color(QPalette::WindowText);
     painter.fillRect(rect(), window.darker(118));
-    QRadialGradient glow{QPointF(width() * 0.5, TileTop + TileSize / 2), width() * 0.55};
+    QRadialGradient glow{QPointF(width() * 0.5, TileTop + top_offset + TileSize / 2),
+                         width() * 0.55};
     glow.setColorAt(0, QColor(accent.red(), accent.green(), accent.blue(), 34));
     glow.setColorAt(1, QColor(accent.red(), accent.green(), accent.blue(), 0));
     painter.fillRect(rect(), glow);
 
     painter.setPen(text);
     painter.setFont(MakeFont(display_family, 30));
-    painter.drawText(QRectF(0, 26, width(), 50), Qt::AlignHCenter | Qt::AlignVCenter,
+    painter.drawText(QRectF(0, 26 + top_offset, width(), 50), Qt::AlignHCenter | Qt::AlignVCenter,
                      tr("Who's playing?"));
 
     for (int i = 0; i < Count(); ++i) {
@@ -277,8 +412,8 @@ void ProfilePicker::paintEvent(QPaintEvent*) {
                 painter.drawEllipse(badge);
                 painter.setPen(QPen{Qt::white, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin});
                 const QPointF c = badge.center();
-                painter.drawPolyline(QPolygonF{{c + QPointF(-7, 0), c + QPointF(-2, 5),
-                                                c + QPointF(8, -6)}});
+                painter.drawPolyline(
+                    QPolygonF{{c + QPointF(-7, 0), c + QPointF(-2, 5), c + QPointF(8, -6)}});
             }
         }
         if (is_focused) {
@@ -411,15 +546,16 @@ void ProfilePicker::ChangePicture() {
     if (focused >= static_cast<int>(profiles.size())) {
         return;
     }
-    const QString file = QFileDialog::getOpenFileName(
-        this, tr("Choose a picture"), QDir::homePath(),
-        tr("Images (*.png *.jpg *.jpeg *.bmp *.webp)"));
+    const QString file =
+        QFileDialog::getOpenFileName(this, tr("Choose a picture"), QDir::homePath(),
+                                     tr("Images (*.png *.jpg *.jpeg *.bmp *.webp)"));
     if (file.isEmpty()) {
         return;
     }
     QImage image{file};
     if (image.isNull()) {
-        QMessageBox::warning(this, tr("Change picture"), tr("This file is not a picture Erable can read."));
+        QMessageBox::warning(this, tr("Change picture"),
+                             tr("This file is not a picture Erable can read."));
         return;
     }
     // Square, centred, 256 px: what the system applets show
