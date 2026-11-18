@@ -3094,8 +3094,7 @@ void BufferCache<P>::UpdateIndexBuffer() {
             inline_buffer_id = CreateBuffer(0, buffer_size, false);
         }
         if (slot_buffers[inline_buffer_id].SizeBytes() < buffer_size) [[unlikely]] {
-            ++buffer_deletions;
-            slot_buffers.erase(inline_buffer_id);
+            DeleteBuffer(inline_buffer_id);
             inline_buffer_id = CreateBuffer(0, buffer_size, false);
         }
         channel_state->index_buffer = Binding{
@@ -4306,6 +4305,9 @@ void BufferCache<P>::DeleteBuffer(BufferId buffer_id, bool do_not_mark) {
     }
 
     Unregister(buffer_id);
+    if (buffer_id == inline_buffer_id) {
+        inline_buffer_id = NULL_BUFFER_ID;
+    }
 
 #ifdef ERABLE_LEGACY
     if (!do_not_mark || !immediately_free)
