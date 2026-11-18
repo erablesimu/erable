@@ -28,6 +28,11 @@ version. Les sections suivantes gardent l'historique.
   15 premières minutes). Elle prépare aussi d'abord les shaders des lieux qui suivent d'habitude
   celui où vous êtes, d'après vos dernières parties.
 - Le record du petit jeu des feuilles est enfin gardé d'une session à l'autre.
+- Jeux introuvables : avec OneDrive, Windows a deux dossiers Documents ; Erable cherche
+  maintenant dans `Documents\Erable\Jeux` des deux. Les raccourcis vers un dossier ou un jeu sont
+  suivis. Et ce qu'Erable trouve sans pouvoir l'afficher est écrit sur la case « Ajouter des
+  jeux » : archives .zip/.7z/.rar à décompresser, mise à jour ou DLC sans son jeu, fichier resté en
+  ligne sur OneDrive, fichier abîmé (la liste des fichiers s'affiche en survolant).
 - Erable ne reste plus en arrière-plan après sa fermeture : si quelque chose l'y retient plus de
   20 secondes, il se ferme de lui-même (cela bloquait le journal et la mémoire du PC).
 

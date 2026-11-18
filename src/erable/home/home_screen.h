@@ -10,6 +10,7 @@
 
 #include <QPixmap>
 #include <QString>
+#include <QStringList>
 #include <QTimer>
 #include <QWidget>
 
@@ -63,6 +64,9 @@ public:
 
     /// The folder Erable reads the player's games from first (Documents\Erable\Jeux).
     [[nodiscard]] static QString GamesFolder();
+    /// Every Documents\Erable\Jeux folder there is: the first is GamesFolder(). With OneDrive
+    /// backing up Documents there are two Documents folders, and the games may be in either.
+    [[nodiscard]] static QStringList GamesFolders();
 
 signals:
     void LaunchGame(const QString& path, u64 program_id);
@@ -125,6 +129,8 @@ private:
     ControllerNavigation* controller = nullptr;
 
     std::vector<Game> games;
+    /// The program ids of every game listed, search filter or not
+    std::set<u64> listed_ids;
     int selected = 0;
     bool active = false;
     bool profile_checked = false;

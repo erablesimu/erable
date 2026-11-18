@@ -221,6 +221,14 @@ ResultStatus GetContainerProgramStatus(FileSys::VirtualFile file, FileType type)
     return status;
 }
 
+u64 GetContainerTitleId(FileSys::VirtualFile file, FileType type) {
+    const auto nsp = OpenContainerAsNsp(file, type);
+    if (!nsp || nsp->GetProgramStatus() == ResultStatus::ErrorMissingHeaderKey) {
+        return 0;
+    }
+    return nsp->GetProgramTitleID();
+}
+
 FileType GuessFromFilename(const std::string& name) {
     if (name == "main")
         return FileType::DeconstructedRomDirectory;

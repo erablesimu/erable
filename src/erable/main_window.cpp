@@ -3549,6 +3549,15 @@ void MainWindow::EnsureGamesFolder() {
     if (!UISettings::values.game_dirs.contains(dir)) {
         UISettings::values.game_dirs.prepend(dir);
     }
+    // With OneDrive backing up Documents there are two Documents folders: games put in the
+    // other one's Erable\Jeux are searched too.
+    const QStringList folders = HomeScreen::GamesFolders();
+    for (qsizetype i = 1; i < folders.size(); ++i) {
+        UISettings::GameDir other{QDir::toNativeSeparators(folders[i]).toStdString(), true, true};
+        if (!UISettings::values.game_dirs.contains(other)) {
+            UISettings::values.game_dirs.insert(1, other);
+        }
+    }
 }
 
 void MainWindow::OnGameListOpenPerGameProperties(const std::string& file) {

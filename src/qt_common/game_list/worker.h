@@ -22,6 +22,7 @@
 #include "core/file_sys/registered_cache.h"
 #include "frontend_common/play_time_manager.h"
 #include "qt_common/config/uisettings.h"
+#include "qt_common/game_list/model.h"
 #include "qt_common/game_list/patch_cache.h"
 
 namespace Core {
@@ -96,6 +97,8 @@ private:
     GameListPatchCache patch_cache;
     /// Loose dumps found by this scan, sized after the list is shown.
     std::vector<std::string> loose_dumps;
+    /// Files this scan found and did not list (archives, lone updates, online-only, damaged)
+    QVector<GameListHiddenFile> hidden_files;
 
     std::mutex lock;
     std::condition_variable cv;

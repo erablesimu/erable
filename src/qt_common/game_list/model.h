@@ -26,6 +26,19 @@ class ManualContentProvider;
 class VfsFilesystem;
 } // namespace FileSys
 
+/// A file found in a game folder and not listed, reported so the player knows why
+struct GameListHiddenFile {
+    enum class Kind {
+        Archive,    ///< .zip, .7z or .rar: to extract
+        AddOn,      ///< An update or add-on whose game isn't in the folders
+        Cloud,      ///< Kept online only by OneDrive (or another cloud folder): never downloaded
+        Unreadable, ///< A game container that doesn't open (damaged or incomplete)
+    };
+    QString path;
+    Kind kind;
+    u64 base_id{}; ///< For AddOn: the program id of its game, 0 when unknown
+};
+
 class GameListModel : public QStandardItemModel {
     Q_OBJECT
 
@@ -48,6 +61,11 @@ public:
     void AddDirEntry(GameListDir* entry_items);
     void AddEntry(const QList<QStandardItem*>& entry_items, GameListDir* parent);
     void DonePopulating(const QStringList& watch_list);
+    /// The files the last scan found and did not list
+    void SetHiddenFiles(QVector<GameListHiddenFile> files);
+    const QVector<GameListHiddenFile>& HiddenFiles() const {
+        return hidden_files;
+    }
     /// Shows the size of a loose dump's folder in every row of that game (favorites included).
     void SetFolderSize(const QString& game_path, u64 size_bytes);
 
@@ -84,6 +102,8 @@ private:
     void StopWorker();
 
     bool m_flat = false;
+
+    QVector<GameListHiddenFile> hidden_files;
     bool scan_enabled = true;
 
     std::shared_ptr<FileSys::VfsFilesystem> vfs;

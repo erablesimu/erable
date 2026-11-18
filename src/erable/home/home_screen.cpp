@@ -763,6 +763,33 @@ QString HomeScreen::GamesFolder() {
         .filePath(QStringLiteral("Erable/Jeux"));
 }
 
+QStringList HomeScreen::GamesFolders() {
+    QStringList folders{GamesFolder()};
+#ifdef _WIN32
+    const auto add = [&folders](const QString& documents) {
+        if (documents.isEmpty()) {
+            return;
+        }
+        const QString folder =
+            QDir::cleanPath(QDir(documents).filePath(QStringLiteral("Erable/Jeux")));
+        const bool known = std::ranges::any_of(folders, [&folder](const QString& other) {
+            return QDir::cleanPath(other).compare(folder, Qt::CaseInsensitive) == 0;
+        });
+        if (!known && QFileInfo(folder).isDir()) {
+            folders.append(folder);
+        }
+    };
+    add(QDir::home().filePath(QStringLiteral("Documents")));
+    for (const char* variable : {"OneDrive", "OneDriveConsumer", "OneDriveCommercial"}) {
+        const QString root = qEnvironmentVariable(variable);
+        if (!root.isEmpty()) {
+            add(QDir(root).filePath(QStringLiteral("Documents")));
+        }
+    }
+#endif
+    return folders;
+}
+
 void HomeScreen::SetDebugMenu(QMenu* menu) {
     debug_menu = menu;
 }
@@ -985,6 +1012,7 @@ void HomeScreen::UpdateStatus() {
 
 void HomeScreen::CollectGames() {
     games.clear();
+    listed_ids.clear();
     const QString filter = search->text().trimmed();
     std::set<QString> seen;
     const QStandardItemModel* model = game_list->GetModel();
@@ -1011,6 +1039,7 @@ void HomeScreen::CollectGames() {
                 static const QRegularExpression title_id{
                     QStringLiteral(R"(\s*\[[0-9A-Fa-f]{16}\]\s*$)")};
                 game.title.remove(title_id);
+                listed_ids.insert(item->data(GameListItemPath::ProgramIdRole).toULongLong());
                 if (!filter.isEmpty() && !game.title.contains(filter, Qt::CaseInsensitive)) {
                     continue;
                 }
@@ -1073,12 +1102,51 @@ void HomeScreen::UpdateSelection() {
     }
     if (!is_game) {
         title->setText(games.empty() ? tr("Welcome to Erable") : tr("Add games"));
-        meta->setText(tr("Put your games in %1 and they show up here.")
-                          .arg(QDir::toNativeSeparators(GamesFolder()).toHtmlEscaped()));
+        QString text = tr("Put your games in %1 and they show up here.")
+                           .arg(QDir::toNativeSeparators(GamesFolder()).toHtmlEscaped());
+        // What the game folders hold that isn't shown, and why
+        int archives = 0, add_ons = 0, online = 0, damaged = 0;
+        QStringList names;
+        for (const GameListHiddenFile& file : game_list->HiddenFiles()) {
+            using Kind = GameListHiddenFile::Kind;
+            if (file.kind == Kind::AddOn && file.base_id != 0 && listed_ids.contains(file.base_id)) {
+                continue; // Applied to its game
+            }
+            ++(file.kind == Kind::Archive  ? archives
+               : file.kind == Kind::AddOn  ? add_ons
+               : file.kind == Kind::Cloud  ? online
+                                           : damaged);
+            if (names.size() < 12) {
+                names.append(QDir::toNativeSeparators(file.path));
+            }
+        }
+        QStringList reasons;
+        if (archives != 0) {
+            reasons.append(tr("%n archive(s) to extract first (.zip, .7z, .rar)", "", archives));
+        }
+        if (add_ons != 0) {
+            reasons.append(tr("%n update(s) or DLC without their game", "", add_ons));
+        }
+        if (online != 0) {
+            reasons.append(tr("%n file(s) kept online only by OneDrive (right-click the file, "
+                              "Always keep on this device)",
+                              "", online));
+        }
+        if (damaged != 0) {
+            reasons.append(tr("%n damaged or incomplete file(s)", "", damaged));
+        }
+        if (!reasons.isEmpty()) {
+            text += QStringLiteral("<br><span style=\"color:%1\">%2</span>")
+                        .arg(MapleHi.name(), tr("Not shown: %1").arg(reasons.join(QStringLiteral(", ")))
+                                              .toHtmlEscaped());
+        }
+        meta->setText(text);
+        meta->setToolTip(names.join(QLatin1Char('\n')));
         favorite_button->setText(tr("Add to favourites"));
         favorite_button->updateGeometry();
         return;
     }
+    meta->setToolTip({});
     const Game& game = games[selected];
     title->setText(game.title);
     const u64 seconds = play_time.GetPlayTime(game.program_id);

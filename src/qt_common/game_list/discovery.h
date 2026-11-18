@@ -14,6 +14,9 @@ namespace GameListDiscovery {
 struct Result {
     std::vector<std::filesystem::path> files;
     std::vector<std::filesystem::path> directories;
+    /// Compressed archives (.zip, .7z, .rar) found where games are searched: never read, they
+    /// are reported so the player knows to extract them.
+    std::vector<std::filesystem::path> archives;
     std::size_t skipped_romfs{};
     std::size_t errors{};
 };
@@ -24,9 +27,19 @@ inline bool IsExeFS(const std::filesystem::path& path) {
            std::filesystem::is_regular_file(path / "main.npdm", ec);
 }
 
-template <typename Supported, typename Stopped>
+inline bool IsArchive(const std::filesystem::path& path) {
+    auto extension = path.extension().u8string();
+    std::transform(extension.begin(), extension.end(), extension.begin(), [](char8_t c) {
+        return static_cast<char8_t>(std::tolower(static_cast<unsigned char>(c)));
+    });
+    return extension == u8".zip" || extension == u8".7z" || extension == u8".rar";
+}
+
+/// `shortcut` gives the target of a Windows shortcut file (.lnk), an empty path for any other
+/// file: a shortcut to a folder is walked like the folder, one to a game lists the game.
+template <typename Supported, typename Stopped, typename Shortcut>
 Result Discover(const std::filesystem::path& root, bool deep, Supported supported,
-                Stopped stopped) {
+                Stopped stopped, Shortcut shortcut) {
     namespace fs = std::filesystem;
     Result result;
     std::unordered_set<fs::path> files;
@@ -64,10 +77,21 @@ Result Discover(const std::filesystem::path& root, bool deep, Supported supporte
         }
     };
 
+    // Folders already walked, by their real path: a linked folder (shortcut, junction or symlink)
+    // is followed, and one that leads back into a walked folder is not walked again.
+    std::unordered_set<fs::path> walked;
+    const auto first_walk = [&](const fs::path& path) {
+        std::error_code ec;
+        const auto real = fs::canonical(path, ec);
+        return walked.insert(ec ? path : real).second;
+    };
     std::vector<std::pair<fs::path, unsigned>> pending{{root, 0}};
     while (!pending.empty() && !stopped()) {
         auto [directory, depth] = std::move(pending.back());
         pending.pop_back();
+        if (!first_walk(directory)) {
+            continue;
+        }
         watch(directory);
         if (IsExeFS(directory)) {
             add_file(directory / "main");
@@ -83,9 +107,6 @@ Result Discover(const std::filesystem::path& root, bool deep, Supported supporte
             const auto& entry = *it;
             std::error_code entry_ec;
             if (entry.is_directory(entry_ec)) {
-                if (entry.is_symlink(entry_ec)) {
-                    continue;
-                }
                 auto name = entry.path().filename().u8string();
                 std::transform(name.begin(), name.end(), name.begin(), [](char8_t c) {
                     return static_cast<char8_t>(std::tolower(static_cast<unsigned char>(c)));
@@ -97,12 +118,19 @@ Result Discover(const std::filesystem::path& root, bool deep, Supported supporte
                 if (deep || depth == 0) {
                     pending.emplace_back(entry.path(), depth + 1);
                 }
-            } else if (entry.is_regular_file(entry_ec) && depth == 0 && !deep) {
+            } else if (entry.is_regular_file(entry_ec) && (deep || depth == 0)) {
                 if (supported(entry.path())) {
                     add_file(entry.path());
+                } else if (IsArchive(entry.path())) {
+                    result.archives.push_back(entry.path());
+                } else if (const fs::path target = shortcut(entry.path()); !target.empty()) {
+                    std::error_code target_ec;
+                    if (fs::is_directory(target, target_ec)) {
+                        pending.emplace_back(target, depth + 1);
+                    } else if (fs::is_regular_file(target, target_ec) && supported(target)) {
+                        add_file(target);
+                    }
                 }
-            } else if (entry.is_regular_file(entry_ec) && deep && supported(entry.path())) {
-                add_file(entry.path());
             }
         }
         result.errors += ec ? 1 : 0;

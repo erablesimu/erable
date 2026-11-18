@@ -88,6 +88,8 @@ public:
     void LoadInterfaceLayout();
 
     QStandardItemModel* GetModel() const;
+    /// The files the last scan found in the game folders and did not list
+    const QVector<GameListHiddenFile>& HiddenFiles() const;
 
     /// Disables events from the emulated controller
     void UnloadController();

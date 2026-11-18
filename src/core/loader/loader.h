@@ -176,6 +176,10 @@ bool IsMissingKeyStatus(ResultStatus status);
  */
 ResultStatus GetContainerProgramStatus(FileSys::VirtualFile file, FileType type);
 
+/// The title id of an NSP or XCI's content (the update's or add-on's for one that holds no game),
+/// 0 when it cannot be read.
+u64 GetContainerTitleId(FileSys::VirtualFile file, FileType type);
+
 /// Interface for loading an application
 class AppLoader {
 public:

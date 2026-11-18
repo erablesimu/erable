@@ -211,6 +211,10 @@ QStandardItemModel* GameList::GetModel() const {
     return item_model;
 }
 
+const QVector<GameListHiddenFile>& GameList::HiddenFiles() const {
+    return item_model->HiddenFiles();
+}
+
 void GameList::UnloadController() {
     controller_navigation->UnloadController();
 }

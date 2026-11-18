@@ -14,6 +14,10 @@
 #include <utility>
 #include <vector>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -135,6 +139,34 @@ void GetMetadataFromControlNCA(const FileSys::PatchManager& patch_manager, const
             const auto [nacp, icon_f] = patch_manager.ParseControlNCA(nca);
             return std::make_pair(icon_f->ReadAllBytes(), nacp->GetApplicationName());
         });
+}
+
+/// Whether a file is a game container (as opposed to a loose NCA, NSO, NRO or KIP)
+bool IsGameContainer(Loader::FileType type) {
+    return type == Loader::FileType::XCI || type == Loader::FileType::XCZ ||
+           type == Loader::FileType::NSP || type == Loader::FileType::NSZ ||
+           type == Loader::FileType::NUP || type == Loader::FileType::NX;
+}
+
+/// Whether a file is kept online only by OneDrive or another cloud folder: reading it would
+/// download the whole game during the scan, or fail while the cloud client is paused.
+bool IsOnlineOnly([[maybe_unused]] const std::filesystem::path& path) {
+#ifdef _WIN32
+    const DWORD attributes = GetFileAttributesW(path.c_str());
+    return attributes != INVALID_FILE_ATTRIBUTES &&
+           (attributes & (FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS | FILE_ATTRIBUTE_RECALL_ON_OPEN |
+                          FILE_ATTRIBUTE_OFFLINE)) != 0;
+#else
+    return false;
+#endif
+}
+
+/// The program id of the game an update or add-on belongs to
+u64 BaseProgramId(u64 title_id) {
+    if ((title_id & 0x1000) != 0) {
+        return (title_id - 0x1000) & ~u64{0xFFF}; // Add-on: game + 0x1000 + index
+    }
+    return title_id & ~u64{0xFFF}; // Update: game | 0x800
 }
 
 bool HasSupportedFileExtension(const std::string& file_name) {
@@ -450,25 +482,45 @@ void GameListWorker::ScanFileSystem(ScanTarget target, const std::vector<std::fi
     const auto process_candidate = [this, target,
                                     parent_dir](const std::filesystem::path& path) {
         const auto physical_name = Common::FS::PathToUTF8String(path);
+        const auto hide = [&](GameListHiddenFile::Kind kind, u64 base_id = 0) {
+            if (target == ScanTarget::PopulateGameList) {
+                hidden_files.push_back({.path = QString::fromStdString(physical_name),
+                                        .kind = kind,
+                                        .base_id = base_id});
+            }
+        };
+        const auto guessed = Loader::GuessFromFilename(physical_name);
+        if (IsOnlineOnly(path)) {
+            LOG_WARNING(Frontend, "Not listing {}: kept online only by a cloud folder",
+                        physical_name);
+            hide(GameListHiddenFile::Kind::Cloud);
+            return;
+        }
+        const auto unreadable = [&] {
+            if (IsGameContainer(guessed)) {
+                LOG_WARNING(Frontend, "Not listing {}: it doesn't open", physical_name);
+                hide(GameListHiddenFile::Kind::Unreadable);
+            }
+        };
         const auto file = vfs->OpenFile(physical_name, FileSys::OpenMode::Read);
         if (!file) {
+            unreadable();
             return;
         }
 
         auto loader = Loader::GetLoader(system, file);
         if (!loader) {
+            unreadable();
             return;
         }
 
         const auto file_type = loader->GetFileType();
         if (file_type == Loader::FileType::Unknown || file_type == Loader::FileType::Error) {
+            unreadable();
             return;
         }
 
-        if (target == ScanTarget::PopulateGameList &&
-            (file_type == Loader::FileType::XCI || file_type == Loader::FileType::XCZ ||
-             file_type == Loader::FileType::NSP || file_type == Loader::FileType::NSZ ||
-             file_type == Loader::FileType::NUP || file_type == Loader::FileType::NX) &&
+        if (target == ScanTarget::PopulateGameList && IsGameContainer(file_type) &&
             !Loader::IsBootableGameContainer(file, file_type)) {
             // Update- and DLC-only containers stay hidden. One whose programs cannot be
             // decrypted is listed so the player sees that keys are missing.
@@ -479,6 +531,13 @@ void GameListWorker::ScanFileSystem(ScanTarget target, const std::vector<std::fi
                     status != Loader::ResultStatus::ErrorNSPMissingProgramNCA &&
                     status != Loader::ResultStatus::ErrorMissingBKTRBaseRomFS) {
                     LOG_WARNING(Frontend, "Not listing {}: {}", physical_name, reason);
+                    hide(GameListHiddenFile::Kind::Unreadable);
+                } else {
+                    // An update or add-on: reported only if its game isn't listed (the home
+                    // screen checks), as one beside its game is applied to it.
+                    const u64 title_id = Loader::GetContainerTitleId(file, file_type);
+                    hide(GameListHiddenFile::Kind::AddOn,
+                         title_id != 0 ? BaseProgramId(title_id) : 0);
                 }
                 return;
             }
@@ -616,6 +675,7 @@ void GameListWorker::run() {
     const auto started = std::chrono::steady_clock::now();
     watch_list.clear();
     loose_dumps.clear();
+    hidden_files.clear();
     provider->ClearAllEntries();
     patch_cache.Clear();
 
@@ -671,7 +731,23 @@ void GameListWorker::run() {
                     const auto name = Common::FS::PathToUTF8String(path);
                     return HasSupportedFileExtension(name) || IsExtractedNCAMain(name);
                 },
-                [this] { return stop_requested.load(); });
+                [this] { return stop_requested.load(); },
+                [](const std::filesystem::path& path) -> std::filesystem::path {
+                    const QFileInfo info{
+                        QString::fromStdString(Common::FS::PathToUTF8String(path))};
+                    if (!info.isShortcut()) {
+                        return {};
+                    }
+                    return std::filesystem::path(
+                        Common::FS::ToU8String(info.symLinkTarget().toStdString()));
+                });
+            for (const auto& archive : discovery.archives) {
+                if (listed_files.insert(file_key(archive)).second) {
+                    hidden_files.push_back(
+                        {.path = QString::fromStdString(Common::FS::PathToUTF8String(archive)),
+                         .kind = GameListHiddenFile::Kind::Archive});
+                }
+            }
             for (const auto& directory : discovery.directories) {
                 watch_list.append(QString::fromStdString(Common::FS::PathToUTF8String(directory)));
             }
@@ -703,7 +779,13 @@ void GameListWorker::run() {
              std::chrono::duration_cast<std::chrono::milliseconds>(
                  std::chrono::steady_clock::now() - started).count(),
              watch_list.size(), stop_requested.load());
-    RecordEvent([this](GameListModel* model) { model->DonePopulating(watch_list); });
+    if (!hidden_files.empty()) {
+        LOG_INFO(Frontend, "Game discovery: {} files found and not listed", hidden_files.size());
+    }
+    RecordEvent([this, hidden = hidden_files](GameListModel* model) mutable {
+        model->SetHiddenFiles(std::move(hidden));
+        model->DonePopulating(watch_list);
+    });
 
     // Loose dump folders are sized once the list is shown: walking their RomFS during discovery
     // made the list slow to appear. A reload stops this through stop_requested.

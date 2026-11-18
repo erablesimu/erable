@@ -207,6 +207,26 @@ Ses sauvegardes restent sur le disque, mais plus aucun profil d&apos;Erable ne l
         <source>Put your games in %1 and they show up here.</source>
         <translation>Déposez vos jeux dans %1 : ils apparaissent ici.</translation>
     </message>
+    <message numerus="yes">
+        <source>%n archive(s) to extract first (.zip, .7z, .rar)</source>
+        <translation><numerusform>%n archive à décompresser d’abord (.zip, .7z, .rar)</numerusform><numerusform>%n archives à décompresser d’abord (.zip, .7z, .rar)</numerusform><numerusform>%n archives à décompresser d’abord (.zip, .7z, .rar)</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n update(s) or DLC without their game</source>
+        <translation><numerusform>%n mise à jour ou DLC sans son jeu</numerusform><numerusform>%n mises à jour ou DLC sans leur jeu</numerusform><numerusform>%n mises à jour ou DLC sans leur jeu</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n file(s) kept online only by OneDrive (right-click the file, Always keep on this device)</source>
+        <translation><numerusform>%n fichier resté en ligne sur OneDrive (clic droit sur le fichier, Toujours conserver sur cet appareil)</numerusform><numerusform>%n fichiers restés en ligne sur OneDrive (clic droit sur les fichiers, Toujours conserver sur cet appareil)</numerusform><numerusform>%n fichiers restés en ligne sur OneDrive (clic droit sur les fichiers, Toujours conserver sur cet appareil)</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n damaged or incomplete file(s)</source>
+        <translation><numerusform>%n fichier abîmé ou incomplet</numerusform><numerusform>%n fichiers abîmés ou incomplets</numerusform><numerusform>%n fichiers abîmés ou incomplets</numerusform></translation>
+    </message>
+    <message>
+        <source>Not shown: %1</source>
+        <translation>Non affichés : %1</translation>
+    </message>
     <message>
         <source>Add to favourites</source>
         <translation>Ajouter aux favoris</translation>

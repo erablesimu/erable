@@ -110,6 +110,10 @@ void GameListModel::DonePopulating(const QStringList& watch_list) {
     emit PopulatingCompleted(watch_list);
 }
 
+void GameListModel::SetHiddenFiles(QVector<GameListHiddenFile> files) {
+    hidden_files = std::move(files);
+}
+
 void GameListModel::SetFolderSize(const QString& game_path, u64 size_bytes) {
     const auto update_children = [&](QStandardItem* parent) {
         for (int row = 0; row < parent->rowCount(); ++row) {
