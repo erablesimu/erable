@@ -26,20 +26,27 @@ std::string Environment(const char* name) {
 } // Anonymous namespace
 
 std::string RoomNickname(std::string_view name) {
-    // Rooms take 4 to 20 of ASCII letters, digits, space, '.', '_' and '-'
+    // Rooms take 4 to 20 of ASCII letters, digits, space, '.', '_' and '-'. Accented Latin letters
+    // (U+00C0 to U+00FF, two UTF-8 bytes from 0xC3) lose their accent; other characters become '_'.
+    static constexpr std::string_view Latin1Base = "AAAAAAACEEEEIIIIDNOOOOOxOUUUUYTs"
+                                                   "aaaaaaaceeeeiiiidnooooo_ouuuuyty";
+    const auto allowed = [](char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
+               c == ' ' || c == '.' || c == '_' || c == '-';
+    };
     std::string nickname;
-    for (const char c : name) {
-        const bool allowed = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
-                             (c >= '0' && c <= '9') || c == ' ' || c == '.' || c == '_' || c == '-';
-        if (allowed) {
-            nickname.push_back(c);
-        } else if (static_cast<unsigned char>(c) < 0x80 ||
-                   (static_cast<unsigned char>(c) & 0xC0) == 0xC0) {
+    for (std::size_t i = 0; i < name.size() && nickname.size() < 20; ++i) {
+        const auto byte = static_cast<unsigned char>(name[i]);
+        if (allowed(name[i])) {
+            nickname.push_back(name[i]);
+        } else if (byte == 0xC3 && i + 1 < name.size() &&
+                   (static_cast<unsigned char>(name[i + 1]) & 0xC0) == 0x80) {
+            const char base = Latin1Base[(static_cast<unsigned char>(name[i + 1]) & 0x3F)];
+            nickname.push_back(allowed(base) ? base : '_');
+            ++i;
+        } else if (byte < 0x80 || (byte & 0xC0) == 0xC0) {
             // One '_' per character: UTF-8 continuation bytes add none
             nickname.push_back('_');
-        }
-        if (nickname.size() == 20) {
-            break;
         }
     }
     while (nickname.size() < 4) {
@@ -100,7 +107,7 @@ std::optional<RoomTarget> ParseRoomAddress(std::string_view address) {
     return target;
 }
 
-std::optional<RoomTarget> RoomFromEnvironment() {
+std::optional<RoomTarget> RoomFromEnvironment(std::string_view profile_name) {
     const std::string address = Environment("EDEN_NX2_ROOM");
     if (address.empty()) {
         return std::nullopt;
@@ -110,7 +117,10 @@ std::optional<RoomTarget> RoomFromEnvironment() {
         LOG_ERROR(Network, "EDEN_NX2_ROOM \"{}\" is not host, host:port or [ipv6]:port", address);
         return std::nullopt;
     }
-    const std::string nickname = Environment("EDEN_NX2_ROOM_NICK");
+    std::string nickname = Environment("EDEN_NX2_ROOM_NICK");
+    if (nickname.empty()) {
+        nickname = std::string{profile_name};
+    }
     if (!nickname.empty()) {
         target->nickname = RoomNickname(nickname);
     } else {
@@ -122,8 +132,8 @@ std::optional<RoomTarget> RoomFromEnvironment() {
     return target;
 }
 
-void JoinRoomFromEnvironment() {
-    const auto target = RoomFromEnvironment();
+void JoinRoomFromEnvironment(std::string_view profile_name) {
+    const auto target = RoomFromEnvironment(profile_name);
     if (!target) {
         return;
     }

@@ -9,6 +9,10 @@
 #include "hid_core/hid_core.h"
 #include "network/network.h"
 #include "network/room_autojoin.h"
+#include "common/settings.h"
+#include "common/string_util.h"
+#include "core/core.h"
+#include "core/hle/service/acc/profile_manager.h"
 #include "qt_common.h"
 
 #include "common/fs/fs.h"
@@ -233,7 +237,18 @@ void Init(QWidget* root) {
 #endif
 
     Network::Init();
-    Network::JoinRoomFromEnvironment();
+    {
+        // The room nickname is the player's profile name
+        Service::Account::ProfileBase profile{};
+        std::string profile_name;
+        const auto& profiles = system->GetProfileManager();
+        if (profiles.GetProfileBase(
+                static_cast<std::size_t>(Settings::values.current_user.GetValue()), profile)) {
+            profile_name = Common::StringFromFixedZeroTerminatedBuffer(
+                reinterpret_cast<const char*>(profile.username.data()), profile.username.size());
+        }
+        Network::JoinRoomFromEnvironment(profile_name);
+    }
 
     QtCommon::Meta::RegisterMetaTypes();
 
