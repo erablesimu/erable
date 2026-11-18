@@ -50,7 +50,9 @@ version. Les sections suivantes gardent l'historique.
   « Récupérer une copie automatique… » en bas de la fenêtre remet tout comme avant.
 
 **Zelda Ocarina of Time**
-- Avec le déblocage des FPS, le Chant de l'Épouvantail s'enregistre à la bonne durée et les
+-- En mode portable avec la résolution au maximum, l'agrandissement de l'image passe aussi par
+  FSR (plus net).
+ Avec le déblocage des FPS, le Chant de l'Épouvantail s'enregistre à la bonne durée et les
   cinématiques vidéo restent synchronisées.
 - Avec le déblocage des FPS au-dessus de 60, les vêtements et les cheveux bougent à la bonne
   vitesse.
@@ -89,7 +91,11 @@ version. Les sections suivantes gardent l'historique.
   coûtait des à-coups au chargement des textures.
 
 **Stabilité et compatibilité**
-- Un jeu qui refuse de s'arrêter ne bloque plus Erable : il est fermé proprement, et les réglages
+-- Corrections de Lichii : moins d'images fausses ou périmées après les copies de mémoire du jeu,
+  ombres plus propres quand la résolution est augmentée, mémoire vidéo des tampons inutilisés
+  rendue après 60 images, et des attentes du GPU qui pouvaient bloquer sont débloquées. Pas de
+  recompilation des shaders.
+ Un jeu qui refuse de s'arrêter ne bloque plus Erable : il est fermé proprement, et les réglages
   et le temps de jeu sont enregistrés sans risque de fichier abîmé.
 - Fichiers NSZ et NCZ « solides » lisibles.
 - Corrections du GPU émulé (copies DMA, synchronisation) et des pilotes Intel et AMD (RADV).
