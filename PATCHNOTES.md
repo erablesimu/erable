@@ -33,6 +33,8 @@ version. Les sections suivantes gardent l'historique.
   suivis. Et ce qu'Erable trouve sans pouvoir l'afficher est écrit sur la case « Ajouter des
   jeux » : archives .zip/.7z/.rar à décompresser, mise à jour ou DLC sans son jeu, fichier resté en
   ligne sur OneDrive, fichier abîmé (la liste des fichiers s'affiche en survolant).
+- Le bouton « Dossier Jeux » en bas de l'accueil s'appelle maintenant « Mes jeux » : il ouvre le
+  dossier où sont vos jeux (avec OneDrive, il demande lequel des deux).
 - Erable ne reste plus en arrière-plan après sa fermeture : si quelque chose l'y retient plus de
   20 secondes, il se ferme de lui-même (cela bloquait le journal et la mémoire du PC).
 

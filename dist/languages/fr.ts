@@ -164,6 +164,14 @@ Ses sauvegardes restent sur le disque, mais plus aucun profil d&apos;Erable ne l
         <translation>Dossier Jeux</translation>
     </message>
     <message>
+        <source>My games</source>
+        <translation>Mes jeux</translation>
+    </message>
+    <message>
+        <source>Open the folder your games are in</source>
+        <translation>Ouvrir le dossier où sont vos jeux</translation>
+    </message>
+    <message>
         <source>Captures</source>
         <translation>Captures</translation>
     </message>

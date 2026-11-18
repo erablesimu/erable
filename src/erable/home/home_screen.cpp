@@ -694,8 +694,24 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
             &HomeScreen::ShowLibrary);
     connect(add_dock(Icon::News, tr("What's new")), &QAbstractButton::clicked, this,
             &HomeScreen::OpenWhatsNew);
-    connect(add_dock(Icon::Folder, tr("Games folder")), &QAbstractButton::clicked, this,
-            &HomeScreen::OpenGamesFolder);
+    DockButton* const games_folder = add_dock(Icon::Folder, tr("My games"));
+    games_folder->setToolTip(tr("Open the folder your games are in"));
+    connect(games_folder, &QAbstractButton::clicked, this, [this, games_folder] {
+        // With OneDrive there can be two games folders: say which one to open
+        const QStringList folders = GamesFolders();
+        if (folders.size() < 2) {
+            OpenGamesFolder();
+            return;
+        }
+        auto* menu = new QMenu(this);
+        menu->setAttribute(Qt::WA_DeleteOnClose);
+        for (const QString& folder : folders) {
+            menu->addAction(QDir::toNativeSeparators(folder), this, [folder] {
+                QDesktopServices::openUrl(QUrl::fromLocalFile(folder));
+            });
+        }
+        menu->popup(games_folder->mapToGlobal(QPoint(0, -menu->sizeHint().height())));
+    });
     connect(add_dock(Icon::Captures, tr("Captures")), &QAbstractButton::clicked, this,
             &HomeScreen::OpenCaptures);
     DockButton* const saves = add_dock(Icon::Saves, tr("Saves"));
