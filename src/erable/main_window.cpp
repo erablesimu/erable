@@ -1059,6 +1059,15 @@ void MainWindow::InitializeWidgets() {
     multiplayer_state = new MultiplayerState(this, game_list->GetModel(), ui->action_Leave_Room,
                                              ui->action_Show_Room, *QtCommon::system);
     multiplayer_state->setVisible(false);
+    // The yuzu "Multiplayer" menu is hidden: its public lobby relied on yuzu's servers, closed
+    // since 2024, and online play now goes through "Online play" in the profile window. A room
+    // joined that way still shows in the status bar (its chat opens from there).
+    ui->menu_Multiplayer->menuAction()->setVisible(false);
+    for (QAction* action : {ui->action_View_Lobby, ui->action_Start_Room,
+                            ui->action_Connect_To_Room}) {
+        action->setVisible(false);
+        action->setEnabled(false);
+    }
 
     // Create status bar
     message_label = new QLabel();

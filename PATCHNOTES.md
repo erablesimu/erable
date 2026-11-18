@@ -24,6 +24,9 @@ version. Les sections suivantes gardent l'historique.
   « Supprimer mon compte » efface tout ; la notice de confidentialité dit ce qui est gardé.
 - Le mode « en ligne » des jeux (serveurs Nintendo) n'est pas concerné : c'est le jeu en local
   sans fil qui passe par Erable.
+- L'ancien menu « Multijoueur » hérité de yuzu disparaît : son hall public dépendait des serveurs
+  de yuzu, fermés depuis 2024. Le salon rejoint reste affiché dans la barre d'état, d'où s'ouvre
+  sa discussion.
 
 **Accueil**
 - Bouton « Plein écran » en haut à droite de l'accueil (ou touche F11) : l'accueil et la
