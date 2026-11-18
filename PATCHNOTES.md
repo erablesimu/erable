@@ -22,6 +22,12 @@ version. Les sections suivantes gardent l'historique.
   la même fenêtre. Chaque compte reçoit un code ami. En cas d'oubli, la réponse à votre question
   de sécurité et votre code de sécurité permettent de choisir un nouveau mot de passe.
   « Supprimer mon compte » efface tout ; la notice de confidentialité dit ce qui est gardé.
+- **Amis** (dans la même fenêtre, une fois connecté) : ajoutez un ami avec son code ami, acceptez
+  ou refusez les demandes, voyez qui est en ligne, à quoi il joue et dans quel salon, et
+  rejoignez-le en un clic. Retirer ou bloquer un joueur se fait au même endroit.
+- Une demande d'ami reçue s'affiche en bas de l'écran (Accepter, Refuser, Plus tard). Erable en
+  arrière-plan, la barre des tâches clignote et Windows affiche une notification. Pendant une
+  partie, rien ne s'affiche : la demande attend la fin du jeu.
 - Le mode « en ligne » des jeux (serveurs Nintendo) n'est pas concerné : c'est le jeu en local
   sans fil qui passe par Erable.
 - L'ancien menu « Multijoueur » hérité de yuzu disparaît : son hall public dépendait des serveurs
