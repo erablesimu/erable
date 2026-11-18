@@ -25,6 +25,9 @@ void SetMode(Mode mode);
 
 /// Puts the chosen mode in effect: LAN play for Wi-Fi, the chosen room of the Erable server for
 /// Server (as the account's nickname, else `profile_name`), neither for Off
-void ApplyMode(const Account* account, const QString& profile_name);
+void ApplyMode(Account* account, const QString& profile_name);
+
+/// Joins the room `port` of the Erable server (a friend's), switching to the external server
+void JoinRoom(Account* account, unsigned port);
 
 } // namespace Online

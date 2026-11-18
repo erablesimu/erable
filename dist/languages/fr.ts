@@ -2,6 +2,14 @@
 <context>
     <name>ProfilePicker</name>
     <message>
+        <source>Friends (%1)</source>
+        <translation>Amis (%1)</translation>
+    </message>
+    <message>
+        <source>Friends</source>
+        <translation>Amis</translation>
+    </message>
+    <message>
         <source>Online play</source>
         <translation>Jeu en ligne</translation>
     </message>
@@ -12155,6 +12163,34 @@ Réessayer sans la recette ? Le jeu fonctionnera toujours depuis l'archive NX, m
 <context>
     <name>Online::Account</name>
     <message>
+        <source>No player has this friend code.</source>
+        <translation>Aucun joueur n’a ce code ami.</translation>
+    </message>
+    <message>
+        <source>This is your own friend code.</source>
+        <translation>C’est votre propre code ami.</translation>
+    </message>
+    <message>
+        <source>You are already friends.</source>
+        <translation>Vous êtes déjà amis.</translation>
+    </message>
+    <message>
+        <source>You already sent this player a request.</source>
+        <translation>Vous avez déjà envoyé une demande à ce joueur.</translation>
+    </message>
+    <message>
+        <source>You sent too many friend requests today. Try again tomorrow.</source>
+        <translation>Vous avez envoyé trop de demandes d’ami aujourd’hui. Réessayez demain.</translation>
+    </message>
+    <message>
+        <source>You have reached the maximum number of friends.</source>
+        <translation>Vous avez atteint le nombre maximum d’amis.</translation>
+    </message>
+    <message>
+        <source>This request no longer exists.</source>
+        <translation>Cette demande n’existe plus.</translation>
+    </message>
+    <message>
         <source>Your Erable account doesn&apos;t have access to the online rooms.</source>
         <translation>Votre compte Erable n’a pas accès aux salons en ligne.</translation>
     </message>
@@ -12440,6 +12476,152 @@ Entrez votre mot de passe pour confirmer :</translation>
     <message>
         <source>&lt;h3&gt;Signed in as %1&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Connecté en tant que %1&lt;/h3&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>Online::FriendsDialog</name>
+    <message>
+        <source>Friends</source>
+        <translation>Amis</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Copier</translation>
+    </message>
+    <message>
+        <source>Friend code copied.</source>
+        <translation>Code ami copié.</translation>
+    </message>
+    <message>
+        <source>A friend&apos;s code: ER-0000-0000-0000</source>
+        <translation>Le code d’un ami : ER-0000-0000-0000</translation>
+    </message>
+    <message>
+        <source>Send a request</source>
+        <translation>Envoyer une demande</translation>
+    </message>
+    <message>
+        <source>Friend requests</source>
+        <translation>Demandes d’ami</translation>
+    </message>
+    <message>
+        <source>No friends yet: share your friend code, or add theirs.</source>
+        <translation>Pas encore d’amis : partagez votre code ami, ou ajoutez le leur.</translation>
+    </message>
+    <message>
+        <source>Requests sent</source>
+        <translation>Demandes envoyées</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>You are now friends.</source>
+        <translation>Vous êtes maintenant amis.</translation>
+    </message>
+    <message>
+        <source>Request sent.</source>
+        <translation>Demande envoyée.</translation>
+    </message>
+    <message>
+        <source>Your friend code: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation>Votre code ami : &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Sign in to your Erable account to add friends.</source>
+        <translation>Connectez-vous à votre compte Erable pour ajouter des amis.</translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <translation>Accepter</translation>
+    </message>
+    <message>
+        <source>Refuse</source>
+        <translation>Refuser</translation>
+    </message>
+    <message>
+        <source>Block</source>
+        <translation>Bloquer</translation>
+    </message>
+    <message>
+        <source>Block %1? You won&apos;t get their requests anymore.</source>
+        <translation>Bloquer %1 ? Vous ne recevrez plus ses demandes.</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; wants to be your friend</source>
+        <translation>&lt;b&gt;%1&lt;/b&gt; veut être votre ami</translation>
+    </message>
+    <message>
+        <source>offline</source>
+        <translation>hors ligne</translation>
+    </message>
+    <message>
+        <source>plays %1 in %2</source>
+        <translation>joue à %1 dans le %2</translation>
+    </message>
+    <message>
+        <source>plays %1</source>
+        <translation>joue à %1</translation>
+    </message>
+    <message>
+        <source>in %1</source>
+        <translation>dans le %1</translation>
+    </message>
+    <message>
+        <source>online</source>
+        <translation>en ligne</translation>
+    </message>
+    <message>
+        <source>Join</source>
+        <translation>Rejoindre</translation>
+    </message>
+    <message>
+        <source>Joining the room...</source>
+        <translation>Connexion au salon...</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Retirer</translation>
+    </message>
+    <message>
+        <source>Remove %1 from your friends?</source>
+        <translation>Retirer %1 de vos amis ?</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Waiting for %1</source>
+        <translation>En attente de %1</translation>
+    </message>
+</context>
+<context>
+    <name>Online::FriendNotifier</name>
+    <message>
+        <source>Accept</source>
+        <translation>Accepter</translation>
+    </message>
+    <message>
+        <source>Refuse</source>
+        <translation>Refuser</translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation>Plus tard</translation>
+    </message>
+    <message>
+        <source>Friend request</source>
+        <translation>Demande d’ami</translation>
+    </message>
+    <message>
+        <source>%1 wants to be your friend on Erable.</source>
+        <translation>%1 veut être votre ami sur Erable.</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; wants to be your friend on Erable.</source>
+        <translation>&lt;b&gt;%1&lt;/b&gt; veut être votre ami sur Erable.</translation>
     </message>
 </context>
 </TS>

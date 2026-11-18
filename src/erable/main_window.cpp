@@ -146,6 +146,8 @@ static FileSys::VirtualFile VfsDirectoryCreateFileWrapper(const FileSys::Virtual
 #include "erable/online/account_dialog.h"
 #include "erable/online/online_account.h"
 #include "erable/online/online_mode.h"
+#include "erable/online/friend_notifier.h"
+#include "erable/online/friends_dialog.h"
 #include "erable/local_report.h"
 
 #ifdef ENABLE_UPDATE_CHECKER
@@ -512,6 +514,17 @@ MainWindow::MainWindow(bool has_broken_vulkan)
             Online::AccountDialog dialog(*online_account, this);
             dialog.exec();
         });
+        // Friend requests: a banner, or the system's notification while in the background
+        friend_notifier = new Online::FriendNotifier(*online_account, this);
+        connect(friend_notifier, &Online::FriendNotifier::OpenFriendsRequested, this,
+                [this, online_account] {
+                    Online::FriendsDialog dialog(*online_account, this);
+                    connect(&dialog, &Online::FriendsDialog::JoinRoomRequested, this,
+                            [online_account](unsigned port) {
+                                Online::JoinRoom(online_account, port);
+                            });
+                    dialog.exec();
+                });
         online_account->Refresh([online_account](const Online::Account::Result&) {
             // The mode chosen last time, once the session and the rooms are known
             online_account->FetchRooms([online_account](const Online::Account::Result&) {
@@ -2946,6 +2959,13 @@ void MainWindow::OnEmulationStopped() {
 
     game_list->SetReportableProgramId(report_session ? report_session->program_id : 0);
 
+    if (Online::Account* online_account = Online::Account::Shared()) {
+        online_account->SetPresenceGame({});
+    }
+    if (friend_notifier) {
+        friend_notifier->SetInGame(false);
+    }
+
     discord_rpc->Update();
     Common::FeralGamemode::Stop();
 
@@ -3905,6 +3925,16 @@ void MainWindow::OnStartGame() {
 
     play_time_manager->SetProgramId(QtCommon::system->GetApplicationProcessProgramID());
     play_time_manager->Start();
+
+    // Friends see the game; friend requests wait for its end
+    if (Online::Account* online_account = Online::Account::Shared()) {
+        std::string title;
+        QtCommon::system->GetAppLoader().ReadTitle(title);
+        online_account->SetPresenceGame(QString::fromStdString(title));
+    }
+    if (friend_notifier) {
+        friend_notifier->SetInGame(true);
+    }
 
     discord_rpc->Update();
     Common::FeralGamemode::Start();

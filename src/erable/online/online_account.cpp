@@ -18,6 +18,7 @@
 #include <QSslCertificate>
 #include <QSslConfiguration>
 #include <QSslError>
+#include <QTimer>
 
 #include "common/fs/path_util.h"
 #include "common/logging.h"
@@ -32,6 +33,7 @@ constexpr char DefaultServer[] = "https://91.134.241.94:24870";
 constexpr char DefaultPin[] = "3dfc8baf6a32e2a2df8b7bf6ac08cf91ddd1b637c9c631e3fe8b4e4409d54dee";
 
 constexpr int TimeoutMs = 15000;
+constexpr int SyncIntervalMs = 30000;
 
 QString SessionPath() {
     return QString::fromStdString(Common::FS::PathToUTF8String(
@@ -46,13 +48,18 @@ QByteArray ParsePin(QByteArray text) {
 
 } // Anonymous namespace
 
-Account::Account(QObject* parent) : QObject{parent}, network{new QNetworkAccessManager(this)} {
+Account::Account(QObject* parent)
+    : QObject{parent}, network{new QNetworkAccessManager(this)}, session_path{SessionPath()},
+      sync_timer{new QTimer(this)} {
     const QByteArray server_env = qgetenv("EDEN_NX2_ONLINE_SERVER");
     server = QUrl(server_env.isEmpty() ? QString::fromLatin1(DefaultServer)
                                        : QString::fromUtf8(server_env));
     const QByteArray pin_env = qgetenv("EDEN_NX2_ONLINE_PIN");
     pinned_sha256 = ParsePin(pin_env.isEmpty() ? QByteArray{DefaultPin} : pin_env);
+    sync_timer->setInterval(SyncIntervalMs);
+    connect(sync_timer, &QTimer::timeout, this, &Account::Sync);
     LoadSession();
+    StartSync();
 }
 
 Account::~Account() = default;
@@ -143,6 +150,27 @@ QString Account::ErrorText(const QString& code) {
     }
     if (code == QStringLiteral("no_access")) {
         return tr("Your Erable account doesn't have access to the online rooms.");
+    }
+    if (code == QStringLiteral("unknown_friend_code")) {
+        return tr("No player has this friend code.");
+    }
+    if (code == QStringLiteral("own_friend_code")) {
+        return tr("This is your own friend code.");
+    }
+    if (code == QStringLiteral("already_friends")) {
+        return tr("You are already friends.");
+    }
+    if (code == QStringLiteral("already_requested")) {
+        return tr("You already sent this player a request.");
+    }
+    if (code == QStringLiteral("too_many_requests")) {
+        return tr("You sent too many friend requests today. Try again tomorrow.");
+    }
+    if (code == QStringLiteral("too_many_friends")) {
+        return tr("You have reached the maximum number of friends.");
+    }
+    if (code == QStringLiteral("no_request")) {
+        return tr("This request no longer exists.");
     }
     if (code == QStringLiteral("no_session")) {
         return tr("Your session has ended. Sign in again.");
@@ -270,6 +298,120 @@ QString Account::RoomPassword(unsigned port) const {
     return {};
 }
 
+QString Account::RoomName(unsigned port) const {
+    for (const Room& room : rooms) {
+        if (room.port == port) {
+            return room.name;
+        }
+    }
+    return {};
+}
+
+void Account::StartSync() {
+    if (!session) {
+        return;
+    }
+    sync_timer->start();
+    Sync();
+}
+
+void Account::SetPresence(const QString& game, unsigned room_port) {
+    if (game == presence_game && room_port == presence_room) {
+        return;
+    }
+    presence_game = game;
+    presence_room = room_port;
+    Sync();
+}
+
+void Account::Sync() {
+    if (!session) {
+        return;
+    }
+    if (syncing) {
+        sync_again = true; // A change made meanwhile is sent once this sync ends
+        return;
+    }
+    syncing = true;
+    Send(QStringLiteral("POST"), QStringLiteral("/v1/sync"),
+         {{QStringLiteral("game"), presence_game},
+          {QStringLiteral("room_port"), static_cast<int>(presence_room)}},
+         true, [this](const Result& result) {
+             syncing = false;
+             if (sync_again) {
+                 sync_again = false;
+                 QTimer::singleShot(0, this, &Account::Sync);
+             }
+             if (!result.ok) {
+                 if (result.error == QStringLiteral("no_session")) {
+                     ClearSession();
+                 }
+                 return;
+             }
+             const auto requests = [](const QJsonArray& array) {
+                 QList<FriendRequest> list;
+                 for (const auto& value : array) {
+                     const QJsonObject item = value.toObject();
+                     list.append(
+                         {.nickname = item.value(QStringLiteral("nickname")).toString(),
+                          .friend_code = item.value(QStringLiteral("friend_code")).toString()});
+                 }
+                 return list;
+             };
+             friends.clear();
+             for (const auto& value : result.data.value(QStringLiteral("friends")).toArray()) {
+                 const QJsonObject item = value.toObject();
+                 friends.append({
+                     .nickname = item.value(QStringLiteral("nickname")).toString(),
+                     .friend_code = item.value(QStringLiteral("friend_code")).toString(),
+                     .online = item.value(QStringLiteral("online")).toBool(),
+                     .game = item.value(QStringLiteral("game")).toString(),
+                     .room_port =
+                         static_cast<unsigned>(item.value(QStringLiteral("room_port")).toInt()),
+                 });
+             }
+             incoming = requests(result.data.value(QStringLiteral("incoming")).toArray());
+             outgoing = requests(result.data.value(QStringLiteral("outgoing")).toArray());
+             emit FriendsChanged();
+             for (const FriendRequest& request : incoming) {
+                 if (!notified_requests.contains(request.friend_code)) {
+                     notified_requests.append(request.friend_code);
+                     emit FriendRequestReceived(request.nickname, request.friend_code);
+                 }
+             }
+         });
+}
+
+void Account::FriendAction(const QString& path, const QJsonObject& body, Callback done) {
+    Send(QStringLiteral("POST"), path, body, true,
+         [this, done = std::move(done)](const Result& result) {
+             done(result);
+             Sync();
+         });
+}
+
+void Account::SendFriendRequest(const QString& friend_code, Callback done) {
+    FriendAction(QStringLiteral("/v1/friends/request"),
+                 {{QStringLiteral("friend_code"), friend_code.trimmed().toUpper()}},
+                 std::move(done));
+}
+
+void Account::RespondFriendRequest(const QString& friend_code, bool accept, Callback done) {
+    FriendAction(QStringLiteral("/v1/friends/respond"),
+                 {{QStringLiteral("friend_code"), friend_code}, {QStringLiteral("accept"), accept}},
+                 std::move(done));
+}
+
+void Account::RemoveFriend(const QString& friend_code, Callback done) {
+    FriendAction(QStringLiteral("/v1/friends/remove"),
+                 {{QStringLiteral("friend_code"), friend_code}}, std::move(done));
+}
+
+void Account::BlockPlayer(const QString& friend_code, Callback done) {
+    FriendAction(QStringLiteral("/v1/friends/block"),
+                 {{QStringLiteral("friend_code"), friend_code}}, std::move(done));
+}
+
 void Account::Send(const QString& method, const QString& path, const QJsonObject& body,
                    bool authorized, Callback done) {
     if (pinned_sha256.isEmpty()) {
@@ -354,10 +496,11 @@ void Account::TakeSession(const Result& result) {
     };
     SaveSession();
     emit SessionChanged();
+    StartSync();
 }
 
 void Account::LoadSession() {
-    QFile file{SessionPath()};
+    QFile file{session_path};
     if (!file.open(QIODevice::ReadOnly)) {
         return;
     }
@@ -378,7 +521,7 @@ void Account::SaveSession() {
     if (!session) {
         return;
     }
-    QSaveFile file{SessionPath()};
+    QSaveFile file{session_path};
     if (!file.open(QIODevice::WriteOnly)) {
         LOG_ERROR(Frontend, "Online: the session could not be saved");
         return;
@@ -396,8 +539,14 @@ void Account::SaveSession() {
 void Account::ClearSession() {
     session.reset();
     rooms.clear();
-    QFile::remove(SessionPath());
+    friends.clear();
+    incoming.clear();
+    outgoing.clear();
+    notified_requests.clear();
+    sync_timer->stop();
+    QFile::remove(session_path);
     emit SessionChanged();
+    emit FriendsChanged();
 }
 
 } // namespace Online

@@ -37,6 +37,7 @@
 #include "core/core.h"
 #include "core/hle/service/acc/profile_manager.h"
 #include "erable/online/account_dialog.h"
+#include "erable/online/friends_dialog.h"
 #include "erable/online/online_account.h"
 #include "erable/online/online_mode.h"
 #include "erable/util/controller_navigation.h"
@@ -202,6 +203,24 @@ void ProfilePicker::MakeOnlineBar(QVBoxLayout* layout) {
         room_box->addItem(tr("Room %1").arg(i + 1), Online::FirstRoomPort + i);
     }
     account_button = new QPushButton(this);
+    friends_button = new QPushButton(this);
+    friends_button->setFocusPolicy(Qt::NoFocus);
+    friends_button->setCursor(Qt::PointingHandCursor);
+    connect(friends_button, &QPushButton::clicked, this, [this] {
+        if (Online::Account* account = Online::Account::Shared()) {
+            Online::FriendsDialog dialog(*account, this);
+            connect(&dialog, &Online::FriendsDialog::JoinRoomRequested, this,
+                    [this, account](unsigned port) {
+                        Online::JoinRoom(account, port);
+                        UpdateOnlineBar();
+                    });
+            dialog.exec();
+            UpdateOnlineBar();
+        }
+    });
+    if (Online::Account* account = Online::Account::Shared()) {
+        connect(account, &Online::Account::FriendsChanged, this, &ProfilePicker::UpdateOnlineBar);
+    }
     for (QPushButton* button : {wifi_button, server_button}) {
         button->setCheckable(true);
     }
@@ -218,6 +237,7 @@ void ProfilePicker::MakeOnlineBar(QVBoxLayout* layout) {
     bar->addSpacing(10);
     bar->addWidget(room_box);
     bar->addWidget(account_button);
+    bar->addWidget(friends_button);
     bar->addStretch();
     layout->addLayout(bar);
 
@@ -304,6 +324,10 @@ void ProfilePicker::UpdateOnlineBar() {
     const auto* session =
         account && account->CurrentSession() ? &*account->CurrentSession() : nullptr;
     account_button->setText(session ? session->nickname : tr("Sign in"));
+    // Friends, whatever the mode, once signed in; the count is the requests waiting
+    friends_button->setVisible(session != nullptr);
+    const auto waiting = account ? account->IncomingRequests().size() : 0;
+    friends_button->setText(waiting > 0 ? tr("Friends (%1)").arg(waiting) : tr("Friends"));
     account_button->setToolTip(
         session ? tr("Your Erable account (friend code %1)").arg(session->friend_code)
                 : tr("Sign in to your Erable account"));

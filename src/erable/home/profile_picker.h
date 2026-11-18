@@ -81,6 +81,7 @@ private:
     QPushButton* server_button = nullptr;
     QComboBox* room_box = nullptr;
     QPushButton* account_button = nullptr;
+    QPushButton* friends_button = nullptr;
     bool fetching_rooms = false;
     bool rooms_tried = false;
     QString display_family;

@@ -36,6 +36,12 @@ MAX_BODY = 16 * 1024
 MAX_FAILURES = 5
 FAILURE_WINDOW = 15 * 60
 
+# Friends: requests one account may send a day, the most friends an account may have, and how long
+# after its last sync an account still counts as online (Erable syncs every 30 s)
+MAX_REQUESTS_PER_DAY = 30
+MAX_FRIENDS = 200
+ONLINE_FOR = 90
+
 # Access to the rooms: free for every account while this is False. A paid access, later, sets it
 # to True; accounts then need access = "paid" with access_until in the future.
 REQUIRE_PAID_ACCESS = False
@@ -71,6 +77,29 @@ CREATE TABLE IF NOT EXISTS sessions (
     account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
     created_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS friends (
+    account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    friend_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    since INTEGER NOT NULL,
+    PRIMARY KEY (account_id, friend_id)
+);
+CREATE TABLE IF NOT EXISTS friend_requests (
+    from_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    to_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    sent_at INTEGER NOT NULL,
+    PRIMARY KEY (from_id, to_id)
+);
+CREATE TABLE IF NOT EXISTS blocks (
+    account_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    blocked_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    PRIMARY KEY (account_id, blocked_id)
+);
+CREATE TABLE IF NOT EXISTS presence (
+    account_id INTEGER PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+    seen_at INTEGER NOT NULL,
+    game TEXT NOT NULL DEFAULT '',
+    room_port INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS failures (
     key TEXT NOT NULL,
@@ -297,6 +326,132 @@ def delete_account(store, account_id, body, client):
     return HTTPStatus.OK, {}
 
 
+def account_by_code(store, body):
+    code = field(body, "friend_code", 32).strip().upper()
+    row = store.db.execute("SELECT id FROM accounts WHERE friend_code = ?", (code,)).fetchone()
+    if row is None:
+        raise ApiError(HTTPStatus.NOT_FOUND, "unknown_friend_code")
+    return row[0]
+
+
+def make_friends(store, a, b):
+    now = int(time.time())
+    store.db.executemany("INSERT OR IGNORE INTO friends VALUES (?, ?, ?)",
+                         [(a, b, now), (b, a, now)])
+    store.db.execute("DELETE FROM friend_requests WHERE (from_id = ? AND to_id = ?) OR "
+                     "(from_id = ? AND to_id = ?)", (a, b, b, a))
+
+
+def friend_request(store, account_id, body, client):
+    target = account_by_code(store, body)
+    if target == account_id:
+        raise ApiError(HTTPStatus.BAD_REQUEST, "own_friend_code")
+    db = store.db
+    if db.execute("SELECT 1 FROM friends WHERE account_id = ? AND friend_id = ?",
+                  (account_id, target)).fetchone():
+        raise ApiError(HTTPStatus.CONFLICT, "already_friends")
+    # They asked first: this accepts
+    if db.execute("SELECT 1 FROM friend_requests WHERE from_id = ? AND to_id = ?",
+                  (target, account_id)).fetchone():
+        make_friends(store, account_id, target)
+        db.commit()
+        return HTTPStatus.OK, {"status": "friends"}
+    if db.execute("SELECT 1 FROM friend_requests WHERE from_id = ? AND to_id = ?",
+                  (account_id, target)).fetchone():
+        raise ApiError(HTTPStatus.CONFLICT, "already_requested")
+    since = int(time.time()) - 86400
+    sent = db.execute("SELECT COUNT(*) FROM friend_requests WHERE from_id = ? AND sent_at > ?",
+                      (account_id, since)).fetchone()[0]
+    if sent >= MAX_REQUESTS_PER_DAY:
+        raise ApiError(HTTPStatus.TOO_MANY_REQUESTS, "too_many_requests")
+    friends = db.execute("SELECT COUNT(*) FROM friends WHERE account_id = ?",
+                         (account_id,)).fetchone()[0]
+    if friends >= MAX_FRIENDS:
+        raise ApiError(HTTPStatus.CONFLICT, "too_many_friends")
+    # Someone who blocked this account gets nothing, and the sender is not told
+    if not db.execute("SELECT 1 FROM blocks WHERE account_id = ? AND blocked_id = ?",
+                      (target, account_id)).fetchone():
+        db.execute("INSERT INTO friend_requests VALUES (?, ?, ?)",
+                   (account_id, target, int(time.time())))
+        db.commit()
+    return HTTPStatus.OK, {"status": "requested"}
+
+
+def friend_respond(store, account_id, body, client):
+    sender = account_by_code(store, body)
+    accept = body.get("accept") is True
+    db = store.db
+    if not db.execute("SELECT 1 FROM friend_requests WHERE from_id = ? AND to_id = ?",
+                      (sender, account_id)).fetchone():
+        raise ApiError(HTTPStatus.NOT_FOUND, "no_request")
+    if accept:
+        make_friends(store, account_id, sender)
+    else:
+        db.execute("DELETE FROM friend_requests WHERE from_id = ? AND to_id = ?",
+                   (sender, account_id))
+    db.commit()
+    return HTTPStatus.OK, {"status": "friends" if accept else "refused"}
+
+
+def friend_remove(store, account_id, body, client):
+    other = account_by_code(store, body)
+    store.db.execute("DELETE FROM friends WHERE (account_id = ? AND friend_id = ?) OR "
+                     "(account_id = ? AND friend_id = ?)", (account_id, other, other, account_id))
+    # A request sent to them is withdrawn too
+    store.db.execute("DELETE FROM friend_requests WHERE from_id = ? AND to_id = ?",
+                     (account_id, other))
+    store.db.commit()
+    return HTTPStatus.OK, {}
+
+
+def block_player(store, account_id, body, client):
+    other = account_by_code(store, body)
+    if other == account_id:
+        raise ApiError(HTTPStatus.BAD_REQUEST, "own_friend_code")
+    db = store.db
+    db.execute("DELETE FROM friends WHERE (account_id = ? AND friend_id = ?) OR "
+               "(account_id = ? AND friend_id = ?)", (account_id, other, other, account_id))
+    db.execute("DELETE FROM friend_requests WHERE (from_id = ? AND to_id = ?) OR "
+               "(from_id = ? AND to_id = ?)", (account_id, other, other, account_id))
+    db.execute("INSERT OR IGNORE INTO blocks VALUES (?, ?)", (account_id, other))
+    db.commit()
+    return HTTPStatus.OK, {}
+
+
+def sync(store, account_id, body, client):
+    """Notes that the account is online (and in which game and room), and gives its friends with
+    theirs and its friend requests: Erable calls it every 30 s"""
+    game = body.get("game") if isinstance(body.get("game"), str) else ""
+    room = body.get("room_port") if isinstance(body.get("room_port"), int) else 0
+    now = int(time.time())
+    db = store.db
+    db.execute("INSERT INTO presence (account_id, seen_at, game, room_port) VALUES (?, ?, ?, ?) "
+               "ON CONFLICT(account_id) DO UPDATE SET seen_at = excluded.seen_at, "
+               "game = excluded.game, room_port = excluded.room_port",
+               (account_id, now, game[:96], room if 0 <= room <= 65535 else 0))
+    db.commit()
+    friends = []
+    for nickname, code, seen, friend_game, friend_room in db.execute(
+            "SELECT a.nickname, a.friend_code, p.seen_at, p.game, p.room_port FROM friends f "
+            "JOIN accounts a ON a.id = f.friend_id LEFT JOIN presence p ON p.account_id = a.id "
+            "WHERE f.account_id = ? ORDER BY a.nickname COLLATE NOCASE", (account_id,)):
+        online = seen is not None and now - seen <= ONLINE_FOR
+        friends.append({"nickname": nickname, "friend_code": code, "online": online,
+                        "game": friend_game if online else "",
+                        "room_port": friend_room if online else 0})
+    incoming = [{"nickname": nickname, "friend_code": code, "sent_at": sent}
+                for nickname, code, sent in db.execute(
+                    "SELECT a.nickname, a.friend_code, r.sent_at FROM friend_requests r "
+                    "JOIN accounts a ON a.id = r.from_id WHERE r.to_id = ? ORDER BY r.sent_at",
+                    (account_id,))]
+    outgoing = [{"nickname": nickname, "friend_code": code, "sent_at": sent}
+                for nickname, code, sent in db.execute(
+                    "SELECT a.nickname, a.friend_code, r.sent_at FROM friend_requests r "
+                    "JOIN accounts a ON a.id = r.to_id WHERE r.from_id = ? ORDER BY r.sent_at",
+                    (account_id,))]
+    return HTTPStatus.OK, {"friends": friends, "incoming": incoming, "outgoing": outgoing}
+
+
 def load_rooms(path):
     if not path:
         return []
@@ -317,6 +472,16 @@ def session_account(store, headers):
         raise ApiError(HTTPStatus.UNAUTHORIZED, "no_session")
     return row[0], hashed
 
+
+# Routes for a signed-in account: (store, account id, body, client address)
+ACCOUNT_ROUTES = {
+    ("POST", "/v1/account/delete"): delete_account,
+    ("POST", "/v1/friends/request"): friend_request,
+    ("POST", "/v1/friends/respond"): friend_respond,
+    ("POST", "/v1/friends/remove"): friend_remove,
+    ("POST", "/v1/friends/block"): block_player,
+    ("POST", "/v1/sync"): sync,
+}
 
 ROUTES = {
     ("POST", "/v1/register"): register,
@@ -344,6 +509,18 @@ def make_handler(store, rooms):
             self.end_headers()
             self.wfile.write(data)
 
+        def read_body(self):
+            length = int(self.headers.get("Content-Length") or 0)
+            if length <= 0 or length > MAX_BODY:
+                raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body")
+            try:
+                body = json.loads(self.rfile.read(length))
+            except ValueError:
+                raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body") from None
+            if not isinstance(body, dict):
+                raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body")
+            return body
+
         def handle_request(self, method):
             try:
                 with store.lock:
@@ -361,19 +538,11 @@ def make_handler(store, rooms):
                             raise ApiError(HTTPStatus.PAYMENT_REQUIRED, "no_access")
                         self.reply(HTTPStatus.OK, {"rooms": rooms})
                         return
-                    if (method, self.path) == ("POST", "/v1/account/delete"):
+                    account_route = ACCOUNT_ROUTES.get((method, self.path))
+                    if account_route is not None:
                         account_id, _ = session_account(store, self.headers)
-                        length = int(self.headers.get("Content-Length") or 0)
-                        if length <= 0 or length > MAX_BODY:
-                            raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body")
-                        try:
-                            body = json.loads(self.rfile.read(length))
-                        except ValueError:
-                            raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body") from None
-                        if not isinstance(body, dict):
-                            raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body")
-                        status, payload = delete_account(store, account_id, body,
-                                                         self.client_address[0])
+                        status, payload = account_route(store, account_id, self.read_body(),
+                                                        self.client_address[0])
                         self.reply(status, payload)
                         return
                     if (method, self.path) == ("POST", "/v1/logout"):
@@ -385,16 +554,7 @@ def make_handler(store, rooms):
                     route = ROUTES.get((method, self.path))
                     if route is None:
                         raise ApiError(HTTPStatus.NOT_FOUND, "not_found")
-                    length = int(self.headers.get("Content-Length") or 0)
-                    if length <= 0 or length > MAX_BODY:
-                        raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body")
-                    try:
-                        body = json.loads(self.rfile.read(length))
-                    except ValueError:
-                        raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body") from None
-                    if not isinstance(body, dict):
-                        raise ApiError(HTTPStatus.BAD_REQUEST, "bad_body")
-                    status, payload = route(store, body, self.client_address[0])
+                    status, payload = route(store, self.read_body(), self.client_address[0])
                 self.reply(status, payload)
             except ApiError as error:
                 self.reply(error.status, {"error": error.code})

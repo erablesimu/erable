@@ -14,6 +14,7 @@
 #include <QUrl>
 
 class QNetworkAccessManager;
+class QTimer;
 class QNetworkReply;
 
 namespace Online {
@@ -31,6 +32,21 @@ struct Room {
     QString name;
     unsigned port{};
     QString password;
+};
+
+/// A friend, as the last sync saw them
+struct Friend {
+    QString nickname;
+    QString friend_code;
+    bool online{};
+    QString game;         ///< The game they play, empty when none or offline
+    unsigned room_port{}; ///< The Erable room they are in, 0 when none
+};
+
+/// A friend request, sent to this account or by it
+struct FriendRequest {
+    QString nickname;
+    QString friend_code;
 };
 
 /// Erable accounts on the Erable server: sign-up, sign-in, recovery with the security answer and
@@ -97,10 +113,43 @@ public:
     }
     /// The password of the room on `port`, if it was fetched
     QString RoomPassword(unsigned port) const;
+    /// The name of the room on `port` ("Salon 3"), else empty
+    QString RoomName(unsigned port) const;
+
+    // Friends. While signed in, Erable syncs with the server every 30 s: it says this player is
+    // online (with the game and room set by SetPresence) and gets the friends and the requests.
+    void SendFriendRequest(const QString& friend_code, Callback done);
+    void RespondFriendRequest(const QString& friend_code, bool accept, Callback done);
+    void RemoveFriend(const QString& friend_code, Callback done);
+    /// Removes them from the friends, drops requests either way, and ignores theirs from now on
+    void BlockPlayer(const QString& friend_code, Callback done);
+    /// Syncs now rather than at the next 30 s tick
+    void Sync();
+    /// What friends see this player doing: the game (empty for none) and the room (0 for none)
+    void SetPresence(const QString& game, unsigned room_port);
+    void SetPresenceGame(const QString& game) {
+        SetPresence(game, presence_room);
+    }
+    void SetPresenceRoom(unsigned room_port) {
+        SetPresence(presence_game, room_port);
+    }
+    const QList<Friend>& Friends() const {
+        return friends;
+    }
+    const QList<FriendRequest>& IncomingRequests() const {
+        return incoming;
+    }
+    const QList<FriendRequest>& OutgoingRequests() const {
+        return outgoing;
+    }
 
 signals:
     /// The session was opened, refreshed or closed
     void SessionChanged();
+    /// A sync brought new friends, requests or presence
+    void FriendsChanged();
+    /// A friend request arrived that this PC had not shown yet
+    void FriendRequestReceived(const QString& nickname, const QString& friend_code);
 
 private:
     void Send(const QString& method, const QString& path, const QJsonObject& body, bool authorized,
@@ -114,8 +163,22 @@ private:
     QNetworkAccessManager* network;
     QUrl server;
     QByteArray pinned_sha256;
+    /// Calls a friends route, then syncs
+    void FriendAction(const QString& path, const QJsonObject& body, Callback done);
+    void StartSync();
+
     std::optional<Session> session;
+    QString session_path;
     QList<Room> rooms;
+    QList<Friend> friends;
+    QList<FriendRequest> incoming;
+    QList<FriendRequest> outgoing;
+    QStringList notified_requests; ///< Friend codes whose request this PC has shown
+    QTimer* sync_timer;
+    bool syncing{};
+    bool sync_again{};
+    QString presence_game;
+    unsigned presence_room{};
 };
 
 } // namespace Online

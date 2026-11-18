@@ -55,11 +55,14 @@ void SetMode(Mode mode) {
                                                                       : "off"};
 }
 
-void ApplyMode(const Account* account, const QString& profile_name) {
+void ApplyMode(Account* account, const QString& profile_name) {
     const Mode mode = CurrentMode();
     Settings::values.lan_play = mode == Mode::WiFi;
     if (mode != Mode::Server || account == nullptr) {
         LeaveServerRoom();
+        if (account) {
+            account->SetPresenceRoom(0);
+        }
         return;
     }
     const std::string host = account->ServerHost().toStdString();
@@ -84,6 +87,14 @@ void ApplyMode(const Account* account, const QString& profile_name) {
     member->Join(nickname, host.c_str(), static_cast<u16>(port), 0, Network::NoPreferredIP,
                  password);
     joined = {host, port};
+    // Friends see the room and can join it
+    account->SetPresenceRoom(port);
+}
+
+void JoinRoom(Account* account, unsigned port) {
+    SetMode(Mode::Server);
+    Settings::values.online_room_port = port;
+    ApplyMode(account, {});
 }
 
 } // namespace Online

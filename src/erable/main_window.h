@@ -49,6 +49,9 @@ class QtConfig;
 class EmuThread;
 class GameList;
 class HomeScreen;
+namespace Online {
+class FriendNotifier;
+}
 class GImageInfo;
 class GRenderWindow;
 class LoadingScreen;
@@ -542,6 +545,7 @@ private:
 #endif
 
     MultiplayerState* multiplayer_state = nullptr;
+    Online::FriendNotifier* friend_notifier = nullptr;
     void RememberSpeedLimitBeforeHotkey();
     void UndoSessionSpeedChanges();
     /// The speed limit before the session's first Toggle Framerate Limit / turbo / slow hotkey,

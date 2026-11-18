@@ -38,6 +38,10 @@ add_executable(erable
     leaf_catcher.cpp
     leaf_catcher.h
     online/account_dialog.cpp
+    online/friend_notifier.cpp
+    online/friend_notifier.h
+    online/friends_dialog.cpp
+    online/friends_dialog.h
     online/account_dialog.h
     online/online_account.cpp
     online/online_account.h
