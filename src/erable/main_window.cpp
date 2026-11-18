@@ -143,6 +143,8 @@ static FileSys::VirtualFile VfsDirectoryCreateFileWrapper(const FileSys::Virtual
 
 #include "erable/debug_session.h"
 #include "erable/home/home_screen.h"
+#include "erable/online/account_dialog.h"
+#include "erable/online/online_account.h"
 #include "erable/local_report.h"
 
 #ifdef ENABLE_UPDATE_CHECKER
@@ -499,6 +501,18 @@ MainWindow::MainWindow(bool has_broken_vulkan)
     EnsureGamesFolder();
     game_list->PopulateAsync(UISettings::values.game_dirs);
     ShowHome(true);
+
+    // The Erable account, not offered yet: only with EDEN_NX2_ONLINE=1, through Ctrl+Shift+O
+    if (Online::Account::Enabled()) {
+        auto* online_account = new Online::Account(this);
+        auto* account_shortcut = new QShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+O")), this);
+        account_shortcut->setContext(Qt::ApplicationShortcut);
+        connect(account_shortcut, &QShortcut::activated, this, [this, online_account] {
+            Online::AccountDialog dialog(*online_account, this);
+            dialog.exec();
+        });
+        online_account->Refresh([](const Online::Account::Result&) {});
+    }
 
     if (whats_new_pending && !UISettings::values.first_start.GetValue() &&
         UISettings::values.show_whats_new.GetValue()) {

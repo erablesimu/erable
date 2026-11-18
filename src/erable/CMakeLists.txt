@@ -37,6 +37,10 @@ add_executable(erable
     home/home_screen.h
     leaf_catcher.cpp
     leaf_catcher.h
+    online/account_dialog.cpp
+    online/account_dialog.h
+    online/online_account.cpp
+    online/online_account.h
     local_report.cpp
     local_report.h
     applets/qt_amiibo_settings.cpp

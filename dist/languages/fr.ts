@@ -9244,6 +9244,10 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>QObject</name>
     <message>
+        <source>6 to 12 digits</source>
+        <translation>6 à 12 chiffres</translation>
+    </message>
+    <message>
         <location filename="../../src/erable/user_data_migration.cpp" line="43"/>
         <location filename="../../src/erable/user_data_migration.cpp" line="121"/>
         <location filename="../../src/erable/user_data_migration.cpp" line="148"/>
@@ -12106,6 +12110,256 @@ Réessayer sans la recette ? Le jeu fonctionnera toujours depuis l'archive NX, m
     <message>
         <source>Got it</source>
         <translation>Compris</translation>
+    </message>
+</context>
+<context>
+    <name>Online::Account</name>
+    <message>
+        <source>What was the name of your first pet?</source>
+        <translation>Comment s’appelait votre premier animal de compagnie ?</translation>
+    </message>
+    <message>
+        <source>In which city were you born?</source>
+        <translation>Dans quelle ville êtes-vous né(e) ?</translation>
+    </message>
+    <message>
+        <source>What was the name of your first school?</source>
+        <translation>Comment s’appelait votre première école ?</translation>
+    </message>
+    <message>
+        <source>What is the first name of your childhood best friend?</source>
+        <translation>Quel est le prénom de votre meilleur(e) ami(e) d’enfance ?</translation>
+    </message>
+    <message>
+        <source>What was the first video game you loved?</source>
+        <translation>Quel est le premier jeu vidéo que vous avez adoré ?</translation>
+    </message>
+    <message>
+        <source>What is your mother&apos;s maiden name?</source>
+        <translation>Quel est le nom de jeune fille de votre mère ?</translation>
+    </message>
+    <message>
+        <source>The Erable server can&apos;t be reached. Check your connection and try again.</source>
+        <translation>Le serveur Erable ne répond pas. Vérifiez votre connexion et réessayez.</translation>
+    </message>
+    <message>
+        <source>The server&apos;s identity could not be verified, so nothing was sent.</source>
+        <translation>L’identité du serveur n’a pas pu être vérifiée : rien n’a été envoyé.</translation>
+    </message>
+    <message>
+        <source>Wrong e-mail or password.</source>
+        <translation>E-mail ou mot de passe incorrect.</translation>
+    </message>
+    <message>
+        <source>The answer or the security code is wrong.</source>
+        <translation>La réponse ou le code de sécurité est incorrect.</translation>
+    </message>
+    <message>
+        <source>Too many attempts. Wait 15 minutes and try again.</source>
+        <translation>Trop d’essais. Attendez 15 minutes et réessayez.</translation>
+    </message>
+    <message>
+        <source>An account already uses this e-mail.</source>
+        <translation>Un compte utilise déjà cet e-mail.</translation>
+    </message>
+    <message>
+        <source>This nickname is taken.</source>
+        <translation>Ce pseudo est déjà pris.</translation>
+    </message>
+    <message>
+        <source>No account uses this e-mail.</source>
+        <translation>Aucun compte n’utilise cet e-mail.</translation>
+    </message>
+    <message>
+        <source>The nickname needs 4 to 20 letters (without accents), digits, spaces, &apos;.&apos;, &apos;_&apos; or &apos;-&apos;.</source>
+        <translation>Le pseudo doit contenir 4 à 20 lettres (sans accents), chiffres, espaces, « . », « _ » ou « - ».</translation>
+    </message>
+    <message>
+        <source>This e-mail address is not valid.</source>
+        <translation>Cette adresse e-mail n’est pas valide.</translation>
+    </message>
+    <message>
+        <source>The password needs at least 8 characters.</source>
+        <translation>Le mot de passe doit contenir au moins 8 caractères.</translation>
+    </message>
+    <message>
+        <source>The security code needs 6 to 12 digits.</source>
+        <translation>Le code de sécurité doit contenir 6 à 12 chiffres.</translation>
+    </message>
+    <message>
+        <source>The answer is too short.</source>
+        <translation>La réponse est trop courte.</translation>
+    </message>
+    <message>
+        <source>Your session has ended. Sign in again.</source>
+        <translation>Votre session a expiré. Reconnectez-vous.</translation>
+    </message>
+    <message>
+        <source>The server refused the request (%1).</source>
+        <translation>Le serveur a refusé la demande (%1).</translation>
+    </message>
+</context>
+<context>
+    <name>Online::AccountDialog</name>
+    <message>
+        <source>Erable account</source>
+        <translation>Compte Erable</translation>
+    </message>
+    <message>
+        <source>&lt;h3&gt;Sign in to your Erable account&lt;/h3&gt;</source>
+        <translation>&lt;h3&gt;Connexion à votre compte Erable&lt;/h3&gt;</translation>
+    </message>
+    <message>
+        <source>you@example.com</source>
+        <translation>vous@exemple.fr</translation>
+    </message>
+    <message>
+        <source>E-mail</source>
+        <translation>E-mail</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Mot de passe</translation>
+    </message>
+    <message>
+        <source>Sign in</source>
+        <translation>Se connecter</translation>
+    </message>
+    <message>
+        <source>Create an account</source>
+        <translation>Créer un compte</translation>
+    </message>
+    <message>
+        <source>Forgot your password?</source>
+        <translation>Mot de passe oublié ?</translation>
+    </message>
+    <message>
+        <source>&lt;h3&gt;Create your Erable account&lt;/h3&gt;</source>
+        <translation>&lt;h3&gt;Créer votre compte Erable&lt;/h3&gt;</translation>
+    </message>
+    <message>
+        <source>4 to 20 characters, no accents</source>
+        <translation>4 à 20 caractères, sans accents</translation>
+    </message>
+    <message>
+        <source>At least 8 characters</source>
+        <translation>Au moins 8 caractères</translation>
+    </message>
+    <message>
+        <source>Nickname</source>
+        <translation>Pseudo</translation>
+    </message>
+    <message>
+        <source>Password again</source>
+        <translation>Confirmer le mot de passe</translation>
+    </message>
+    <message>
+        <source>Security question</source>
+        <translation>Question de sécurité</translation>
+    </message>
+    <message>
+        <source>Answer</source>
+        <translation>Réponse</translation>
+    </message>
+    <message>
+        <source>Security code</source>
+        <translation>Code de sécurité</translation>
+    </message>
+    <message>
+        <source>Security code again</source>
+        <translation>Confirmer le code</translation>
+    </message>
+    <message>
+        <source>The answer and the security code let you choose a new password if you forget yours: keep them somewhere safe.</source>
+        <translation>La réponse et le code de sécurité vous permettront de choisir un nouveau mot de passe si vous l’oubliez : gardez-les en lieu sûr.</translation>
+    </message>
+    <message>
+        <source>Create the account</source>
+        <translation>Créer le compte</translation>
+    </message>
+    <message>
+        <source>I already have an account</source>
+        <translation>J’ai déjà un compte</translation>
+    </message>
+    <message>
+        <source>&lt;h3&gt;Choose a new password&lt;/h3&gt;</source>
+        <translation>&lt;h3&gt;Choisir un nouveau mot de passe&lt;/h3&gt;</translation>
+    </message>
+    <message>
+        <source>Give your account&apos;s e-mail, then the answer to your security question and your security code.</source>
+        <translation>Indiquez l’e-mail de votre compte, puis la réponse à votre question de sécurité et votre code de sécurité.</translation>
+    </message>
+    <message>
+        <source>Show my question</source>
+        <translation>Afficher ma question</translation>
+    </message>
+    <message>
+        <source>Question</source>
+        <translation>Question</translation>
+    </message>
+    <message>
+        <source>New password</source>
+        <translation>Nouveau mot de passe</translation>
+    </message>
+    <message>
+        <source>New password again</source>
+        <translation>Confirmer le nouveau mot de passe</translation>
+    </message>
+    <message>
+        <source>Change the password</source>
+        <translation>Changer le mot de passe</translation>
+    </message>
+    <message>
+        <source>Back to sign in</source>
+        <translation>Retour à la connexion</translation>
+    </message>
+    <message>
+        <source>Copy my friend code</source>
+        <translation>Copier mon code ami</translation>
+    </message>
+    <message>
+        <source>Friend code copied.</source>
+        <translation>Code ami copié.</translation>
+    </message>
+    <message>
+        <source>Sign out</source>
+        <translation>Se déconnecter</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Friend code</source>
+        <translation>Code ami</translation>
+    </message>
+    <message>
+        <source>Give your e-mail and your password.</source>
+        <translation>Indiquez votre e-mail et votre mot de passe.</translation>
+    </message>
+    <message>
+        <source>The two passwords differ.</source>
+        <translation>Les deux mots de passe sont différents.</translation>
+    </message>
+    <message>
+        <source>The two security codes differ.</source>
+        <translation>Les deux codes de sécurité sont différents.</translation>
+    </message>
+    <message>
+        <source>Give your account&apos;s e-mail.</source>
+        <translation>Indiquez l’e-mail de votre compte.</translation>
+    </message>
+    <message>
+        <source>Show your question first.</source>
+        <translation>Affichez d’abord votre question.</translation>
+    </message>
+    <message>
+        <source>Password changed. Your other devices were signed out.</source>
+        <translation>Mot de passe changé. Vos autres appareils ont été déconnectés.</translation>
+    </message>
+    <message>
+        <source>&lt;h3&gt;Signed in as %1&lt;/h3&gt;</source>
+        <translation>&lt;h3&gt;Connecté en tant que %1&lt;/h3&gt;</translation>
     </message>
 </context>
 </TS>
