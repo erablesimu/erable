@@ -467,7 +467,7 @@ void AccountDialog::ShowPrivacyNotice() {
         "<p><b>Why:</b> to sign you in, to let you choose a new password, and to let you play "
         "online in the Erable rooms. Nothing is sold, shared or used for advertising. No e-mail "
         "is sent to you.</p>"
-        "<p><b>Where:</b> on Erable's server, hosted by OVHcloud. Online rooms relay the game's "
+        "<p><b>Where:</b> on Erable's server. Online rooms relay the game's "
         "traffic "
         "between the players; they keep nothing.</p>"
         "<p><b>How long:</b> until you delete your account: \"Delete my account\", once signed "
