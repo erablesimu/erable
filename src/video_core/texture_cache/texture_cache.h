@@ -212,7 +212,7 @@ void TextureCache<P>::RunGarbageCollector(bool out_of_memory) {
     bool async_downloads = download_overlaps && AsyncOverlapDownloadsEnabled();
     KeepRanges keep;
     WritebackRanges::TickedRanges keep_ticks;
-    const auto CanEvict = [this, &high_priority_mode, &aggressive_mode, &evict_old_costly,
+    const auto CanEvict = [this, &aggressive_mode, &evict_old_costly,
                            &evict_bad_overlaps, out_of_memory](ImageId image_id,
                                                                bool* out_must_download = nullptr) {
         const auto& image = slot_images[image_id];
