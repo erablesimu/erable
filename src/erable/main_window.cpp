@@ -463,10 +463,10 @@ MainWindow::MainWindow(bool has_broken_vulkan)
     show();
 
 #ifdef ENABLE_UPDATE_CHECKER
+    update_watcher.connect(&update_watcher, &QFutureWatcher<QString>::finished, this,
+                           &MainWindow::OnEmulatorUpdateAvailable);
     if (UISettings::values.check_for_updates) {
         update_future = QtConcurrent::run([]() { return UpdateChecker::Check(); });
-        update_watcher.connect(&update_watcher, &QFutureWatcher<QString>::finished, this,
-                               &MainWindow::OnEmulatorUpdateAvailable);
         update_watcher.setFuture(update_future);
     }
 #endif
@@ -1040,6 +1040,12 @@ void MainWindow::InitializeWidgets() {
         OnSaveConfig();
     });
     connect(home_screen, &HomeScreen::OpenWhatsNew, this, &MainWindow::OnWhatsNew);
+#ifdef ENABLE_UPDATE_CHECKER
+    connect(home_screen, &HomeScreen::InstallUpdate, this, &MainWindow::ShowPendingUpdate);
+    if (pending_update) {
+        home_screen->SetUpdateAvailable(QString::fromStdString(pending_update->tag));
+    }
+#endif
     connect(home_screen, &HomeScreen::OpenSaves, this, [this] {
         SavesDialog dialog(this);
         dialog.StartWithImport();
@@ -1872,6 +1878,10 @@ void MainWindow::ConnectMenuEvents() {
     connect_menu(ui->action_Data_Manager, &MainWindow::OnDataDialog);
     connect_menu(ui->action_Saves, &MainWindow::OnSavesDialog);
 
+#ifdef ENABLE_UPDATE_CHECKER
+    connect(ui->menu_Help->addAction(tr("Check for Updates...")), &QAction::triggered, this,
+            &MainWindow::CheckForUpdatesNow);
+#endif
 #if defined(ENABLE_UPDATE_CHECKER) && (defined(__linux__) || defined(_WIN32))
     auto* restore_action = ui->menu_Help->addAction(tr("Restore Previous Version..."));
     restore_action->setVisible(false);
@@ -5596,30 +5606,81 @@ void MainWindow::KeepNextendoSessionAlive() {
 #ifdef ENABLE_UPDATE_CHECKER
 void MainWindow::OnEmulatorUpdateAvailable() {
     const auto result = update_future.result();
+    const bool manual = std::exchange(manual_update_check, false);
     if (result.failure == UpdateChecker::Failure::RateLimited) {
-        statusBar()->showMessage(
-            tr("Could not check for updates: GitHub rate limit reached. Erable will try again at "
-               "the next start."),
-            15000);
+        const QString text = tr("Could not check for updates: GitHub rate limit reached. Erable "
+                                "will try again at the next start.");
+        if (manual) {
+            QMessageBox::warning(this, tr("Check for Updates"), text);
+        } else {
+            statusBar()->showMessage(text, 15000);
+        }
         return;
     }
     if (result.failure == UpdateChecker::Failure::Http) {
-        statusBar()->showMessage(
-            tr("Could not check for updates: GitHub answered with HTTP %1.").arg(result.status),
-            15000);
+        const QString text =
+            tr("Could not check for updates: GitHub answered with HTTP %1.").arg(result.status);
+        if (manual) {
+            QMessageBox::warning(this, tr("Check for Updates"), text);
+        } else {
+            statusBar()->showMessage(text, 15000);
+        }
+        return;
+    }
+    if (result.failure != UpdateChecker::Failure::None && manual) {
+        QMessageBox::warning(this, tr("Check for Updates"),
+                             tr("Could not check for updates: no connection to GitHub. Check "
+                                "your Internet connection and try again."));
         return;
     }
     if (!result.update) {
+        pending_update.reset();
+        if (home_screen) {
+            home_screen->SetUpdateAvailable({});
+        }
+        if (manual) {
+            const QString tag = QString::fromUtf8(Common::g_build_release_tag);
+            QMessageBox::information(this, tr("Check for Updates"),
+                                     tag.isEmpty() ? tr("Erable is up to date.")
+                                                   : tr("Erable is up to date (%1).").arg(tag));
+        }
         return;
     }
 
-    const auto& release = *result.update;
+    // Until it is installed, the home keeps an Update button for it: refused, put off or its
+    // install left unfinished at start, it can still be done later
+    pending_update = *result.update;
+    if (home_screen) {
+        home_screen->SetUpdateAvailable(QString::fromStdString(pending_update->tag));
+    }
+
+    const auto& release = *pending_update;
     const auto now = static_cast<unsigned long long>(QDateTime::currentSecsSinceEpoch());
-    if (UISettings::values.skipped_update_tag.GetValue() == release.tag ||
-        UISettings::values.update_remind_at.GetValue() > now) {
+    if (!manual && (UISettings::values.skipped_update_tag.GetValue() == release.tag ||
+                    UISettings::values.update_remind_at.GetValue() > now)) {
         return;
     }
+    ShowPendingUpdate();
+}
 
+void MainWindow::CheckForUpdatesNow() {
+    if (update_watcher.isRunning()) {
+        manual_update_check = true;
+        return;
+    }
+    manual_update_check = true;
+    statusBar()->showMessage(tr("Checking for updates..."), 5000);
+    update_future = QtConcurrent::run([]() { return UpdateChecker::Check(); });
+    update_watcher.setFuture(update_future);
+}
+
+void MainWindow::ShowPendingUpdate() {
+    if (!pending_update) {
+        CheckForUpdatesNow();
+        return;
+    }
+    const auto release = *pending_update;
+    const auto now = static_cast<unsigned long long>(QDateTime::currentSecsSinceEpoch());
     UpdateDialog dialog(release, this);
     switch (dialog.exec()) {
     case UpdateDialog::SkipVersion:
@@ -5629,6 +5690,7 @@ void MainWindow::OnEmulatorUpdateAvailable() {
         UISettings::values.update_remind_at = now + 24 * 60 * 60;
         break;
     default:
+        // Installing: Erable restarts on the new version. The button stays if it did not.
         return;
     }
     OnSaveConfig();

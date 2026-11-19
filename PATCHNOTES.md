@@ -5,6 +5,14 @@ version. Les sections suivantes gardent l'historique.
 
 ## Nouveautés de cette version
 
+**Mises à jour**
+- Une mise à jour refusée, reportée ou pas terminée au lancement n'est plus perdue : un bouton
+  « Mise à jour » apparaît dans le dock de l'accueil tant qu'elle n'est pas installée, et
+  l'installe en un clic.
+- Nouveau : Aide > « Rechercher les mises à jour… », pour vérifier à tout moment (même si la
+  recherche au lancement est désactivée). Erable dit s'il est à jour ou pourquoi la recherche a
+  échoué.
+
 **À savoir**
 - Cette version change de nouveau le traducteur de shaders : les shaders sont recompilés une
   fois au premier lancement de chaque jeu. Dès 60 %, vous pouvez choisir « Jouer maintenant ».

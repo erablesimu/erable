@@ -23,6 +23,7 @@ class GameList;
 class CaseShelf;
 class PillButton;
 class LaunchOverlay;
+class QAbstractButton;
 class QNetworkAccessManager;
 class QLabel;
 class QLineEdit;
@@ -62,6 +63,10 @@ public:
     /// Whether the window fills the screen: the full screen button says how to leave it.
     void SetFullscreen(bool fullscreen);
 
+    /// Shows the dock's Update button for the version `tag` found and not installed, or hides it
+    /// (empty `tag`).
+    void SetUpdateAvailable(const QString& tag);
+
     /// The folder Erable reads the player's games from first (Documents\Erable\Jeux).
     [[nodiscard]] static QString GamesFolder();
     /// Every Documents\Erable\Jeux folder there is: the first is GamesFolder(). With OneDrive
@@ -78,6 +83,8 @@ signals:
     /// The dock's Saves button: the saves window, opened on taking another emulator's saves.
     void OpenSaves();
     void ReportProblem();
+    /// The dock's Update button: install the version found and not installed.
+    void InstallUpdate();
     /// The music or the shelf style changed: saved at once, so a crash or a forced close keeps it.
     void HomeSettingsChanged();
     /// The theme button picked the next theme (in UISettings): MainWindow applies it.
@@ -126,6 +133,7 @@ private:
     PlayTime::PlayTimeManager& play_time;
     Core::System& system;
     QMenu* debug_menu = nullptr;
+    QAbstractButton* update_button = nullptr;
     ControllerNavigation* controller = nullptr;
 
     std::vector<Game> games;

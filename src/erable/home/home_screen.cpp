@@ -157,7 +157,7 @@ QPainterPath MapleLeaf(QPointF centre, double size) {
     return path;
 }
 
-enum class Icon { Library, News, Folder, Captures, Saves, Debug, Settings };
+enum class Icon { Library, News, Folder, Captures, Saves, Debug, Settings, Update };
 
 /// The dock's line icons, drawn on a 24-unit grid in `box`.
 void DrawIcon(QPainter& painter, Icon icon, const QRectF& box, const QColor& color) {
@@ -233,6 +233,13 @@ void DrawIcon(QPainter& painter, Icon icon, const QRectF& box, const QColor& col
                  {{2, 12}, {5, 12}}, {{19, 12}, {22, 12}}, {{4.9, 19.1}, {7, 17}}, {{17, 7}, {19.1, 4.9}}}}) {
             painter.drawLine(from, to);
         }
+        break;
+    case Icon::Update:
+        // A circling arrow around a downward one: a new version to install
+        painter.drawArc(QRectF{3, 3, 18, 18}, 120 * 16, 300 * 16);
+        painter.drawPolyline(QPolygonF{{QPointF{4.5, 3.5}, QPointF{7.5, 7.2}, QPointF{3.3, 8.5}}});
+        painter.drawLine(QPointF{12, 7.5}, QPointF{12, 15.5});
+        painter.drawPolyline(QPolygonF{{QPointF{9, 12.5}, QPointF{12, 15.5}, QPointF{15, 12.5}}});
         break;
     }
     painter.restore();
@@ -370,6 +377,12 @@ public:
         setFocusPolicy(Qt::NoFocus);
     }
 
+    /// A red dot on the circle: something waits there (an update not installed)
+    void SetDot(bool dot) {
+        dot_ = dot;
+        update();
+    }
+
 protected:
     void paintEvent(QPaintEvent*) override {
         QPainter painter{this};
@@ -385,6 +398,11 @@ protected:
         painter.setBrush(Surface);
         painter.drawEllipse(circle);
         DrawIcon(painter, icon_, circle.adjusted(16, 16, -16, -16), Maple);
+        if (dot_) {
+            painter.setPen(QPen{Surface, 2});
+            painter.setBrush(QColor{0xe5, 0x53, 0x4b});
+            painter.drawEllipse(QPointF{circle.right() - 8, circle.top() + 8}, 7, 7);
+        }
         painter.setPen(Muted);
         painter.setFont(MakeFont(HomeFonts().body, 12));
         painter.drawText(QRectF{0, 68, 88, 24}, Qt::AlignHCenter | Qt::AlignTop, text());
@@ -400,6 +418,7 @@ protected:
 
 private:
     Icon icon_;
+    bool dot_ = false;
 };
 
 /// Over the home while a game starts: the game's picture, its name and a turning ring, so the
@@ -725,6 +744,13 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     });
     connect(add_dock(Icon::Settings, tr("Settings")), &QAbstractButton::clicked, this,
             &HomeScreen::OpenSettings);
+    // Shown only while a newer version was found and not installed (refused, put off, or its
+    // install not finished)
+    DockButton* const update_dock = add_dock(Icon::Update, tr("Update"));
+    update_dock->SetDot(true);
+    update_dock->hide();
+    connect(update_dock, &QAbstractButton::clicked, this, &HomeScreen::InstallUpdate);
+    update_button = update_dock;
     dock->addStretch();
     layout->addLayout(dock);
 
@@ -1225,6 +1251,15 @@ void HomeScreen::ToggleFavorite() {
             Select(static_cast<int>(i));
         }
     }
+}
+
+void HomeScreen::SetUpdateAvailable(const QString& tag) {
+    if (update_button == nullptr) {
+        return;
+    }
+    update_button->setToolTip(tag.isEmpty() ? QString{}
+                                            : tr("Install the new version of Erable (%1)").arg(tag));
+    update_button->setVisible(!tag.isEmpty());
 }
 
 void HomeScreen::OpenGamesFolder() {

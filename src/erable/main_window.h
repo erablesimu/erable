@@ -479,6 +479,10 @@ private slots:
 
 #ifdef ENABLE_UPDATE_CHECKER
     void OnEmulatorUpdateAvailable();
+    /// Help > Check for Updates: looks again now, and says so when Erable is up to date
+    void CheckForUpdatesNow();
+    /// The update dialog for the version found and not installed (the home's Update button)
+    void ShowPendingUpdate();
 #endif
     void KeepNextendoSessionAlive();
 
@@ -542,6 +546,10 @@ private:
 #ifdef ENABLE_UPDATE_CHECKER
     QFuture<UpdateChecker::CheckResult> update_future;
     QFutureWatcher<UpdateChecker::CheckResult> update_watcher;
+    /// The newer version found and not installed yet: the home shows an Update button for it
+    std::optional<Common::Net::Release> pending_update;
+    /// The check running was asked for from the menu: its result is always said
+    bool manual_update_check = false;
 #endif
 
     MultiplayerState* multiplayer_state = nullptr;

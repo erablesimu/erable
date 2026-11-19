@@ -136,6 +136,14 @@ Ses sauvegardes restent sur le disque, mais plus aucun profil d&apos;Erable ne l
 <context>
     <name>HomeScreen</name>
     <message>
+        <source>Update</source>
+        <translation>Mise à jour</translation>
+    </message>
+    <message>
+        <source>Install the new version of Erable (%1)</source>
+        <translation>Installer la nouvelle version d'Erable (%1)</translation>
+    </message>
+    <message>
         <source>Starting the game...</source>
         <translation>Lancement du jeu…</translation>
     </message>
@@ -7350,6 +7358,38 @@ Message de débogage :</translation>
 </context>
 <context>
     <name>MainWindow</name>
+    <message>
+        <source>Check for Updates...</source>
+        <translation>Rechercher les mises à jour…</translation>
+    </message>
+    <message>
+        <source>Check for Updates</source>
+        <translation>Rechercher les mises à jour</translation>
+    </message>
+    <message>
+        <source>Checking for updates...</source>
+        <translation>Recherche des mises à jour…</translation>
+    </message>
+    <message>
+        <source>Could not check for updates: GitHub rate limit reached. Erable will try again at the next start.</source>
+        <translation>Impossible de rechercher les mises à jour : GitHub limite les demandes pour le moment. Erable réessaiera au prochain lancement.</translation>
+    </message>
+    <message>
+        <source>Could not check for updates: GitHub answered with HTTP %1.</source>
+        <translation>Impossible de rechercher les mises à jour : GitHub a répondu par une erreur HTTP %1.</translation>
+    </message>
+    <message>
+        <source>Could not check for updates: no connection to GitHub. Check your Internet connection and try again.</source>
+        <translation>Impossible de rechercher les mises à jour : pas de connexion à GitHub. Vérifiez votre connexion Internet puis réessayez.</translation>
+    </message>
+    <message>
+        <source>Erable is up to date.</source>
+        <translation>Erable est à jour.</translation>
+    </message>
+    <message>
+        <source>Erable is up to date (%1).</source>
+        <translation>Erable est à jour (%1).</translation>
+    </message>
     <message>
         <location filename="../../src/erable/main.ui" line="14"/>
         <source>Erable</source>
