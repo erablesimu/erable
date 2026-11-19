@@ -11,6 +11,13 @@ version. Les sections suivantes gardent l'historique.
 - Build 41 : sur les cartes NVIDIA, Erable garde son propre cache de shaders, pour que les mises
   à jour suivantes ne recompilent plus tout.
 
+**Processeurs Intel récents**
+- Sur les Intel à cœurs « performance » et « efficacité » (12e à 14e génération, Core Ultra),
+  Erable n'oblige plus ses fils les plus pressés à rester sur les cœurs performance : Windows les
+  y place en priorité et peut déborder sur les autres. Les forcer les faisait attendre les uns
+  derrière les autres (jusqu'à deux fois moins d'images par seconde sur certains processeurs).
+  L'ancien comportement reste possible avec `EDEN_HYBRID_CORES=1`.
+
 **Images et textures**
 - Les images que le GPU dessine et que le jeu relit ensuite sont mieux recopiées dans sa mémoire :
   moins d'objets noirs, de motifs « arc-en-ciel » ou d'éléments périmés quand une image est

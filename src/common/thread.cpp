@@ -454,25 +454,32 @@ void RememberCurrentThreadNice(pid_t tid, s32 nice_value) {
 
 #ifdef _WIN32
 namespace {
-// Hybrid CPUs (Intel P/E cores): Windows alone may run the emulator's time-critical threads on an
-// efficiency core, where a frame takes much longer. Keep them on the fastest cores with CPU sets
-// (a soft affinity the power manager respects) and background workers on the slower ones.
-// EDEN_HYBRID_CORES=0 turns this off.
+// Hybrid CPUs (Intel P/E cores). Background workers keep off the performance cores with CPU sets.
+// The time-critical threads (guest cores, GPU threads, Vulkan worker, timing, fencing, present:
+// about twelve) are left to Windows by default: the process is high QoS (SetHighQoS), so Windows
+// runs them on the performance cores first and moves them to the efficiency cores when those are
+// busy. Holding them to the performance cores made them queue behind each other while the
+// efficiency cores idled: on a 6 P-core Core Ultra 7 255H, guest timers late 175 times a second
+// instead of 2, and 13.3 FPS instead of 30.9.
+// EDEN_HYBRID_CORES: unset or 2 = that (soft), 1 = time-critical threads held to the performance
+// cores (strict, as before), 0 = no placement at all.
 struct WindowsCpuSets {
     std::vector<Common::LogicalProcessor> processors;
     std::vector<ULONG> performance;
     std::vector<ULONG> efficiency;
     bool hybrid = false;
+    bool strict = false; ///< Time-critical threads held to the performance cores
 };
 
 const WindowsCpuSets& CpuSets() {
     static const WindowsCpuSets sets = [] {
         WindowsCpuSets result;
-        if (const char* text = std::getenv("EDEN_HYBRID_CORES");
-            text != nullptr && std::strtol(text, nullptr, 10) == 0) {
+        const char* mode = std::getenv("EDEN_HYBRID_CORES");
+        if (mode != nullptr && *mode != '\0' && std::strtol(mode, nullptr, 10) == 0) {
             LOG_INFO(Common, "Hybrid core placement off (EDEN_HYBRID_CORES=0)");
             return result;
         }
+        result.strict = mode != nullptr && std::strtol(mode, nullptr, 10) == 1;
         using PFN_GetSystemCpuSetInformation = BOOL(WINAPI*)(PSYSTEM_CPU_SET_INFORMATION, ULONG,
                                                              PULONG, HANDLE, ULONG);
         const HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
@@ -526,8 +533,12 @@ const WindowsCpuSets& CpuSets() {
         if (result.hybrid) {
             LOG_INFO(Common,
                      "Hybrid CPU: {} performance and {} efficiency logical processors, "
-                     "time-critical threads stay on the performance cores",
-                     result.performance.size(), result.efficiency.size());
+                     "time-critical threads {} (EDEN_HYBRID_CORES={})",
+                     result.performance.size(), result.efficiency.size(),
+                     result.strict
+                         ? "held to the performance cores"
+                         : "left to Windows, background workers off the performance cores",
+                     result.strict ? 1 : 2);
         }
         return result;
     }();
@@ -722,8 +733,11 @@ void SetCurrentThreadToPerformanceCores() {
     }
     SetCurrentThreadCoreGroup(CoreGroup::Performance);
 #elif defined(_WIN32)
+    // Soft placement by default: Windows already prefers the performance cores for this
+    // high-QoS process, and may spill to the others when they are all busy. A thread that had
+    // been put on the efficiency cores gets all of them back.
     if (const WindowsCpuSets& sets = CpuSets(); sets.hybrid) {
-        SelectCurrentThreadCpuSets(sets.performance);
+        SelectCurrentThreadCpuSets(sets.strict ? sets.performance : std::vector<ULONG>{});
     }
 #endif
 }
