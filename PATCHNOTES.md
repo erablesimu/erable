@@ -5,6 +5,14 @@ version. Les sections suivantes gardent l'historique.
 
 ## Nouveautés de cette version
 
+**Moins de saccades quand la mémoire manque**
+- Quand le cache de textures doit libérer de la place en urgence, il jette d'abord les images
+  qu'il n'a pas besoin de recopier, au lieu d'attendre la carte graphique pour chacune. Dans
+  Ocarina of Time, avec la mémoire de Windows presque pleine, il attendait 1 441 fois en
+  20 minutes, dans presque chaque saccade.
+- Conseil : si Erable saccade sur un PC bien équipé, agrandissez le fichier d'échange de Windows
+  (« Gestion automatique » ou au moins 16 Go) et fermez les programmes gourmands.
+
 **Réglages recommandés selon votre PC**
 - Aide > « Appliquer les réglages recommandés » choisit aussi la résolution, le mode de la console
   et la mise à l'échelle selon votre carte graphique, votre processeur et votre mémoire :

@@ -213,9 +213,14 @@ void TextureCache<P>::RunGarbageCollector(bool out_of_memory) {
     bool async_downloads = download_overlaps && AsyncOverlapDownloadsEnabled();
     KeepRanges keep;
     WritebackRanges::TickedRanges keep_ticks;
-    const auto CanEvict = [this, &aggressive_mode, &evict_old_costly,
-                           &evict_bad_overlaps, out_of_memory](ImageId image_id,
-                                                               bool* out_must_download = nullptr) {
+    // Short of memory, the images that go without a download go first: each GPU-written one is
+    // read back with a full GPU wait (runtime.Finish below). Ocarina of Time with Windows' commit
+    // nearly full held the cache under its usage, and the collector waited 1,441 times in 20
+    // minutes, in nearly every hitch.
+    bool defer_downloads = false;
+    const auto CanEvict = [this, &aggressive_mode, &evict_old_costly, &evict_bad_overlaps,
+                           &defer_downloads, out_of_memory](ImageId image_id,
+                                                            bool* out_must_download = nullptr) {
         const auto& image = slot_images[image_id];
         if (True(image.flags & ImageFlagBits::IsDecoding) ||
             (evict_bad_overlaps && False(image.flags & ImageFlagBits::BadOverlap))) {
@@ -233,7 +238,8 @@ void TextureCache<P>::RunGarbageCollector(bool out_of_memory) {
         // images in 10 s, each one a full GPU wait in the middle of the load.
         if ((!aggressive_mode && !evict_old_costly &&
              True(image.flags & ImageFlagBits::CostlyLoad)) ||
-            (!aggressive_mode && !out_of_memory && must_download)) {
+            (!aggressive_mode && !out_of_memory && must_download) ||
+            (defer_downloads && must_download)) {
             return false;
         }
         return true;
@@ -444,7 +450,12 @@ void TextureCache<P>::RunGarbageCollector(bool out_of_memory) {
     Collect();
     if (out_of_memory || total_used_memory >= critical_memory) {
         Configure(true);
+        defer_downloads = !out_of_memory;
         Collect();
+        defer_downloads = false;
+        if (out_of_memory || total_used_memory >= critical_memory) {
+            Collect();
+        }
     }
     if (!overlap_downloads.empty() && async_downloads) {
         std::stable_sort(overlap_downloads.begin(), overlap_downloads.end(),
