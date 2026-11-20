@@ -45,6 +45,10 @@
 #include "frontend_common/update_checker.h"
 #endif
 
+namespace Settings {
+struct RecommendedSettingChange;
+}
+
 class QtConfig;
 class EmuThread;
 class GameList;
@@ -426,6 +430,8 @@ private slots:
     void OnAbout();
     void OnEdenDependencies();
     void OnApplyRecommendedSettings();
+    /// Puts the games' names in place of their program ids in the changes' per-game configs
+    void NameGamesInChanges(std::vector<Settings::RecommendedSettingChange>& changes) const;
     void OnRestorePreviousSettings();
     void OnDataDialog();
     void OnSavesDialog();

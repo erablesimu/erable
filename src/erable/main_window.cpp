@@ -8,6 +8,7 @@
 #undef VMA_IMPLEMENTATION
 #endif
 
+#include <map>
 #include <QSysInfo>
 #include <boost/algorithm/string/split.hpp>
 #include "common/fs/path_util.h"
@@ -140,6 +141,8 @@ static FileSys::VirtualFile VfsDirectoryCreateFileWrapper(const FileSys::Virtual
 // Frontend //
 #include "frontend_common/play_time_manager.h"
 #include "frontend_common/recommended_settings.h"
+#include "qt_common/game_list/game_list_p.h"
+#include <QRegularExpression>
 
 #include "erable/debug_session.h"
 #include "erable/home/home_screen.h"
@@ -4880,6 +4883,41 @@ void MainWindow::OnEdenDependencies() {
     depsDialog.exec();
 }
 
+void MainWindow::NameGamesInChanges(std::vector<Settings::RecommendedSettingChange>& changes) const {
+    // Per-game configs are named by program id: the game list knows their names
+    std::map<u64, QString> names;
+    const QStandardItemModel* model = game_list->GetModel();
+    const auto visit = [&](auto&& self, const QModelIndex& parent) -> void {
+        for (int i = 0; i < model->rowCount(parent); ++i) {
+            const QModelIndex index = model->index(i, 0, parent);
+            const QStandardItem* item = model->itemFromIndex(index);
+            if (!item) {
+                continue;
+            }
+            if (item->data(GameListItem::TypeRole).value<GameListItemType>() ==
+                GameListItemType::Game) {
+                QString title = item->data(GameListItemPath::TitleRole).toString();
+                static const QRegularExpression title_id{
+                    QStringLiteral(R"(\s*\[[0-9A-Fa-f]{16}\]\s*$)")};
+                title.remove(title_id);
+                if (!title.isEmpty()) {
+                    names.emplace(item->data(GameListItemPath::ProgramIdRole).toULongLong(),
+                                  title);
+                }
+            }
+            self(self, index);
+        }
+    };
+    visit(visit, QModelIndex{});
+    for (auto& change : changes) {
+        bool ok = false;
+        const u64 program_id = QString::fromStdString(change.game).toULongLong(&ok, 16);
+        if (const auto it = names.find(program_id); ok && it != names.end()) {
+            change.game = it->second.toStdString();
+        }
+    }
+}
+
 void MainWindow::OnApplyRecommendedSettings() {
     if (emulation_running) {
         return;
@@ -4891,8 +4929,9 @@ void MainWindow::OnApplyRecommendedSettings() {
     // The settings that depend on the PC (resolution, console mode, upscaler) come with them
     const auto hardware =
         VkDeviceInfo::ProbeHostHardware(Settings::values.vulkan_device.GetValue());
-    const auto changes = FrontendCommon::ApplyRecommendedSettings(
+    auto changes = FrontendCommon::ApplyRecommendedSettings(
         Settings::values, hardware ? &*hardware : nullptr);
+    NameGamesInChanges(changes);
     LOG_INFO(Config, "Applied the recommended settings: {} changed", changes.size());
     Settings::UpdateGPUAccuracy();
     OnSaveConfig();
@@ -4904,7 +4943,8 @@ void MainWindow::OnRestorePreviousSettings() {
     if (emulation_running) {
         return;
     }
-    const auto changes = FrontendCommon::RestorePreviousSettings(Settings::values);
+    auto changes = FrontendCommon::RestorePreviousSettings(Settings::values);
+    NameGamesInChanges(changes);
     LOG_INFO(Config, "Restored the settings from before the recommended ones: {} changed",
              changes.size());
     Settings::UpdateGPUAccuracy();
