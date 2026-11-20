@@ -477,13 +477,18 @@ Network::IPv4Address LANDiscovery::GetLocalIp() const {
     if (direct_lan) {
         return direct_lan->GetLocalIp();
     }
-    Network::IPv4Address local_ip{0xFF, 0xFF, 0xFF, 0xFF};
     if (auto room_member = Network::GetRoomMember().lock()) {
         if (room_member->IsConnected()) {
-            local_ip = room_member->GetFakeIpAddress();
+            return room_member->GetFakeIpAddress();
         }
     }
-    return local_ip;
+    // Without a room or the same-network mode, nobody else can join, but a game may still host
+    // alone. It checks its node against GetIpv4Address, which gives the selected interface's
+    // address: 255.255.255.255 there made Mario Kart World drop the group and show an error.
+    if (const auto network_interface = Network::GetSelectedNetworkInterface()) {
+        return Network::TranslateIPv4(network_interface->ip_address);
+    }
+    return {0xFF, 0xFF, 0xFF, 0xFF};
 }
 
 template <typename Data>
