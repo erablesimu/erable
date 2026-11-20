@@ -25,6 +25,13 @@ version. Les sections suivantes gardent l'historique.
 - On écrit à ses amis depuis l'onglet Amis du panneau, qu'ils soient dans un salon ou non. Les
   messages sont gardés 15 jours sur le serveur, puis effacés.
 
+**Pas de mods ni de codes de triche dans les salons**
+- Lancer depuis l'accueil un jeu qui a des mods ou des codes de triche activés, en étant dans un
+  salon, propose de les mettre en pause d'un clic (ou de jouer hors ligne avec). Les correctifs
+  intégrés d'Erable ne comptent pas : tout le monde les a.
+- Les mods mis en pause reviennent tout seuls en passant hors ligne, en quittant le salon ou au
+  lancement suivant d'Erable.
+
 **Filtre à insultes**
 - Dans les messages entre amis, les insultes et gros mots des langues européennes s'affichent
   en étoiles (français, anglais, espagnol, italien, allemand, portugais, néerlandais, polonais,

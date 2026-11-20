@@ -3,9 +3,14 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include <QFrame>
 #include <QString>
 #include <QTimer>
+
+#include "common/common_types.h"
 
 class QLabel;
 class QLineEdit;
@@ -40,9 +45,15 @@ public:
     /// The friend requests and unread messages, for the status button's count
     int AlertCount() const;
 
-    /// Whether `title` may start: in a room another game holds, it may not, and the player is told
-    /// so and offered the room list. Called before the home launches a game.
-    bool MayLaunch(const QString& title);
+    /// Whether a room is joined (its mods then checked before a game starts)
+    bool InRoom() const {
+        return JoinedPort() != 0;
+    }
+
+    /// Whether `title` may start: not in a room another game holds (the room list is offered),
+    /// nor with mods or cheats in a room (`mods`, the game's enabled ones: they can be paused, or
+    /// the room left). Called before the home launches a game.
+    bool MayLaunch(const QString& title, u64 program_id, const std::vector<std::string>& mods);
 
     /// Follows the theme's palette
     void RefreshStyle();
@@ -50,6 +61,8 @@ public:
 signals:
     /// The status text, the online state or the alert count changed
     void StatusChanged();
+    /// Mods were paused for the online play or turned back on: the configuration to save
+    void ModsChanged();
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
@@ -76,6 +89,8 @@ private:
     void LeaveRoom();
     void GoOffline();
     void ToggleWiFi();
+    /// Turns back on the mods paused for the online play, saying so
+    void RestoreMods();
     void OpenConversation(const QString& friend_code, const QString& nickname);
     void CloseConversation();
     void FetchConversation();
@@ -96,6 +111,7 @@ private:
     QStackedWidget* pages = nullptr;
 
     QLabel* offline_account = nullptr;
+    QLabel* mods_note = nullptr;
     QPushButton* wifi_button = nullptr;
 
     QWidget* room_card = nullptr;

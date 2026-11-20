@@ -12581,6 +12581,34 @@ Entrez votre mot de passe pour confirmer :</translation>
 <context>
     <name>Online::OnlinePanel</name>
     <message>
+        <source>No mods in the rooms</source>
+        <translation>Pas de mods dans les salons</translation>
+    </message>
+    <message>
+        <source>Mods and cheats are not allowed in the rooms of the Erable server. %1 has these on:
+
+%2
+
+Pause them to play online: they come back when you go offline, leave the room or start Erable again.</source>
+        <translation>Les mods et les codes de triche sont interdits dans les salons du serveur Erable. %1 a ceux-ci d’activés :
+
+%2
+
+Mets-les en pause pour jouer en ligne : ils reviennent quand tu passes hors ligne, quittes le salon ou relances Erable.</translation>
+    </message>
+    <message>
+        <source>Pause them and play</source>
+        <translation>Les mettre en pause et jouer</translation>
+    </message>
+    <message>
+        <source>Play offline with them</source>
+        <translation>Jouer hors ligne avec</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n mod(s) paused for the online play turned back on.</source>
+        <translation><numerusform>%n mod mis en pause pour le jeu en ligne est réactivé.</numerusform><numerusform>%n mods mis en pause pour le jeu en ligne sont réactivés.</numerusform><numerusform>%n mods mis en pause pour le jeu en ligne sont réactivés.</numerusform></translation>
+    </message>
+    <message>
         <source>Your nickname holds an insult or a swear word. Choose another one to play online and write to your friends.</source>
         <translation>Ton pseudo contient une insulte ou un gros mot. Choisis-en un autre pour jouer en ligne et écrire à tes amis.</translation>
     </message>

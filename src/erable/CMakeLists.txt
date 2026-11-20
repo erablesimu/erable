@@ -47,6 +47,8 @@ add_executable(erable
     online/online_account.h
     online/online_mode.cpp
     online/online_mode.h
+    online/online_mods.cpp
+    online/online_mods.h
     online/online_panel.cpp
     online/online_panel.h
     local_report.cpp

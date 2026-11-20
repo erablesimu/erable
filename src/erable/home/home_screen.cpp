@@ -50,6 +50,7 @@
 #include "erable/home/case_shelf.h"
 #include "erable/home/profile_picker.h"
 #include "erable/online/online_account.h"
+#include "erable/online/online_mods.h"
 #include "erable/online/online_panel.h"
 #include "erable/util/controller_navigation.h"
 #include "frontend_common/play_time_manager.h"
@@ -630,6 +631,8 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
                 &Online::OnlinePanel::Toggle);
         connect(online_panel, &Online::OnlinePanel::StatusChanged, this,
                 &HomeScreen::UpdateOnlineButton);
+        connect(online_panel, &Online::OnlinePanel::ModsChanged, this,
+                &HomeScreen::HomeSettingsChanged);
         right->addWidget(online_button);
         UpdateOnlineButton();
     }
@@ -1232,8 +1235,14 @@ void HomeScreen::UpdateSelection() {
 void HomeScreen::Launch() {
     if (selected < static_cast<int>(games.size())) {
         const Game& game = games[selected];
-        if (online_panel && !online_panel->MayLaunch(game.title)) {
-            return;
+        if (online_panel) {
+            std::vector<std::string> mods;
+            if (online_panel->InRoom()) {
+                mods = Online::Mods::Active(system, game.program_id);
+            }
+            if (!online_panel->MayLaunch(game.title, game.program_id, mods)) {
+                return;
+            }
         }
         music.Stop();
         if (launch_overlay == nullptr) {

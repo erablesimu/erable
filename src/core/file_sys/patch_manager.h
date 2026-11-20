@@ -116,6 +116,10 @@ public:
     // Returns a vector of patches
     [[nodiscard]] std::vector<Patch> GetPatches(VirtualFile update_raw = nullptr) const;
 
+    // Whether `name` is one of Erable's built-in patches of the title, which every player has,
+    // rather than a mod the player added
+    [[nodiscard]] static bool IsBuiltinPatch(u64 title_id, std::string_view name);
+
     // If the game update exists, returns the u32 version field in its Meta-type NCA. If that fails,
     // it will fallback to the Meta-type NCA of the base game. If that fails, the result will be
     // std::nullopt

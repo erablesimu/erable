@@ -30,6 +30,7 @@
 #include "erable/online/friends_dialog.h"
 #include "erable/online/online_account.h"
 #include "erable/online/online_mode.h"
+#include "erable/online/online_mods.h"
 #include "network/network.h"
 #include "network/room_member.h"
 
@@ -146,6 +147,8 @@ OnlinePanel::OnlinePanel(const QString& display_font, const QString& body_font, 
     RebuildFriends();
     RebuildAlerts();
     Update();
+    // Erable starts offline: mods a former session paused come back
+    QTimer::singleShot(0, this, &OnlinePanel::RestoreMods);
 }
 
 OnlinePanel::~OnlinePanel() = default;
@@ -176,6 +179,9 @@ void OnlinePanel::BuildOfflinePage() {
     wifi_button = MakeButton({}, "row", page_widget);
     connect(wifi_button, &QPushButton::clicked, this, &OnlinePanel::ToggleWiFi);
     column->addWidget(wifi_button);
+    mods_note = MakeLabel({}, "hint", page_widget);
+    mods_note->hide();
+    column->addWidget(mods_note);
     column->addStretch();
     column->addWidget(MakeLabel(tr("Friends and alerts show once you are online."), "hint",
                                 page_widget));
@@ -702,6 +708,7 @@ void OnlinePanel::Choose(unsigned port) {
 void OnlinePanel::LeaveRoom() {
     SetMode(Mode::Off);
     ApplyMode(account, {});
+    RestoreMods();
     online = true;
     ShowTab(Tab::Rooms);
     RebuildRooms();
@@ -711,6 +718,7 @@ void OnlinePanel::LeaveRoom() {
 void OnlinePanel::GoOffline() {
     SetMode(Mode::Off);
     ApplyMode(account, {});
+    RestoreMods();
     online = false;
     CloseConversation();
     Update();
@@ -904,9 +912,48 @@ void OnlinePanel::SendToFriend() {
     });
 }
 
-bool OnlinePanel::MayLaunch(const QString& game_title) {
+void OnlinePanel::RestoreMods() {
+    const int restored = Mods::Restore();
+    if (restored == 0) {
+        return;
+    }
+    mods_note->setText(tr("%n mod(s) paused for the online play turned back on.", "", restored));
+    mods_note->show();
+    emit ModsChanged();
+}
+
+bool OnlinePanel::MayLaunch(const QString& game_title, u64 program_id,
+                            const std::vector<std::string>& mods) {
     const unsigned port = JoinedPort();
-    if (port == 0 || !account || game_title.isEmpty()) {
+    if (port == 0 || !account) {
+        return true;
+    }
+    if (!mods.empty()) {
+        QStringList names;
+        for (const std::string& name : mods) {
+            names.append(QStringLiteral("• ") + QString::fromStdString(name));
+        }
+        QMessageBox box(QMessageBox::Information, tr("No mods in the rooms"),
+                        tr("Mods and cheats are not allowed in the rooms of the Erable server. "
+                           "%1 has these on:\n\n%2\n\nPause them to play online: they come back "
+                           "when you go offline, leave the room or start Erable again.")
+                            .arg(game_title, names.join(QLatin1Char('\n'))),
+                        QMessageBox::NoButton, window());
+        QPushButton* pause = box.addButton(tr("Pause them and play"), QMessageBox::AcceptRole);
+        QPushButton* offline = box.addButton(tr("Play offline with them"), QMessageBox::ActionRole);
+        box.addButton(QMessageBox::Cancel);
+        box.exec();
+        if (box.clickedButton() == pause) {
+            Mods::Pause(program_id, mods);
+            emit ModsChanged();
+        } else if (box.clickedButton() == offline) {
+            GoOffline();
+            return true;
+        } else {
+            return false;
+        }
+    }
+    if (game_title.isEmpty()) {
         return true;
     }
     for (const Room& room : account->Rooms()) {

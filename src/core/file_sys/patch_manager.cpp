@@ -1383,6 +1383,12 @@ VirtualFile PatchManager::PatchRomFS(const NCA* base_nca, VirtualFile base_romfs
     return romfs;
 }
 
+bool PatchManager::IsBuiltinPatch(u64 title_id, std::string_view name) {
+    return std::ranges::any_of(BUILTIN_PATCHES, [&](const BuiltinPatch& patch) {
+        return patch.title_id == title_id && patch.name == name;
+    });
+}
+
 std::vector<Patch> PatchManager::GetPatches(VirtualFile update_raw) const {
     if (title_id == 0) {
         return {};
