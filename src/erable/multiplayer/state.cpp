@@ -148,7 +148,7 @@ void MultiplayerState::UpdateNotificationStatus() {
 }
 
 void MultiplayerState::OnNetworkStateChanged(const Network::RoomMember::State& state) {
-    LOG_DEBUG(Frontend, "Network State: {}", Network::GetStateStr(state));
+    LOG_INFO(Network, "Room state: {}", Network::GetStateStr(state));
     if (state == Network::RoomMember::State::Joined ||
         state == Network::RoomMember::State::Moderator) {
 
@@ -162,7 +162,7 @@ void MultiplayerState::OnNetworkStateChanged(const Network::RoomMember::State& s
 }
 
 void MultiplayerState::OnNetworkError(const Network::RoomMember::Error& error) {
-    LOG_DEBUG(Frontend, "Network Error: {}", Network::GetErrorStr(error));
+    LOG_WARNING(Network, "Room error: {}", Network::GetErrorStr(error));
     switch (error) {
     case Network::RoomMember::Error::LostConnection:
         NetworkMessage::ErrorManager::ShowError(NetworkMessage::ErrorManager::LOST_CONNECTION);

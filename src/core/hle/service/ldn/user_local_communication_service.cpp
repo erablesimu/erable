@@ -293,6 +293,17 @@ Result IUserLocalCommunicationService::Initialize(ClientProcessId aruid) {
 
     // A joined room carries the guest's sockets, so it carries LDN too
     auto room_member = Network::GetRoomMember().lock();
+    if (room_member && room_member->IsConnected()) {
+        const auto& ip = room_member->GetFakeIpAddress();
+        LOG_INFO(Service_LDN, "Local play goes through the room, {} members, room address {}.{}.{}.{}",
+                 room_member->GetMemberInformation().size(), ip[0], ip[1], ip[2], ip[3]);
+    } else if (Settings::values.lan_play.GetValue()) {
+        LOG_INFO(Service_LDN, "Local play goes through the same network ({})",
+                 network_interface->name);
+    } else {
+        LOG_WARNING(Service_LDN, "Local play has no room and no same-network mode: nobody else "
+                                 "can see this console's groups");
+    }
     if (Settings::values.lan_play.GetValue() && !(room_member && room_member->IsConnected())) {
         R_TRY(lan_discovery.Initialize([&]() { OnEventFired(); }, network_interface));
         is_initialized = true;
