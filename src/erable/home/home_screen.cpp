@@ -607,7 +607,6 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
             emit HomeSettingsChanged();
         }
     });
-    right->addWidget(music_button);
     song_button = new PillButton({}, {}, false, this);
     song_button->setToolTip(tr("Next tune"));
     connect(song_button, &QAbstractButton::clicked, this, [this] {
@@ -619,7 +618,6 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         UpdateMusic();
         emit HomeSettingsChanged();
     });
-    right->addWidget(song_button);
     style_button = new PillButton({}, {}, false, this);
     style_button->setToolTip(tr("How the games are shown"));
     connect(style_button, &QAbstractButton::clicked, this, [this] {
@@ -643,7 +641,6 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         emit ThemeChangeRequested();
         emit HomeSettingsChanged();
     });
-    right->addWidget(theme_button);
     // Online play: the status, which opens the panel on the right
     if (Online::Account::Enabled()) {
         online_panel = new Online::OnlinePanel(fonts.display, fonts.body, this);
@@ -742,7 +739,6 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     // Dock of round buttons
     auto* dock = new QHBoxLayout;
     dock->setSpacing(10);
-    dock->addStretch();
     const auto add_dock = [this, dock](Icon icon, const QString& label) {
         auto* button = new DockButton(icon, label, this);
         dock->addWidget(button);
@@ -793,8 +789,19 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
     update_dock->hide();
     connect(update_dock, &QAbstractButton::clicked, this, &HomeScreen::InstallUpdate);
     update_button = update_dock;
-    dock->addStretch();
-    layout->addLayout(dock);
+    // The home's music and theme in the bottom left corner, the dock centred
+    auto* corner = new QHBoxLayout;
+    corner->setSpacing(8);
+    corner->addWidget(music_button);
+    corner->addWidget(song_button);
+    corner->addWidget(theme_button);
+    corner->addStretch();
+    corner->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
+    auto* bottom = new QHBoxLayout;
+    bottom->addLayout(corner, 1);
+    bottom->addLayout(dock, 0);
+    bottom->addStretch(1);
+    layout->addLayout(bottom);
 
 
     controller = new ControllerNavigation(system.HIDCore(), this);

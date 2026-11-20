@@ -21,6 +21,7 @@ version. Les sections suivantes gardent l'historique.
 - La fenêtre du salon peut maintenant être réduite.
 - Le bouton d'état est rouge hors ligne et vert en ligne.
 - Les salons sont triés par jeu, et la liste « Jeu » n'en montre qu'un.
+- Les boutons de la musique et du thème de l'accueil sont passés en bas à gauche.
 - Le jeu local passe par les salons du serveur Erable : le mode Wi-Fi (même réseau) n'est plus
   proposé, et s'il était activé il est coupé au démarrage.
 - L'ancien explorateur de salons publics de yuzu ne s'ouvre plus : cliquer sur l'état du salon,
