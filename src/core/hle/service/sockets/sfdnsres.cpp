@@ -223,10 +223,12 @@ static std::pair<u32, GetAddrInfoError> GetHostByNameRequestImpl(HLERequestConte
     // For now, ignore options, which are in input buffer 1 for GetHostByNameRequestWithOptions.
     const auto redirect = Nextendo::RedirectAddress(host, program_id);
 
-    // Prevent resolution of Nintendo servers
+    // Prevent resolution of Nintendo servers. The name is reported as not found rather than as a
+    // temporary failure: Mario Kart World, told to try again later, keeps its internet login
+    // pending, and its local wireless mode then waits for that login forever.
     if (!redirect && IsBlockedHost(host)) {
-        LOG_WARNING(Network, "Resolution of hostname {} requested, returning EAI_AGAIN", host);
-        return {0, GetAddrInfoError::AGAIN};
+        LOG_WARNING(Network, "Resolution of hostname {} requested, returning EAI_NONAME", host);
+        return {0, GetAddrInfoError::NONAME};
     }
 
     auto res_v = Network::GetAddressInfo(redirect.value_or(host), /*service*/ std::nullopt);
@@ -393,10 +395,12 @@ static std::pair<u32, GetAddrInfoError> GetAddrInfoRequestImpl(HLERequestContext
 
     const auto redirect = Nextendo::RedirectAddress(host, program_id);
 
-    // Prevent resolution of Nintendo servers
+    // Prevent resolution of Nintendo servers. The name is reported as not found rather than as a
+    // temporary failure: Mario Kart World, told to try again later, keeps its internet login
+    // pending, and its local wireless mode then waits for that login forever.
     if (!redirect && IsBlockedHost(host)) {
-        LOG_WARNING(Network, "Resolution of hostname {} requested, returning EAI_AGAIN", host);
-        return {0, GetAddrInfoError::AGAIN};
+        LOG_WARNING(Network, "Resolution of hostname {} requested, returning EAI_NONAME", host);
+        return {0, GetAddrInfoError::NONAME};
     }
 
     // Serialized hints otherwise pick only the family.
