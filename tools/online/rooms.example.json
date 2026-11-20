@@ -55,29 +55,35 @@
     "name": "Salon 5",
     "port": 24876,
     "password": "CHANGE-ME-5",
-    "reserved": "Pokémon Legends: Z-A",
-    "title_ids": [],
+    "reserved": "Légendes Pokémon : Z-A",
+    "title_ids": [
+      "0100F43008C44000"
+    ],
     "keywords": [
       "Z-A"
     ],
-    "max_players": 4
+    "max_players": 4,
+    "open_anytime": true
   },
   {
     "name": "Salon 6",
     "port": 24877,
     "password": "CHANGE-ME-6",
-    "reserved": "Pokémon Legends: Z-A",
-    "title_ids": [],
+    "reserved": "Légendes Pokémon : Z-A",
+    "title_ids": [
+      "0100F43008C44000"
+    ],
     "keywords": [
       "Z-A"
     ],
-    "max_players": 4
+    "max_players": 4,
+    "open_anytime": true
   },
   {
     "name": "Salon 7",
     "port": 24878,
     "password": "CHANGE-ME-7",
-    "reserved": "Pokémon Scarlet & Violet",
+    "reserved": "Pokémon Écarlate et Violet",
     "title_ids": [
       "0100A3D008C5C000",
       "01008F6008C5E000"
@@ -93,13 +99,14 @@
       "Scarlatto",
       "Violetto"
     ],
-    "max_players": 4
+    "max_players": 4,
+    "open_anytime": true
   },
   {
     "name": "Salon 8",
     "port": 24879,
     "password": "CHANGE-ME-8",
-    "reserved": "Pokémon Scarlet & Violet",
+    "reserved": "Pokémon Écarlate et Violet",
     "title_ids": [
       "0100A3D008C5C000",
       "01008F6008C5E000"
@@ -115,7 +122,8 @@
       "Scarlatto",
       "Violetto"
     ],
-    "max_players": 4
+    "max_players": 4,
+    "open_anytime": true
   },
   {
     "name": "Salon 9",
@@ -128,7 +136,8 @@
     "keywords": [
       "Splatoon Raiders"
     ],
-    "max_players": 4
+    "max_players": 4,
+    "open_anytime": true
   },
   {
     "name": "Salon 10",
@@ -141,7 +150,8 @@
     "keywords": [
       "Splatoon Raiders"
     ],
-    "max_players": 4
+    "max_players": 4,
+    "open_anytime": true
   },
   {
     "name": "Salon 11",
@@ -154,7 +164,8 @@
     "keywords": [
       "Splatoon Raiders"
     ],
-    "max_players": 4
+    "max_players": 4,
+    "open_anytime": true
   },
   {
     "name": "Salon 12",
@@ -167,7 +178,8 @@
     "keywords": [
       "Pokopia"
     ],
-    "max_players": 4
+    "max_players": 4,
+    "open_anytime": true
   },
   {
     "name": "Salon 13",
@@ -180,7 +192,8 @@
     "keywords": [
       "Pokopia"
     ],
-    "max_players": 4
+    "max_players": 4,
+    "open_anytime": true
   },
   {
     "name": "Salon 14",
@@ -193,7 +206,8 @@
     "keywords": [
       "Pokopia"
     ],
-    "max_players": 4
+    "max_players": 4,
+    "open_anytime": true
   },
   {
     "name": "Salon 15",

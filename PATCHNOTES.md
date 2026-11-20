@@ -30,7 +30,9 @@ version. Les sections suivantes gardent l'historique.
   montre « Mario Kart World · 3/8 joueurs » ou « complet ». Lancer un autre jeu dans un salon
   réservé propose de changer de salon.
 - Quand tous les salons d'un jeu sont pleins, « Ouvrir un salon de plus » en crée un sur le
-  serveur, qui se ferme après 10 minutes vide (64 salons au plus).
+  serveur, qui se ferme après 10 minutes vide (64 salons au plus). Pour les jeux à petits groupes
+  (Pokopia, Splatoon Raiders, les Pokémon), on peut en ouvrir un à tout moment, même si d'autres
+  ont encore de la place.
 
 **Pas de mods ni de codes de triche dans les salons**
 - Lancer depuis l'accueil un jeu qui a des mods ou des codes de triche activés, en étant dans un

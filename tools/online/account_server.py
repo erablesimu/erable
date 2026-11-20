@@ -12,7 +12,8 @@ together: nothing is sent by e-mail.
         --cert cert.pem --key key.pem --port 24870 --rooms rooms.json
 
 rooms.json lists the rooms signed-in players may join, with their passwords, and optionally the
-game a room is kept for and how many players it takes (see rooms.example.json):
+game a room is kept for, how many players it takes, and whether players may open one more for it
+at any time rather than once all are full (see rooms.example.json):
     [{"name": "Salon 1", "port": 24872, "password": "...", "reserved": "Mario Kart World",
       "title_ids": ["0400C3F00006E000"], "keywords": ["Mario Kart World"], "max_players": 8}, ...]
 
@@ -707,6 +708,9 @@ def load_rooms(path):
              "title_ids": [str(i).upper() for i in room.get("title_ids", [])],
              "keywords": [str(k) for k in room.get("keywords", [])],
              "max_players": max(2, min(16, int(room.get("max_players", 8)))),
+             # Players may open one more room for this game at any time, not only once all are
+             # full (games played in small groups of friends)
+             "open_anytime": bool(room.get("open_anytime", False)),
              "dynamic": False} for room in rooms]
 
 
@@ -767,7 +771,8 @@ class RoomManager:
             raise ApiError(HTTPStatus.BAD_REQUEST, "unknown_room_game")
         same = [room for room in rooms_with_players(store, account_id, self.all_rooms())
                 if room["reserved"] == reserved]
-        if any(room["players"] < room["max_players"] for room in same):
+        if not template["open_anytime"] and any(room["players"] < room["max_players"]
+                                                for room in same):
             raise ApiError(HTTPStatus.CONFLICT, "rooms_available")
         if len(self.static) + len(self.dynamic) >= self.max_rooms:
             raise ApiError(HTTPStatus.SERVICE_UNAVAILABLE, "no_room_left")

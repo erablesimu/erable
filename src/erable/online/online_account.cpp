@@ -316,7 +316,9 @@ void Account::FetchRooms(Callback done) {
                                           .toVariant()
                                           .toStringList(),
                           .max_players = room.value(QStringLiteral("max_players")).toInt(8),
-                          .opened = room.value(QStringLiteral("dynamic")).toBool()});
+                          .opened = room.value(QStringLiteral("dynamic")).toBool(),
+                          .open_anytime =
+                              room.value(QStringLiteral("open_anytime")).toBool()});
                  }
              } else if (result.error == QStringLiteral("no_session")) {
                  ClearSession();

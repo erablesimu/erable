@@ -672,11 +672,16 @@ void OnlinePanel::RebuildRooms() {
         }
     }
     const unsigned joined = JoinedPort();
-    // The games whose rooms are all full: one more can be opened for them
+    // The games one more room can be opened for: those whose rooms are all full, and those for
+    // which the server lets players open one at any time
     QStringList full_games;
     QStringList open_games;
+    QStringList anytime_games;
     for (const Room& room : rooms) {
         (room.Full() ? full_games : open_games).append(room.reserved);
+        if (room.open_anytime) {
+            anytime_games.append(room.reserved);
+        }
     }
     for (const Room& room : rooms) {
         const QString game = !room.reserved.isEmpty() ? room.reserved
@@ -697,11 +702,16 @@ void OnlinePanel::RebuildRooms() {
         connect(button, &QPushButton::clicked, this, [this, port] { Choose(port); });
         rooms_list->addWidget(button);
     }
-    full_games.removeDuplicates();
-    for (const QString& reserved : full_games) {
-        if (open_games.contains(reserved)) {
-            continue;
+    QStringList openable;
+    for (const Room& room : rooms) {
+        const QString& reserved = room.reserved;
+        if (!openable.contains(reserved) &&
+            (anytime_games.contains(reserved) ||
+             (full_games.contains(reserved) && !open_games.contains(reserved)))) {
+            openable.append(reserved);
         }
+    }
+    for (const QString& reserved : openable) {
         auto* open = MakeButton(reserved.isEmpty() ? tr("Open one more room for any game")
                                                    : tr("Open one more room for %1").arg(reserved),
                                 "link", nullptr);

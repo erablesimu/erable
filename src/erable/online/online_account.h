@@ -44,6 +44,7 @@ struct Room {
     QStringList keywords;  ///< Words of that game's title, in any language
     int max_players{8};
     bool opened{}; ///< Opened on demand, once the others of its game were full
+    bool open_anytime{}; ///< One more may be opened for its game even when some have places
 
     /// Whether the room takes this game: any game when it is kept for none
     bool Takes(u64 program_id, const QString& title) const;
