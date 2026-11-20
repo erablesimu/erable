@@ -40,6 +40,10 @@ FAILURE_WINDOW = 15 * 60
 # after its last sync an account still counts as online (Erable syncs every 30 s)
 MAX_REQUESTS_PER_DAY = 30
 MAX_FRIENDS = 200
+# Messages between friends: kept 15 days, then deleted
+MESSAGE_DAYS = 15
+MAX_MESSAGE_LENGTH = 500
+MAX_MESSAGES_PER_MINUTE = 20
 ONLINE_FOR = 90
 
 # Access to the rooms: free for every account while this is False. A paid access, later, sets it
@@ -101,6 +105,16 @@ CREATE TABLE IF NOT EXISTS presence (
     game TEXT NOT NULL DEFAULT '',
     room_port INTEGER NOT NULL DEFAULT 0
 );
+CREATE TABLE IF NOT EXISTS messages (
+    id INTEGER PRIMARY KEY,
+    from_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    to_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+    sent_at INTEGER NOT NULL,
+    body TEXT NOT NULL,
+    read INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS messages_pair ON messages(from_id, to_id, id);
+CREATE INDEX IF NOT EXISTS messages_unread ON messages(to_id, read);
 CREATE TABLE IF NOT EXISTS failures (
     key TEXT NOT NULL,
     at INTEGER NOT NULL
@@ -207,7 +221,10 @@ class Store:
                               "FROM accounts WHERE id = ?", (account_id,)).fetchone()
         result = {"nickname": row[0], "email": row[1], "friend_code": row[2],
                   "access": row[3], "access_until": row[4],
-                  "has_access": self.has_access(account_id)}
+                  "has_access": self.has_access(account_id),
+                  # A nickname from before the filter, or that a newer list catches, is changed
+                  # before playing online again
+                  "nickname_must_change": is_offensive_nickname(row[0])}
         if token:
             result["token"] = token
         return result
@@ -474,6 +491,7 @@ def make_friends(store, a, b):
 
 
 def friend_request(store, account_id, body, client):
+    require_proper_nickname(store, account_id)
     target = account_by_code(store, body)
     if target == account_id:
         raise ApiError(HTTPStatus.BAD_REQUEST, "own_friend_code")
@@ -549,6 +567,86 @@ def block_player(store, account_id, body, client):
     return HTTPStatus.OK, {}
 
 
+def require_proper_nickname(store, account_id):
+    """Refuses the online play to an account whose nickname holds an insult, until changed"""
+    nickname = store.db.execute("SELECT nickname FROM accounts WHERE id = ?",
+                                (account_id,)).fetchone()[0]
+    if is_offensive_nickname(nickname):
+        raise ApiError(HTTPStatus.FORBIDDEN, "nickname_must_change")
+
+
+def check_nickname(store, nickname, account_id=None):
+    if not NICKNAME_RE.fullmatch(nickname):
+        raise ApiError(HTTPStatus.BAD_REQUEST, "bad_nickname")
+    if is_offensive_nickname(nickname):
+        raise ApiError(HTTPStatus.BAD_REQUEST, "offensive_nickname")
+    row = store.db.execute("SELECT id FROM accounts WHERE nickname = ?", (nickname,)).fetchone()
+    if row and row[0] != account_id:
+        raise ApiError(HTTPStatus.CONFLICT, "nickname_taken")
+
+
+def change_nickname(store, account_id, body, client):
+    """A new nickname: the one an offensive nickname must give way to, or any other"""
+    nickname = field(body, "nickname", 20).strip()
+    check_nickname(store, nickname, account_id)
+    store.check_throttle("nickname:" + str(account_id))
+    store.note_failure("nickname:" + str(account_id))
+    store.db.execute("UPDATE accounts SET nickname = ? WHERE id = ?", (nickname, account_id))
+    store.db.commit()
+    return HTTPStatus.OK, store.profile(account_id)
+
+
+def are_friends(db, a, b):
+    return db.execute("SELECT 1 FROM friends WHERE account_id = ? AND friend_id = ?",
+                      (a, b)).fetchone() is not None
+
+
+def purge_messages(db):
+    db.execute("DELETE FROM messages WHERE sent_at < ?",
+               (int(time.time()) - MESSAGE_DAYS * 86400,))
+
+
+def send_message(store, account_id, body, client):
+    """A message to a friend, kept MESSAGE_DAYS days"""
+    require_proper_nickname(store, account_id)
+    target = account_by_code(store, body)
+    db = store.db
+    if not are_friends(db, account_id, target):
+        raise ApiError(HTTPStatus.FORBIDDEN, "not_friends")
+    text = field(body, "text", MAX_MESSAGE_LENGTH).strip()
+    if not text:
+        raise ApiError(HTTPStatus.BAD_REQUEST, "bad_text")
+    now = int(time.time())
+    recent = db.execute("SELECT COUNT(*) FROM messages WHERE from_id = ? AND sent_at > ?",
+                        (account_id, now - 60)).fetchone()[0]
+    if recent >= MAX_MESSAGES_PER_MINUTE:
+        raise ApiError(HTTPStatus.TOO_MANY_REQUESTS, "too_many_messages")
+    cursor = db.execute("INSERT INTO messages (from_id, to_id, sent_at, body) VALUES (?, ?, ?, ?)",
+                        (account_id, target, now, text))
+    db.commit()
+    return HTTPStatus.OK, {"id": cursor.lastrowid, "sent_at": now}
+
+
+def read_messages(store, account_id, body, client):
+    """The messages with a friend of the last MESSAGE_DAYS days after the id `after`, oldest
+    first; those received are marked read"""
+    target = account_by_code(store, body)
+    db = store.db
+    if not are_friends(db, account_id, target):
+        raise ApiError(HTTPStatus.FORBIDDEN, "not_friends")
+    after = body.get("after") if isinstance(body.get("after"), int) else 0
+    purge_messages(db)
+    rows = db.execute(
+        "SELECT id, from_id, sent_at, body FROM messages WHERE id > ? AND "
+        "((from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?)) ORDER BY id LIMIT 200",
+        (after, account_id, target, target, account_id)).fetchall()
+    db.execute("UPDATE messages SET read = 1 WHERE to_id = ? AND from_id = ? AND read = 0",
+               (account_id, target))
+    db.commit()
+    return HTTPStatus.OK, {"messages": [{"id": row[0], "from_me": row[1] == account_id,
+                                         "sent_at": row[2], "text": row[3]} for row in rows]}
+
+
 def sync(store, account_id, body, client):
     """Notes that the account is online (and in which game and room), and gives its friends with
     theirs and its friend requests: Erable calls it every 30 s"""
@@ -561,6 +659,10 @@ def sync(store, account_id, body, client):
                "game = excluded.game, room_port = excluded.room_port",
                (account_id, now, game[:96], room if 0 <= room <= 65535 else 0))
     db.commit()
+    unread = dict(db.execute(
+        "SELECT a.friend_code, COUNT(*) FROM messages m JOIN accounts a ON a.id = m.from_id "
+        "WHERE m.to_id = ? AND m.read = 0 AND m.sent_at >= ? GROUP BY a.friend_code",
+        (account_id, now - MESSAGE_DAYS * 86400)).fetchall())
     friends = []
     for nickname, code, seen, friend_game, friend_room in db.execute(
             "SELECT a.nickname, a.friend_code, p.seen_at, p.game, p.room_port FROM friends f "
@@ -569,7 +671,8 @@ def sync(store, account_id, body, client):
         online = seen is not None and now - seen <= ONLINE_FOR
         friends.append({"nickname": nickname, "friend_code": code, "online": online,
                         "game": friend_game if online else "",
-                        "room_port": friend_room if online else 0})
+                        "room_port": friend_room if online else 0,
+                        "unread": unread.get(code, 0)})
     incoming = [{"nickname": nickname, "friend_code": code, "sent_at": sent}
                 for nickname, code, sent in db.execute(
                     "SELECT a.nickname, a.friend_code, r.sent_at FROM friend_requests r "
@@ -632,6 +735,9 @@ ACCOUNT_ROUTES = {
     ("POST", "/v1/friends/remove"): friend_remove,
     ("POST", "/v1/friends/block"): block_player,
     ("POST", "/v1/sync"): sync,
+    ("POST", "/v1/account/nickname"): change_nickname,
+    ("POST", "/v1/messages/send"): send_message,
+    ("POST", "/v1/messages"): read_messages,
 }
 
 ROUTES = {
@@ -687,6 +793,7 @@ def make_handler(store, rooms):
                         account_id, _ = session_account(store, self.headers)
                         if not store.has_access(account_id):
                             raise ApiError(HTTPStatus.PAYMENT_REQUIRED, "no_access")
+                        require_proper_nickname(store, account_id)
                         self.reply(HTTPStatus.OK, {"rooms": rooms_with_players(store, account_id,
                                                                               rooms)})
                         return

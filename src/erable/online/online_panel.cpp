@@ -3,9 +3,15 @@
 
 #include "erable/online/online_panel.h"
 
+#include <algorithm>
+
 #include <QApplication>
+#include <QDate>
+#include <QDateTime>
 #include <QEvent>
+#include <QEventLoop>
 #include <QHBoxLayout>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -13,12 +19,13 @@
 #include <QPointer>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QScrollBar>
 #include <QStackedWidget>
+#include <QTextBrowser>
 #include <QVBoxLayout>
 
 #include "common/profanity_filter.h"
 #include "common/settings.h"
-#include "erable/multiplayer/chat_room.h"
 #include "erable/online/account_dialog.h"
 #include "erable/online/friends_dialog.h"
 #include "erable/online/online_account.h"
@@ -31,6 +38,7 @@ namespace Online {
 namespace {
 
 constexpr int PanelWidth = 400;
+constexpr int MaxMessageLength = 500;
 
 QLabel* MakeLabel(const QString& text, const char* name, QWidget* parent) {
     auto* label = new QLabel(text, parent);
@@ -77,9 +85,9 @@ QScrollArea* MakeList(QVBoxLayout*& rows, QWidget* parent) {
     return area;
 }
 
-/// A player's name as shown: insults and swear words as stars
-QString Shown(const QString& nickname) {
-    return QString::fromStdString(Common::Profanity::Mask(nickname.toStdString()));
+/// A text as shown: insults and swear words as stars
+QString Shown(const QString& text) {
+    return QString::fromStdString(Common::Profanity::Mask(text.toStdString()));
 }
 
 } // Anonymous namespace
@@ -112,8 +120,7 @@ OnlinePanel::OnlinePanel(const QString& display_font, const QString& body_font, 
     pages = new QStackedWidget(this);
     layout->addWidget(pages, 1);
     BuildOfflinePage();
-    BuildRoomsPage();
-    BuildRoomPage();
+    BuildOnlinePage();
 
     if (parent) {
         parent->installEventFilter(this);
@@ -132,6 +139,8 @@ OnlinePanel::OnlinePanel(const QString& display_font, const QString& body_font, 
     rooms_timer.setInterval(30000);
     connect(&rooms_timer, &QTimer::timeout, this, &OnlinePanel::FetchRooms);
     rooms_timer.start();
+    conversation_timer.setInterval(4000);
+    connect(&conversation_timer, &QTimer::timeout, this, &OnlinePanel::FetchConversation);
 
     RefreshStyle();
     RebuildFriends();
@@ -168,42 +177,37 @@ void OnlinePanel::BuildOfflinePage() {
     connect(wifi_button, &QPushButton::clicked, this, &OnlinePanel::ToggleWiFi);
     column->addWidget(wifi_button);
     column->addStretch();
-    column->addWidget(
-        MakeLabel(tr("Friends and alerts show once you are online."), "hint", page_widget));
+    column->addWidget(MakeLabel(tr("Friends and alerts show once you are online."), "hint",
+                                page_widget));
     pages->addWidget(page_widget);
 }
 
-void OnlinePanel::BuildRoomsPage() {
-    auto* page_widget = new QWidget(pages);
-    auto* column = new QVBoxLayout(page_widget);
-    column->setContentsMargins(0, 0, 0, 0);
-    column->setSpacing(10);
-    column->addWidget(MakeLabel(tr("A room holds one game at a time: the game its players run. "
-                                   "It is free again once empty."),
-                                "muted", page_widget));
-    rooms_status = MakeLabel({}, "hint", page_widget);
-    column->addWidget(rooms_status);
-    column->addWidget(MakeList(rooms_list, page_widget), 1);
-    column->addWidget(MakeLabel(tr("The room you choose stays yours until Erable closes. Erable "
-                                   "starts offline the next time."),
-                                "note", page_widget));
-    auto* offline = MakeButton(tr("Go offline"), "row", page_widget);
-    connect(offline, &QPushButton::clicked, this, &OnlinePanel::GoOffline);
-    column->addWidget(offline);
-    pages->addWidget(page_widget);
-}
-
-void OnlinePanel::BuildRoomPage() {
+void OnlinePanel::BuildOnlinePage() {
     auto* page_widget = new QWidget(pages);
     auto* column = new QVBoxLayout(page_widget);
     column->setContentsMargins(0, 0, 0, 0);
     column->setSpacing(10);
 
+    // The nickname to change before anything online
+    auto* notice = new QFrame(page_widget);
+    notice->setObjectName(QStringLiteral("card"));
+    auto* notice_column = new QVBoxLayout(notice);
+    notice_column->setContentsMargins(16, 14, 16, 14);
+    notice_column->addWidget(MakeLabel(tr("Your nickname holds an insult or a swear word. Choose "
+                                          "another one to play online and write to your friends."),
+                                       "", notice));
+    auto* rename = MakeButton(tr("Change my nickname"), "accept", notice);
+    connect(rename, &QPushButton::clicked, this, [this] { ChangeNickname(); });
+    notice_column->addWidget(rename, 0, Qt::AlignLeft);
+    nickname_notice = notice;
+    column->addWidget(notice);
+
+    // The room joined
     auto* card = new QFrame(page_widget);
     card->setObjectName(QStringLiteral("card"));
     auto* card_column = new QVBoxLayout(card);
     card_column->setContentsMargins(16, 14, 16, 14);
-    card_column->setSpacing(10);
+    card_column->setSpacing(8);
     auto* name_row = new QHBoxLayout;
     auto* names = new QVBoxLayout;
     names->setSpacing(2);
@@ -217,26 +221,15 @@ void OnlinePanel::BuildRoomPage() {
     connect(leave, &QPushButton::clicked, this, &OnlinePanel::LeaveRoom);
     name_row->addWidget(leave, 0, Qt::AlignTop);
     card_column->addLayout(name_row);
-    auto* actions = new QHBoxLayout;
-    auto* change = MakeButton(tr("Change room"), "row", card);
-    connect(change, &QPushButton::clicked, this, [this] {
-        browsing = true;
-        FetchRooms();
-        Update();
-    });
-    auto* offline = MakeButton(tr("Go offline"), "row", card);
-    connect(offline, &QPushButton::clicked, this, &OnlinePanel::GoOffline);
-    actions->addWidget(change);
-    actions->addWidget(offline);
-    card_column->addLayout(actions);
     card_column->addWidget(MakeLabel(tr("Kept until Erable closes"), "hint", card));
+    room_card = card;
     column->addWidget(card);
 
     auto* tab_row = new QHBoxLayout;
     tab_row->setSpacing(4);
-    const QString names_of_tabs[] = {tr("Friends"), tr("Chat"), tr("Alerts")};
+    const QString tab_names[] = {tr("Rooms"), tr("Friends"), tr("Alerts")};
     for (int i = 0; i < 3; ++i) {
-        tab_buttons[i] = MakeButton(names_of_tabs[i], "tab", page_widget);
+        tab_buttons[i] = MakeButton(tab_names[i], "tab", page_widget);
         tab_buttons[i]->setCheckable(true);
         connect(tab_buttons[i], &QPushButton::clicked, this,
                 [this, i] { ShowTab(static_cast<Tab>(i)); });
@@ -246,17 +239,49 @@ void OnlinePanel::BuildRoomPage() {
     column->addLayout(tab_row);
 
     tabs = new QStackedWidget(page_widget);
-    // Friends: who is online and where, joining their room, adding one by their code
-    auto* friends_page = new QWidget(tabs);
-    auto* friends_column = new QVBoxLayout(friends_page);
-    friends_column->setContentsMargins(0, 0, 0, 0);
-    friends_column->setSpacing(8);
-    friends_column->addWidget(MakeList(friends_list, friends_page), 1);
+    tabs->addWidget(BuildRoomsTab());
+    tabs->addWidget(BuildFriendsTab());
+    tabs->addWidget(BuildAlertsTab());
+    column->addWidget(tabs, 1);
+
+    auto* offline = MakeButton(tr("Go offline"), "row", page_widget);
+    connect(offline, &QPushButton::clicked, this, &OnlinePanel::GoOffline);
+    column->addWidget(offline);
+    pages->addWidget(page_widget);
+    ShowTab(Tab::Rooms);
+}
+
+QWidget* OnlinePanel::BuildRoomsTab() {
+    auto* page_widget = new QWidget(tabs);
+    auto* column = new QVBoxLayout(page_widget);
+    column->setContentsMargins(0, 0, 0, 0);
+    column->setSpacing(10);
+    column->addWidget(MakeLabel(tr("A room holds one game at a time: the game its players run. "
+                                   "It is free again once empty."),
+                                "muted", page_widget));
+    rooms_status = MakeLabel({}, "hint", page_widget);
+    column->addWidget(rooms_status);
+    column->addWidget(MakeList(rooms_list, page_widget), 1);
+    column->addWidget(MakeLabel(tr("The room you choose stays yours until Erable closes. Erable "
+                                   "starts offline the next time."),
+                                "note", page_widget));
+    return page_widget;
+}
+
+QWidget* OnlinePanel::BuildFriendsTab() {
+    friends_pages = new QStackedWidget(tabs);
+
+    // The friends: who is online and where, joining their room, writing to them
+    auto* list_page = new QWidget(friends_pages);
+    auto* list_column = new QVBoxLayout(list_page);
+    list_column->setContentsMargins(0, 0, 0, 0);
+    list_column->setSpacing(8);
+    list_column->addWidget(MakeList(friends_list, list_page), 1);
     auto* add_row = new QHBoxLayout;
-    friend_code = new QLineEdit(friends_page);
+    friend_code = new QLineEdit(list_page);
     friend_code->setPlaceholderText(tr("Friend code: ER-0000-0000-0000"));
     friend_code->setAccessibleName(tr("Friend code"));
-    auto* add = MakeButton(tr("Add"), "small", friends_page);
+    auto* add = MakeButton(tr("Add"), "small", list_page);
     const auto send_request = [this] {
         const QString code = friend_code->text().trimmed().toUpper();
         if (!account || code.isEmpty()) {
@@ -278,10 +303,10 @@ void OnlinePanel::BuildRoomPage() {
     connect(friend_code, &QLineEdit::returnPressed, this, send_request);
     add_row->addWidget(friend_code, 1);
     add_row->addWidget(add);
-    friends_column->addLayout(add_row);
-    friend_message = MakeLabel({}, "hint", friends_page);
-    friends_column->addWidget(friend_message);
-    auto* manage = MakeButton(tr("Manage friends..."), "link", friends_page);
+    list_column->addLayout(add_row);
+    friend_message = MakeLabel({}, "hint", list_page);
+    list_column->addWidget(friend_message);
+    auto* manage = MakeButton(tr("Manage friends..."), "link", list_page);
     connect(manage, &QPushButton::clicked, this, [this] {
         if (!account) {
             return;
@@ -291,24 +316,49 @@ void OnlinePanel::BuildRoomPage() {
                 [this](unsigned port) { Choose(port); });
         dialog.exec();
     });
-    friends_column->addWidget(manage, 0, Qt::AlignLeft);
-    tabs->addWidget(friends_page);
+    list_column->addWidget(manage, 0, Qt::AlignLeft);
+    friends_pages->addWidget(list_page);
 
-    // The room's chat, as in the room window
-    chat = new ChatRoom(tabs);
-    chat->Initialize();
-    tabs->addWidget(chat);
+    // A conversation with one of them
+    auto* talk_page = new QWidget(friends_pages);
+    auto* talk_column = new QVBoxLayout(talk_page);
+    talk_column->setContentsMargins(0, 0, 0, 0);
+    talk_column->setSpacing(8);
+    auto* talk_head = new QHBoxLayout;
+    auto* back = MakeButton(tr("Back"), "small", talk_page);
+    connect(back, &QPushButton::clicked, this, &OnlinePanel::CloseConversation);
+    talking_name = MakeLabel({}, "roomName", talk_page);
+    talk_head->addWidget(back);
+    talk_head->addWidget(talking_name, 1);
+    talk_column->addLayout(talk_head);
+    conversation = new QTextBrowser(talk_page);
+    conversation->setObjectName(QStringLiteral("conversation"));
+    conversation->setOpenLinks(false);
+    talk_column->addWidget(conversation, 1);
+    auto* write_row = new QHBoxLayout;
+    message_edit = new QLineEdit(talk_page);
+    message_edit->setMaxLength(MaxMessageLength);
+    message_edit->setPlaceholderText(tr("Write a message"));
+    message_edit->setAccessibleName(tr("Message"));
+    auto* send = MakeButton(tr("Send"), "accept", talk_page);
+    connect(send, &QPushButton::clicked, this, &OnlinePanel::SendToFriend);
+    connect(message_edit, &QLineEdit::returnPressed, this, &OnlinePanel::SendToFriend);
+    write_row->addWidget(message_edit, 1);
+    write_row->addWidget(send);
+    talk_column->addLayout(write_row);
+    message_error = MakeLabel({}, "hint", talk_page);
+    talk_column->addWidget(message_error);
+    talk_column->addWidget(MakeLabel(tr("Messages are kept 15 days."), "hint", talk_page));
+    friends_pages->addWidget(talk_page);
+    return friends_pages;
+}
 
-    // Alerts: the friend requests to answer, the ones sent
-    auto* alerts_page = new QWidget(tabs);
-    auto* alerts_column = new QVBoxLayout(alerts_page);
-    alerts_column->setContentsMargins(0, 0, 0, 0);
-    alerts_column->addWidget(MakeList(alerts_list, alerts_page), 1);
-    tabs->addWidget(alerts_page);
-
-    column->addWidget(tabs, 1);
-    pages->addWidget(page_widget);
-    ShowTab(Tab::Friends);
+QWidget* OnlinePanel::BuildAlertsTab() {
+    auto* page_widget = new QWidget(tabs);
+    auto* column = new QVBoxLayout(page_widget);
+    column->setContentsMargins(0, 0, 0, 0);
+    column->addWidget(MakeList(alerts_list, page_widget), 1);
+    return page_widget;
 }
 
 void OnlinePanel::RefreshStyle() {
@@ -345,7 +395,6 @@ void OnlinePanel::RefreshStyle() {
             "#onlinePanel QPushButton#row { text-align: left; }"
             "#onlinePanel QPushButton#room { text-align: left; padding: 12px 14px;"
             " border-radius: 14px; }"
-            "#onlinePanel QPushButton#room:disabled { color: %7; background: %1; }"
             "#onlinePanel QPushButton#roomJoined { text-align: left; padding: 12px 14px;"
             " border-radius: 14px; border: 2px solid %5; }"
             "#onlinePanel QPushButton#tab { background: transparent; border: none;"
@@ -355,8 +404,8 @@ void OnlinePanel::RefreshStyle() {
             " padding: 4px 0; }"
             "#onlinePanel QPushButton#accept { background: %5; color: %6; border: none;"
             " padding: 6px 12px; font-size: 13px; }"
-            "#onlinePanel QLineEdit { background: %10; border: 1px solid %4; border-radius: 12px;"
-            " padding: 9px 11px; }"
+            "#onlinePanel QLineEdit, #onlinePanel QTextBrowser { background: %10;"
+            " border: 1px solid %4; border-radius: 12px; padding: 9px 11px; }"
             "#onlinePanel #friendRow { background: transparent; border-radius: 12px; }")
             .arg(palette.color(QPalette::Window).name(), surface, text, line, accent, ink, muted,
                  body, display, ground));
@@ -387,10 +436,15 @@ void OnlinePanel::Open() {
     Place();
     show();
     raise();
-    if (page != Page::Offline) {
+    if (online) {
         FetchRooms();
+        FetchConversation();
     }
     Update();
+}
+
+bool OnlinePanel::SignedIn() const {
+    return account && account->CurrentSession().has_value();
 }
 
 unsigned OnlinePanel::JoinedPort() const {
@@ -406,7 +460,8 @@ QString OnlinePanel::RoomLabel(unsigned port) const {
         return name;
     }
     const int index = static_cast<int>(port) - static_cast<int>(FirstRoomPort);
-    return index >= 0 && index < RoomCount ? tr("Room %1").arg(index + 1) : tr("Room %1").arg(port);
+    return index >= 0 && index < RoomCount ? tr("Room %1").arg(index + 1)
+                                           : tr("Room %1").arg(port);
 }
 
 QString OnlinePanel::StatusText() const {
@@ -421,47 +476,49 @@ QString OnlinePanel::StatusText() const {
         const int players = static_cast<int>(member->GetMemberInformation().size());
         return tr("Online · %1 · %n player(s)", "", players).arg(RoomLabel(port));
     }
-    if (browsing) {
-        return tr("Online · choose a room");
+    if (online) {
+        return tr("Online");
     }
     return tr("Offline");
 }
 
 bool OnlinePanel::IsOnline() const {
-    return JoinedPort() != 0 || browsing || CurrentMode() == Mode::WiFi;
+    return JoinedPort() != 0 || online || CurrentMode() == Mode::WiFi;
 }
 
 int OnlinePanel::AlertCount() const {
-    return account && account->CurrentSession()
-               ? static_cast<int>(account->IncomingRequests().size())
-               : 0;
+    if (!SignedIn()) {
+        return 0;
+    }
+    int count = static_cast<int>(account->IncomingRequests().size());
+    for (const Friend& player : account->Friends()) {
+        count += player.unread;
+    }
+    return count;
 }
 
 void OnlinePanel::Update() {
-    const bool signed_in = account && account->CurrentSession();
+    const bool signed_in = SignedIn();
     if (!signed_in && CurrentMode() != Mode::Server) {
-        browsing = false;
+        online = false;
     }
-    const Page wanted = browsing ? Page::Rooms : JoinedPort() != 0 ? Page::Room : Page::Offline;
-    if (wanted != page) {
-        page = wanted;
-        pages->setCurrentIndex(static_cast<int>(page));
-        if (page == Page::Rooms) {
-            RebuildRooms();
-        }
+    if (JoinedPort() != 0) {
+        online = true; // A room joined from elsewhere (a friend's "Join") is online too
     }
-    title->setText(page == Page::Rooms ? tr("Rooms") : tr("Online"));
-    refresh_button->setVisible(page == Page::Rooms);
+    pages->setCurrentIndex(online ? 1 : 0);
+    refresh_button->setVisible(online && tab == Tab::Rooms);
 
-    offline_account->setText(
-        signed_in ? tr("As %1, with your Erable account").arg(account->CurrentSession()->nickname)
-                  : tr("Needs an Erable account: you sign in first."));
-    wifi_button->setText(CurrentMode() == Mode::WiFi
-                             ? tr("Local Wi-Fi is on · Turn it off")
-                             : tr("Play on the local Wi-Fi (same network)"));
+    offline_account->setText(signed_in ? tr("As %1, with your Erable account")
+                                             .arg(Shown(account->CurrentSession()->nickname))
+                                       : tr("Needs an Erable account: you sign in first."));
+    wifi_button->setText(CurrentMode() == Mode::WiFi ? tr("Local Wi-Fi is on · Turn it off")
+                                                     : tr("Play on the local Wi-Fi (same network)"));
 
-    if (page == Page::Room) {
-        const unsigned port = JoinedPort();
+    nickname_notice->setVisible(signed_in && account->CurrentSession()->nickname_must_change);
+
+    const unsigned port = JoinedPort();
+    room_card->setVisible(port != 0);
+    if (port != 0) {
         const auto member = Network::GetRoomMember().lock();
         const bool connected = member && member->IsConnected();
         room_name->setText(RoomLabel(port));
@@ -480,30 +537,24 @@ void OnlinePanel::Update() {
         } else {
             room_game->setText(tr("Free: the first game started here holds it"));
         }
-        // The chat's member list follows the room
-        if (connected) {
-            QString signature;
-            const auto members = member->GetMemberInformation();
-            for (const auto& info : members) {
-                signature += QString::fromStdString(info.nickname) + QLatin1Char('\n');
-            }
-            if (signature != member_signature) {
-                member_signature = signature;
-                chat->SetPlayerList(members);
-            }
-        }
     }
-    const int alerts = AlertCount();
-    tab_buttons[static_cast<int>(Tab::Alerts)]->setText(alerts > 0 ? tr("Alerts · %1").arg(alerts)
-                                                                   : tr("Alerts"));
+
+    int requests = 0;
+    int unread = 0;
     int online_friends = 0;
-    if (account) {
+    if (signed_in) {
+        requests = static_cast<int>(account->IncomingRequests().size());
         for (const Friend& player : account->Friends()) {
             online_friends += player.online ? 1 : 0;
+            unread += player.unread;
         }
     }
+    tab_buttons[static_cast<int>(Tab::Alerts)]->setText(
+        requests > 0 ? tr("Alerts · %1").arg(requests) : tr("Alerts"));
     tab_buttons[static_cast<int>(Tab::Friends)]->setText(
-        online_friends > 0 ? tr("Friends · %1").arg(online_friends) : tr("Friends"));
+        unread > 0           ? tr("Friends · %1 new").arg(unread)
+        : online_friends > 0 ? tr("Friends · %1").arg(online_friends)
+                             : tr("Friends"));
     emit StatusChanged();
 }
 
@@ -512,6 +563,53 @@ void OnlinePanel::ShowTab(Tab chosen) {
     tabs->setCurrentIndex(static_cast<int>(tab));
     for (int i = 0; i < 3; ++i) {
         tab_buttons[i]->setChecked(i == static_cast<int>(tab));
+    }
+    if (tab == Tab::Rooms) {
+        FetchRooms();
+    } else if (tab == Tab::Friends) {
+        FetchConversation();
+    }
+    refresh_button->setVisible(online && tab == Tab::Rooms);
+}
+
+bool OnlinePanel::ChangeNickname() {
+    if (!SignedIn()) {
+        return false;
+    }
+    QString error;
+    while (true) {
+        bool ok = false;
+        QString label = tr("Your new nickname: 4 to 20 letters (without accents), digits, spaces, "
+                           "'.', '_' or '-'.");
+        if (!error.isEmpty()) {
+            label = error + QStringLiteral("\n\n") + label;
+        }
+        const QString nickname = QInputDialog::getText(window(), tr("Change my nickname"), label,
+                                                       QLineEdit::Normal, {}, &ok);
+        if (!ok) {
+            return false;
+        }
+        if (Common::Profanity::Contains(nickname.toStdString())) {
+            error = Account::ErrorText(QStringLiteral("offensive_nickname"));
+            continue;
+        }
+        // The server's answer before asking again
+        bool answered = false;
+        bool changed = false;
+        QEventLoop loop;
+        account->ChangeNickname(nickname, [&](const Account::Result& result) {
+            answered = true;
+            changed = result.ok;
+            error = result.ok ? QString{} : Account::ErrorText(result.error);
+            loop.quit();
+        });
+        if (!answered) {
+            loop.exec();
+        }
+        if (changed) {
+            Update();
+            return true;
+        }
     }
 }
 
@@ -526,18 +624,20 @@ void OnlinePanel::GoOnline() {
             return;
         }
     }
+    if (account->CurrentSession()->nickname_must_change && !ChangeNickname()) {
+        return;
+    }
     if (CurrentMode() == Mode::WiFi) {
         SetMode(Mode::Off);
         ApplyMode(account, {});
     }
-    browsing = true;
-    FetchRooms();
+    online = true;
     Update();
+    ShowTab(Tab::Rooms);
 }
 
 void OnlinePanel::FetchRooms() {
-    if (!account || !account->CurrentSession() || fetching_rooms ||
-        (page == Page::Offline && !browsing) || !isVisible()) {
+    if (!SignedIn() || fetching_rooms || !online || !isVisible()) {
         return;
     }
     fetching_rooms = true;
@@ -588,48 +688,52 @@ void OnlinePanel::Choose(unsigned port) {
     if (!account) {
         return;
     }
+    if (SignedIn() && account->CurrentSession()->nickname_must_change && !ChangeNickname()) {
+        return;
+    }
     if (port != JoinedPort()) {
         JoinRoom(account, port);
     }
-    browsing = false;
-    member_signature.clear();
-    chat->Clear();
+    online = true;
+    RebuildRooms();
     Update();
 }
 
 void OnlinePanel::LeaveRoom() {
     SetMode(Mode::Off);
     ApplyMode(account, {});
-    browsing = true;
-    FetchRooms();
+    online = true;
+    ShowTab(Tab::Rooms);
+    RebuildRooms();
     Update();
 }
 
 void OnlinePanel::GoOffline() {
     SetMode(Mode::Off);
     ApplyMode(account, {});
-    browsing = false;
+    online = false;
+    CloseConversation();
     Update();
 }
 
 void OnlinePanel::ToggleWiFi() {
     SetMode(CurrentMode() == Mode::WiFi ? Mode::Off : Mode::WiFi);
     ApplyMode(account, {});
-    browsing = false;
+    online = false;
     Update();
 }
 
 void OnlinePanel::RebuildFriends() {
     ClearLayout(friends_list);
-    if (!account || !account->CurrentSession()) {
+    if (!SignedIn()) {
         return;
     }
     const auto& friends = account->Friends();
     if (friends.isEmpty()) {
-        friends_list->addWidget(
-            MakeLabel(tr("No friends yet: share your friend code (%1), or add theirs.")
-                          .arg(account->CurrentSession()->friend_code),
-                      "hint", nullptr));
+        friends_list->addWidget(MakeLabel(
+            tr("No friends yet: share your friend code (%1), or add theirs.")
+                .arg(account->CurrentSession()->friend_code),
+            "hint", nullptr));
         return;
     }
     const unsigned joined = JoinedPort();
@@ -653,21 +757,30 @@ void OnlinePanel::RebuildFriends() {
         } else {
             status = tr("Online");
         }
+        if (player.unread > 0) {
+            status = tr("%n new message(s)", "", player.unread) + QStringLiteral(" · ") + status;
+        }
         names->addWidget(MakeLabel(status, "hint", row));
         line->addLayout(names, 1);
         if (player.online && player.room_port != 0 && player.room_port != joined) {
-            auto* join = MakeButton(tr("Join"), "accept", row);
+            auto* join = MakeButton(tr("Join"), "small", row);
             const unsigned port = player.room_port;
             connect(join, &QPushButton::clicked, this, [this, port] { Choose(port); });
             line->addWidget(join);
         }
+        auto* write = MakeButton(tr("Write"), player.unread > 0 ? "accept" : "small", row);
+        const QString code = player.friend_code;
+        const QString nickname = player.nickname;
+        connect(write, &QPushButton::clicked, this,
+                [this, code, nickname] { OpenConversation(code, nickname); });
+        line->addWidget(write);
         friends_list->addWidget(row);
     }
 }
 
 void OnlinePanel::RebuildAlerts() {
     ClearLayout(alerts_list);
-    if (!account || !account->CurrentSession()) {
+    if (!SignedIn()) {
         return;
     }
     const auto& incoming = account->IncomingRequests();
@@ -708,6 +821,89 @@ void OnlinePanel::RebuildAlerts() {
     }
 }
 
+void OnlinePanel::OpenConversation(const QString& code, const QString& nickname) {
+    talking_code = code;
+    talking_name->setText(Shown(nickname));
+    conversation->clear();
+    message_error->clear();
+    last_message_id = 0;
+    friends_pages->setCurrentIndex(1);
+    FetchConversation();
+    conversation_timer.start();
+    message_edit->setFocus();
+}
+
+void OnlinePanel::CloseConversation() {
+    conversation_timer.stop();
+    talking_code.clear();
+    friends_pages->setCurrentIndex(0);
+}
+
+void OnlinePanel::FetchConversation() {
+    if (talking_code.isEmpty() || !SignedIn() || fetching_messages) {
+        return;
+    }
+    if (!isVisible() || tab != Tab::Friends) {
+        return; // Fetched again when shown: the friends' counts tell meanwhile
+    }
+    fetching_messages = true;
+    QPointer<OnlinePanel> self{this};
+    const QString code = talking_code;
+    account->FetchMessages(
+        code, last_message_id,
+        [self, code](const Account::Result& result, const QList<Message>& messages) {
+            if (!self) {
+                return;
+            }
+            self->fetching_messages = false;
+            if (code != self->talking_code) {
+                return;
+            }
+            if (!result.ok) {
+                self->message_error->setText(Account::ErrorText(result.error));
+                return;
+            }
+            const QString friend_name = self->talking_name->text().toHtmlEscaped();
+            for (const Message& message : messages) {
+                const QDateTime when = QDateTime::fromSecsSinceEpoch(message.sent_at);
+                const QString time = when.date() == QDate::currentDate()
+                                         ? when.toString(QStringLiteral("HH:mm"))
+                                         : when.toString(QStringLiteral("dd/MM HH:mm"));
+                self->conversation->append(
+                    QStringLiteral("<p style=\"margin:4px 0\"><b>%1</b> "
+                                   "<span style=\"color:gray\">%2</span><br>%3</p>")
+                        .arg(message.from_me ? tr("You") : friend_name, time,
+                             Shown(message.text).toHtmlEscaped()));
+                self->last_message_id = std::max(self->last_message_id, message.id);
+            }
+            if (!messages.isEmpty()) {
+                QScrollBar* bar = self->conversation->verticalScrollBar();
+                bar->setValue(bar->maximum());
+            }
+        });
+}
+
+void OnlinePanel::SendToFriend() {
+    const QString text = message_edit->text().trimmed();
+    if (text.isEmpty() || talking_code.isEmpty() || !SignedIn()) {
+        return;
+    }
+    // Sent with its insults and swear words as stars
+    QPointer<OnlinePanel> self{this};
+    account->SendMessage(talking_code, Shown(text), [self](const Account::Result& result) {
+        if (!self) {
+            return;
+        }
+        if (result.ok) {
+            self->message_edit->clear();
+            self->message_error->clear();
+            self->FetchConversation();
+        } else {
+            self->message_error->setText(Account::ErrorText(result.error));
+        }
+    });
+}
+
 bool OnlinePanel::MayLaunch(const QString& game_title) {
     const unsigned port = JoinedPort();
     if (port == 0 || !account || game_title.isEmpty()) {
@@ -727,8 +923,9 @@ bool OnlinePanel::MayLaunch(const QString& game_title) {
         box.addButton(QMessageBox::Cancel);
         box.exec();
         if (box.clickedButton() == rooms_button) {
-            browsing = true;
+            online = true;
             Open();
+            ShowTab(Tab::Rooms);
         }
         return false;
     }

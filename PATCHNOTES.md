@@ -7,11 +7,12 @@ version. Les sections suivantes gardent l'historique.
 
 **Panneau « En ligne » sur l'accueil**
 - Un bouton en haut de l'accueil montre l'état (Hors ligne, salon et nombre de joueurs) et le
-  nombre de demandes d'ami en attente. Il ouvre un panneau à droite :
-  - « Connexion en ligne » (avec votre compte Erable), puis la liste des salons du serveur, avec
-    leurs joueurs et leur jeu ;
-  - une fois dans un salon : les amis (et « Rejoindre » leur salon), la discussion du salon et les
-    alertes (demandes d'ami à accepter ou refuser), plus l'ajout d'un ami par son code ;
+  nombre de demandes d'ami et de messages non lus. Il ouvre un panneau à droite :
+  - « Connexion en ligne » (avec votre compte Erable), puis trois onglets ;
+  - Salons : la liste des salons du serveur, avec leurs joueurs et leur jeu ;
+  - Amis : leur présence, « Rejoindre » leur salon, « Écrire » pour discuter avec eux, et l'ajout
+    d'un ami par son code ;
+  - Alertes : les demandes d'ami à accepter ou refuser ;
   - le bouton « – » réduit le panneau ; l'état reste affiché en haut.
 - Un salon accueille un seul jeu à la fois, celui de ses joueurs : lancer un autre jeu propose de
   changer de salon. Un salon vide redevient libre.
@@ -19,15 +20,22 @@ version. Les sections suivantes gardent l'historique.
   hors ligne.
 - La fenêtre du salon peut maintenant être réduite.
 
+**Discussion entre amis, plus de discussion dans les salons**
+- Les salons n'ont plus de discussion : on n'y croise plus les messages d'inconnus.
+- On écrit à ses amis depuis l'onglet Amis du panneau, qu'ils soient dans un salon ou non. Les
+  messages sont gardés 15 jours sur le serveur, puis effacés.
+
 **Filtre à insultes**
-- Dans la discussion des salons, les insultes et gros mots des langues européennes s'affichent
+- Dans les messages entre amis, les insultes et gros mots des langues européennes s'affichent
   en étoiles (français, anglais, espagnol, italien, allemand, portugais, néerlandais, polonais,
   tchèque, slovaque, hongrois, roumain, langues nordiques, finnois, croate et serbe, turc, grec,
   russe, ukrainien, bulgare). Les messages envoyés partent déjà masqués.
 - Il voit à travers les fautes et les contournements : majuscules, accents, chiffres à la place
   des lettres (« s4l0pe »), lettres répétées, espacées ou séparées par des points (« c.o.n »),
   orthographes qui se prononcent pareil (« phuck »), deux lettres inversées dans les mots longs.
-- Le serveur refuse les pseudos qui en contiennent, même collés à un autre mot (« BigC0nnard »).
+- Les pseudos insultants ou offensants sont interdits : le serveur les refuse à l'inscription,
+  même collés à un autre mot (« BigC0nnard »), et un compte qui en a déjà un doit en changer
+  avant de rejouer en ligne (« Changer mon pseudo » dans le panneau).
 
 **Mario Kart World en sans fil local**
 - Le « Patientez » sans fin du mode sans fil local est corrigé, sans mode avion, seul comme dans un

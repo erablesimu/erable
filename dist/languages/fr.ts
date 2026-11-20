@@ -467,6 +467,10 @@ Ce logiciel ne doit pas servir à jouer à des jeux que vous n'avez pas obtenus 
 <context>
     <name>ChatRoom</name>
     <message>
+        <source>Rooms have no chat: write to your friends from the Online panel of the home screen.</source>
+        <translation>Les salons n’ont pas de discussion : écris à tes amis depuis le panneau En ligne de l’accueil.</translation>
+    </message>
+    <message>
         <location filename="../../src/erable/multiplayer/chat_room.ui" line="14"/>
         <source>Room Window</source>
         <translation>Fenêtre du Salon</translation>
@@ -12243,8 +12247,20 @@ Réessayer sans la recette ? Le jeu fonctionnera toujours depuis l'archive NX, m
 <context>
     <name>Online::Account</name>
     <message>
+        <source>Your nickname holds an insult or a swear word: change it to play online.</source>
+        <translation>Ton pseudo contient une insulte ou un gros mot : change-le pour jouer en ligne.</translation>
+    </message>
+    <message>
+        <source>You are no longer friends.</source>
+        <translation>Vous n’êtes plus amis.</translation>
+    </message>
+    <message>
+        <source>Too many messages at once: wait a minute.</source>
+        <translation>Trop de messages d’un coup : attends une minute.</translation>
+    </message>
+    <message>
         <source>This nickname holds an insult or a swear word: choose another one.</source>
-        <translation>Ce pseudo contient une insulte ou un gros mot : choisissez-en un autre.</translation>
+        <translation>Ce pseudo contient une insulte ou un gros mot : choisis-en un autre.</translation>
     </message>
     <message>
         <source>No player has this friend code.</source>
@@ -12564,6 +12580,54 @@ Entrez votre mot de passe pour confirmer :</translation>
 </context>
 <context>
     <name>Online::OnlinePanel</name>
+    <message>
+        <source>Your nickname holds an insult or a swear word. Choose another one to play online and write to your friends.</source>
+        <translation>Ton pseudo contient une insulte ou un gros mot. Choisis-en un autre pour jouer en ligne et écrire à tes amis.</translation>
+    </message>
+    <message>
+        <source>Change my nickname</source>
+        <translation>Changer mon pseudo</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation>Retour</translation>
+    </message>
+    <message>
+        <source>Write a message</source>
+        <translation>Écrire un message</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Message</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>Envoyer</translation>
+    </message>
+    <message>
+        <source>Messages are kept 15 days.</source>
+        <translation>Les messages sont gardés 15 jours.</translation>
+    </message>
+    <message>
+        <source>Friends · %1 new</source>
+        <translation>Amis · %1 nouveaux</translation>
+    </message>
+    <message>
+        <source>Write</source>
+        <translation>Écrire</translation>
+    </message>
+    <message>
+        <source>You</source>
+        <translation>Toi</translation>
+    </message>
+    <message>
+        <source>Your new nickname: 4 to 20 letters (without accents), digits, spaces, '.', '_' or '-'.</source>
+        <translation>Ton nouveau pseudo : 4 à 20 lettres (sans accents), chiffres, espaces, « . », « _ » ou « - ».</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n new message(s)</source>
+        <translation><numerusform>%n nouveau message</numerusform><numerusform>%n nouveaux messages</numerusform><numerusform>%n nouveaux messages</numerusform></translation>
+    </message>
     <message>
         <source>Online</source>
         <translation>En ligne</translation>

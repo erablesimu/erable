@@ -216,11 +216,6 @@ public:
      */
     void HandleLdnPacket(const ENetEvent* event);
 
-    /**
-     * Extracts a chat entry from a received ENet packet and adds it to the chat queue.
-     * @param event The ENet event that was received.
-     */
-    void HandleChatPacket(const ENetEvent* event);
 
     /**
      * Extracts the game name from a received ENet packet and broadcasts it.
@@ -257,7 +252,8 @@ void Room::RoomImpl::StartLoop() {
                         HandleLdnPacket(&event);
                         break;
                     case IdChatMessage:
-                        HandleChatPacket(&event);
+                        // Erable rooms carry no chat: players talk to their friends, through the
+                        // Erable account server, where they chose who they talk to
                         break;
                     // Moderation
                     case IdModKick:
@@ -926,56 +922,6 @@ void Room::RoomImpl::HandleLdnPacket(const ENetEvent* event) {
         }
     }
     enet_host_flush(server);
-}
-
-void Room::RoomImpl::HandleChatPacket(const ENetEvent* event) {
-    Packet in_packet;
-    in_packet.Append(event->packet->data, event->packet->dataLength);
-
-    in_packet.IgnoreBytes(sizeof(u8)); // Ignore the message type
-    std::string message;
-    in_packet.Read(message);
-    auto CompareNetworkAddress = [event](const Member member) -> bool {
-        return member.peer == event->peer;
-    };
-
-    std::lock_guard lock(member_mutex);
-    const auto sending_member = std::find_if(members.begin(), members.end(), CompareNetworkAddress);
-    if (sending_member == members.end()) {
-        return; // Received a chat message from a unknown sender
-    }
-
-    // Limit the size of chat messages to MaxMessageSize
-    message.resize((std::min)(static_cast<u32>(message.size()), MaxMessageSize));
-
-    Packet out_packet;
-    out_packet.Write(static_cast<u8>(IdChatMessage));
-    out_packet.Write(sending_member->nickname);
-    out_packet.Write(sending_member->user_data.username);
-    out_packet.Write(message);
-
-    ENetPacket* enet_packet = enet_packet_create(out_packet.GetData(), out_packet.GetDataSize(),
-                                                 ENET_PACKET_FLAG_RELIABLE);
-    bool sent_packet = false;
-    for (const auto& member : members) {
-        if (member.peer != event->peer) {
-            sent_packet = true;
-            enet_peer_send(member.peer, 0, enet_packet);
-        }
-    }
-
-    if (!sent_packet) {
-        enet_packet_destroy(enet_packet);
-    }
-
-    enet_host_flush(server);
-
-    if (sending_member->user_data.username.empty()) {
-        LOG_INFO(Network, "{}: {}", sending_member->nickname, message);
-    } else {
-        LOG_INFO(Network, "{} ({}): {}", sending_member->nickname,
-                 sending_member->user_data.username, message);
-    }
 }
 
 void Room::RoomImpl::HandleGameInfoPacket(const ENetEvent* event) {

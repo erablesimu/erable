@@ -7,20 +7,21 @@
 #include <QString>
 #include <QTimer>
 
-class ChatRoom;
 class QLabel;
 class QLineEdit;
 class QPushButton;
 class QStackedWidget;
+class QTextBrowser;
 class QVBoxLayout;
 
 namespace Online {
 
 class Account;
 
-/// The "Online" panel of the home screen, slid in on its right: going online, choosing a room of
-/// the Erable server, then the friends, the room's chat and the alerts. The room chosen is kept
-/// until Erable closes; the next start is offline again. A room holds one game at a time.
+/// The "Online" panel of the home screen, slid in on its right: going online, then the rooms of
+/// the Erable server, the friends with their messages, and the alerts. The room chosen is kept
+/// until Erable closes; the next start is offline again. A room holds one game at a time and has
+/// no chat: players write to their friends, kept 15 days on the server.
 class OnlinePanel : public QFrame {
     Q_OBJECT
 
@@ -36,7 +37,7 @@ public:
     QString StatusText() const;
     /// Whether the status button shows the online colour
     bool IsOnline() const;
-    /// The friend requests waiting, for the status button's count
+    /// The friend requests and unread messages, for the status button's count
     int AlertCount() const;
 
     /// Whether `title` may start: in a room another game holds, it may not, and the player is told
@@ -54,12 +55,13 @@ protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
-    enum class Page { Offline, Rooms, Room };
-    enum class Tab { Friends, Chat, Alerts };
+    enum class Tab { Rooms, Friends, Alerts };
 
     void BuildOfflinePage();
-    void BuildRoomsPage();
-    void BuildRoomPage();
+    void BuildOnlinePage();
+    QWidget* BuildRoomsTab();
+    QWidget* BuildFriendsTab();
+    QWidget* BuildAlertsTab();
     void Place();
     void Update();
     void ShowTab(Tab tab);
@@ -68,21 +70,26 @@ private:
     void RebuildFriends();
     void RebuildAlerts();
     void GoOnline();
+    /// Asks for a new nickname until one is taken or the player gives up; whether it was changed
+    bool ChangeNickname();
     void Choose(unsigned port);
     void LeaveRoom();
     void GoOffline();
     void ToggleWiFi();
+    void OpenConversation(const QString& friend_code, const QString& nickname);
+    void CloseConversation();
+    void FetchConversation();
+    void SendToFriend();
     /// The room joined, 0 when none
     unsigned JoinedPort() const;
+    bool SignedIn() const;
     QString RoomLabel(unsigned port) const;
 
     Account* account;
     QString display;
     QString body;
-    bool browsing = false; ///< The room list is wanted (going online, or changing rooms)
-    Page page = Page::Offline;
-    Tab tab = Tab::Friends;
-    QString member_signature; ///< The room's members last given to the chat
+    bool online = false; ///< Gone online this session (the rooms, friends and alerts shown)
+    Tab tab = Tab::Rooms;
 
     QLabel* title = nullptr;
     QPushButton* refresh_button = nullptr;
@@ -91,21 +98,35 @@ private:
     QLabel* offline_account = nullptr;
     QPushButton* wifi_button = nullptr;
 
+    QWidget* room_card = nullptr;
+    QLabel* room_name = nullptr;
+    QLabel* room_game = nullptr;
+    QWidget* nickname_notice = nullptr;
+    QPushButton* tab_buttons[3]{};
+    QStackedWidget* tabs = nullptr;
+
     QLabel* rooms_status = nullptr;
     QVBoxLayout* rooms_list = nullptr;
 
-    QLabel* room_name = nullptr;
-    QLabel* room_game = nullptr;
-    QPushButton* tab_buttons[3]{};
-    QStackedWidget* tabs = nullptr;
+    QStackedWidget* friends_pages = nullptr;
     QVBoxLayout* friends_list = nullptr;
     QLineEdit* friend_code = nullptr;
     QLabel* friend_message = nullptr;
-    QVBoxLayout* alerts_list = nullptr;
-    ChatRoom* chat = nullptr;
 
-    QTimer state_timer; ///< The room's state, every second
-    QTimer rooms_timer; ///< The rooms' players and games, every 30 s while online
+    // The conversation open with a friend
+    QString talking_code;
+    QLabel* talking_name = nullptr;
+    QTextBrowser* conversation = nullptr;
+    QLineEdit* message_edit = nullptr;
+    QLabel* message_error = nullptr;
+    qint64 last_message_id = 0;
+    bool fetching_messages = false;
+
+    QVBoxLayout* alerts_list = nullptr;
+
+    QTimer state_timer;        ///< The room's state, every second
+    QTimer rooms_timer;        ///< The rooms' players and games, every 30 s while online
+    QTimer conversation_timer; ///< New messages, every 4 s while a conversation is open
     bool fetching_rooms = false;
 };
 

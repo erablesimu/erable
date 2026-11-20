@@ -136,6 +136,15 @@ QString Account::ErrorText(const QString& code) {
         return tr("The nickname needs 4 to 20 letters (without accents), digits, spaces, '.', "
                   "'_' or '-'.");
     }
+    if (code == QStringLiteral("nickname_must_change")) {
+        return tr("Your nickname holds an insult or a swear word: change it to play online.");
+    }
+    if (code == QStringLiteral("not_friends")) {
+        return tr("You are no longer friends.");
+    }
+    if (code == QStringLiteral("too_many_messages")) {
+        return tr("Too many messages at once: wait a minute.");
+    }
     if (code == QStringLiteral("offensive_nickname")) {
         return tr("This nickname holds an insult or a swear word: choose another one.");
     }
@@ -235,6 +244,8 @@ void Account::Refresh(Callback done) {
                  session->nickname = result.data.value(QStringLiteral("nickname")).toString();
                  session->email = result.data.value(QStringLiteral("email")).toString();
                  session->friend_code = result.data.value(QStringLiteral("friend_code")).toString();
+                 session->nickname_must_change =
+                     result.data.value(QStringLiteral("nickname_must_change")).toBool();
                  SaveSession();
                  emit SessionChanged();
              } else if (result.error == QStringLiteral("no_session")) {
@@ -289,6 +300,9 @@ void Account::FetchRooms(Callback done) {
                  }
              } else if (result.error == QStringLiteral("no_session")) {
                  ClearSession();
+             } else if (result.error == QStringLiteral("nickname_must_change") && session) {
+                 session->nickname_must_change = true;
+                 emit SessionChanged();
              }
              done(result);
          });
@@ -373,6 +387,7 @@ void Account::Sync() {
                      .game = item.value(QStringLiteral("game")).toString(),
                      .room_port =
                          static_cast<unsigned>(item.value(QStringLiteral("room_port")).toInt()),
+                     .unread = item.value(QStringLiteral("unread")).toInt(),
                  });
              }
              incoming = requests(result.data.value(QStringLiteral("incoming")).toArray());
@@ -384,6 +399,57 @@ void Account::Sync() {
                      emit FriendRequestReceived(request.nickname, request.friend_code);
                  }
              }
+         });
+}
+
+void Account::ChangeNickname(const QString& nickname, Callback done) {
+    Send(QStringLiteral("POST"), QStringLiteral("/v1/account/nickname"),
+         {{QStringLiteral("nickname"), nickname.trimmed()}}, true,
+         [this, done = std::move(done)](const Result& result) {
+             if (result.ok && session) {
+                 session->nickname = result.data.value(QStringLiteral("nickname")).toString();
+                 session->nickname_must_change =
+                     result.data.value(QStringLiteral("nickname_must_change")).toBool();
+                 SaveSession();
+                 emit SessionChanged();
+                 Sync();
+             }
+             done(result);
+         });
+}
+
+void Account::SendMessage(const QString& friend_code, const QString& text, Callback done) {
+    Send(QStringLiteral("POST"), QStringLiteral("/v1/messages/send"),
+         {{QStringLiteral("friend_code"), friend_code}, {QStringLiteral("text"), text}}, true,
+         std::move(done));
+}
+
+void Account::FetchMessages(const QString& friend_code, qint64 after_id,
+                            std::function<void(const Result&, const QList<Message>&)> done) {
+    Send(QStringLiteral("POST"), QStringLiteral("/v1/messages"),
+         {{QStringLiteral("friend_code"), friend_code},
+          {QStringLiteral("after"), static_cast<qint64>(after_id)}},
+         true, [this, friend_code, done = std::move(done)](const Result& result) {
+             QList<Message> messages;
+             for (const auto& value : result.data.value(QStringLiteral("messages")).toArray()) {
+                 const QJsonObject item = value.toObject();
+                 messages.append({
+                     .id = item.value(QStringLiteral("id")).toInteger(),
+                     .from_me = item.value(QStringLiteral("from_me")).toBool(),
+                     .sent_at = item.value(QStringLiteral("sent_at")).toInteger(),
+                     .text = item.value(QStringLiteral("text")).toString(),
+                 });
+             }
+             // Read now: the friend's count goes, without waiting for the next sync
+             if (result.ok) {
+                 for (Friend& player : friends) {
+                     if (player.friend_code == friend_code && player.unread != 0) {
+                         player.unread = 0;
+                         emit FriendsChanged();
+                     }
+                 }
+             }
+             done(result, messages);
          });
 }
 
@@ -498,6 +564,8 @@ void Account::TakeSession(const Result& result) {
         .nickname = result.data.value(QStringLiteral("nickname")).toString(),
         .email = result.data.value(QStringLiteral("email")).toString(),
         .friend_code = result.data.value(QStringLiteral("friend_code")).toString(),
+        .nickname_must_change =
+            result.data.value(QStringLiteral("nickname_must_change")).toBool(),
     };
     SaveSession();
     emit SessionChanged();

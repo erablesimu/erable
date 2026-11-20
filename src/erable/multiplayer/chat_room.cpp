@@ -206,6 +206,11 @@ ChatRoom::ChatRoom(QWidget* parent) : QWidget(parent), ui(std::make_unique<Ui::C
 ChatRoom::~ChatRoom() = default;
 
 void ChatRoom::Initialize() {
+    // Erable rooms carry no chat: players write to their friends, from the home's online panel
+    ui->chat_message->hide();
+    ui->send_message->hide();
+    AppendStatusMessage(tr("Rooms have no chat: write to your friends from the Online panel of "
+                           "the home screen."));
     // setup the callbacks for network updates
     if (auto member = Network::GetRoomMember().lock()) {
         member->BindOnChatMessageReceived(

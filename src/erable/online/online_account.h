@@ -25,6 +25,9 @@ struct Session {
     QString nickname;
     QString email;
     QString friend_code;
+    /// The nickname holds an insult: no online play until it is changed (from the server, not
+    /// saved)
+    bool nickname_must_change{};
 };
 
 /// A room of the Erable server that signed-in players may join
@@ -43,6 +46,15 @@ struct Friend {
     bool online{};
     QString game;         ///< The game they play, empty when none or offline
     unsigned room_port{}; ///< The Erable room they are in, 0 when none
+    int unread{};         ///< Their messages not read yet
+};
+
+/// A message between two friends; the server keeps them 15 days
+struct Message {
+    qint64 id{};
+    bool from_me{};
+    qint64 sent_at{}; ///< Seconds since 1970, UTC
+    QString text;
 };
 
 /// A friend request, sent to this account or by it
@@ -127,6 +139,15 @@ public:
     void BlockPlayer(const QString& friend_code, Callback done);
     /// Syncs now rather than at the next 30 s tick
     void Sync();
+
+    /// Changes the nickname (one with an insult must be changed before playing online)
+    void ChangeNickname(const QString& nickname, Callback done);
+
+    /// Sends a message to a friend
+    void SendMessage(const QString& friend_code, const QString& text, Callback done);
+    /// The messages with a friend after `after_id`, oldest first, theirs then marked read
+    void FetchMessages(const QString& friend_code, qint64 after_id,
+                       std::function<void(const Result&, const QList<Message>&)> done);
     /// What friends see this player doing: the game (empty for none) and the room (0 for none)
     void SetPresence(const QString& game, unsigned room_port);
     void SetPresenceGame(const QString& game) {
