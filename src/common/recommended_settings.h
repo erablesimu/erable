@@ -75,7 +75,6 @@ void ForEachRecommendedSetting(Values& settings, Func&& func) {
     entry(settings.cpu_clock, CpuClock::Normal);
     entry(settings.gpu_clock, GpuClock::Boost);
     entry(settings.use_multi_core, true);
-    entry(settings.memory_layout_mode, MemoryLayout::Memory_4Gb);
     entry(settings.use_speed_limit, true);
     entry(settings.speed_limit, 100);
     entry(settings.slow_speed_limit, 50);

@@ -602,6 +602,34 @@ Cela bannirait à la fois son nom d&apos;utilisateur du forum et son adresse IP.
 <context>
     <name>ConfigurationShared</name>
     <message>
+        <source>Precache shaders before game start:</source>
+        <translation>Précompiler les shaders avant le lancement du jeu :</translation>
+    </message>
+    <message>
+        <source>Builds shaders on the loading screen, on every CPU thread, so they don't stutter the first time the game uses them: the compute shaders found in the game files. The first launch reads the game files and takes a few minutes; later launches only build what is new, until the GPU driver changes. The loading screen has a Skip button.
+Ask asks at launch while the game has never been precached.</source>
+        <translation>Compile les shaders pendant l'écran de chargement, sur tous les fils du processeur, pour qu'ils ne saccadent pas la première fois que le jeu s'en sert : les shaders de calcul trouvés dans les fichiers du jeu. Le premier lancement lit les fichiers du jeu et prend quelques minutes ; les suivants ne compilent que ce qui est nouveau, jusqu'à un changement de pilote graphique. L'écran de chargement a un bouton Passer.
+Demander pose la question au lancement tant que le jeu n'a jamais été précompilé.</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>Désactivé</translation>
+    </message>
+    <message>
+        <source>Ask</source>
+        <translation>Demander</translation>
+    </message>
+    <message>
+        <source>Build all cached shaders before game start</source>
+        <translation>Compiler tous les shaders en cache avant le lancement du jeu</translation>
+    </message>
+    <message>
+        <source>Builds every shader saved by earlier play sessions on the loading screen and keeps them built, so places you visited long ago don't stutter. Without it, only the shaders of recent sessions are built there and the rest in the background or when the game first needs them.
+Loading takes longer and uses more memory, about 0.3 MB per shader, up to a quarter of the RAM. Takes effect when a game starts.</source>
+        <translation>Compile pendant l'écran de chargement tous les shaders enregistrés lors des sessions précédentes et les garde prêts, pour que les lieux visités il y a longtemps ne saccadent pas. Sans cette option, seuls les shaders des sessions récentes y sont compilés, les autres en arrière-plan ou quand le jeu en a besoin.
+Le chargement est plus long et utilise plus de mémoire, environ 0,3 Mo par shader, jusqu'au quart de la RAM. S'applique au lancement d'un jeu.</translation>
+    </message>
+    <message>
         <source>Mario Kart World: 60 FPS mode</source>
         <translation>Mario Kart World : mode 60 FPS</translation>
     </message>
