@@ -461,6 +461,26 @@ def load_rooms(path):
              "password": str(room.get("password", ""))} for room in rooms]
 
 
+def rooms_with_players(store, account_id, rooms):
+    """The rooms, each with the other players online in it and the game they play there: a
+    room holds one game at a time, the one its players run, and is free again once empty"""
+    now = int(time.time())
+    by_port = {}
+    for port, game in store.db.execute(
+            "SELECT room_port, game FROM presence WHERE account_id != ? AND room_port != 0 "
+            "AND seen_at >= ?", (account_id, now - ONLINE_FOR)):
+        players, games = by_port.setdefault(port, [0, {}])
+        by_port[port][0] = players + 1
+        if game:
+            games[game] = games.get(game, 0) + 1
+    listed = []
+    for room in rooms:
+        players, games = by_port.get(room["port"], [0, {}])
+        game = max(games, key=games.get) if games else ""
+        listed.append(dict(room, players=players, game=game))
+    return listed
+
+
 def session_account(store, headers):
     auth = headers.get("Authorization", "")
     if not auth.startswith("Bearer "):
@@ -536,7 +556,8 @@ def make_handler(store, rooms):
                         account_id, _ = session_account(store, self.headers)
                         if not store.has_access(account_id):
                             raise ApiError(HTTPStatus.PAYMENT_REQUIRED, "no_access")
-                        self.reply(HTTPStatus.OK, {"rooms": rooms})
+                        self.reply(HTTPStatus.OK, {"rooms": rooms_with_players(store, account_id,
+                                                                              rooms)})
                         return
                     account_route = ACCOUNT_ROUTES.get((method, self.path))
                     if account_route is not None:

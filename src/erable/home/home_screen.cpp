@@ -49,6 +49,8 @@
 #include "erable/game/game_list.h"
 #include "erable/home/case_shelf.h"
 #include "erable/home/profile_picker.h"
+#include "erable/online/online_account.h"
+#include "erable/online/online_panel.h"
 #include "erable/util/controller_navigation.h"
 #include "frontend_common/play_time_manager.h"
 #include "hid_core/frontend/emulated_controller.h"
@@ -619,6 +621,18 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
         emit HomeSettingsChanged();
     });
     right->addWidget(theme_button);
+    // Online play: the status, which opens the panel on the right
+    if (Online::Account::Enabled()) {
+        online_panel = new Online::OnlinePanel(fonts.display, fonts.body, this);
+        online_button = new PillButton({}, {}, false, this);
+        online_button->setToolTip(tr("Online play, friends and alerts"));
+        connect(online_button, &QAbstractButton::clicked, online_panel,
+                &Online::OnlinePanel::Toggle);
+        connect(online_panel, &Online::OnlinePanel::StatusChanged, this,
+                &HomeScreen::UpdateOnlineButton);
+        right->addWidget(online_button);
+        UpdateOnlineButton();
+    }
     fullscreen_button = new PillButton(tr("Full screen"), {}, false, this);
     fullscreen_button->setToolTip(tr("Fill the screen (F11)"));
     connect(fullscreen_button, &QAbstractButton::clicked, this, [this] { emit FullscreenRequested(); });
@@ -1009,6 +1023,9 @@ void HomeScreen::RefreshTheme() {
         label->setPalette(palette);
     }
     shelf->RefreshTheme();
+    if (online_panel) {
+        online_panel->RefreshStyle();
+    }
     UpdateTheme();
     UpdateStatus();
     UpdateSelection();
@@ -1214,8 +1231,11 @@ void HomeScreen::UpdateSelection() {
 
 void HomeScreen::Launch() {
     if (selected < static_cast<int>(games.size())) {
-        music.Stop();
         const Game& game = games[selected];
+        if (online_panel && !online_panel->MayLaunch(game.title)) {
+            return;
+        }
+        music.Stop();
         if (launch_overlay == nullptr) {
             launch_overlay = new LaunchOverlay(this);
         }
@@ -1224,6 +1244,17 @@ void HomeScreen::Launch() {
     } else {
         OpenGamesFolder();
     }
+}
+
+void HomeScreen::UpdateOnlineButton() {
+    if (!online_button) {
+        return;
+    }
+    const int alerts = online_panel->AlertCount();
+    online_button->setText(alerts > 0 ? QStringLiteral("%1 · %2").arg(online_panel->StatusText())
+                                            .arg(alerts)
+                                      : online_panel->StatusText());
+    online_button->SetBadge(online_panel->IsOnline() ? QStringLiteral("●") : QStringLiteral("○"));
 }
 
 void HomeScreen::OpenGameSettingsOfSelected() {

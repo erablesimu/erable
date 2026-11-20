@@ -136,6 +136,10 @@ Ses sauvegardes restent sur le disque, mais plus aucun profil d&apos;Erable ne l
 <context>
     <name>HomeScreen</name>
     <message>
+        <source>Online play, friends and alerts</source>
+        <translation>Jeu en ligne, amis et alertes</translation>
+    </message>
+    <message>
         <source>Update</source>
         <translation>Mise à jour</translation>
     </message>
@@ -12552,6 +12556,245 @@ Entrez votre mot de passe pour confirmer :</translation>
     <message>
         <source>&lt;h3&gt;Signed in as %1&lt;/h3&gt;</source>
         <translation>&lt;h3&gt;Connecté en tant que %1&lt;/h3&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>Online::OnlinePanel</name>
+    <message>
+        <source>Online</source>
+        <translation>En ligne</translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation>Actualiser</translation>
+    </message>
+    <message>
+        <source>Fetch the rooms' players again</source>
+        <translation>Recharger les joueurs des salons</translation>
+    </message>
+    <message>
+        <source>Minimize: the button at the top keeps the state and opens it again</source>
+        <translation>Réduire : le bouton en haut garde l’état et rouvre le panneau</translation>
+    </message>
+    <message>
+        <source>Minimize the panel</source>
+        <translation>Réduire le panneau</translation>
+    </message>
+    <message>
+        <source>Play with your friends</source>
+        <translation>Joue avec tes amis</translation>
+    </message>
+    <message>
+        <source>Go online on the Erable server to see its rooms, find your friends and get their requests.</source>
+        <translation>Connecte-toi au serveur Erable pour voir ses salons, retrouver tes amis et recevoir leurs demandes.</translation>
+    </message>
+    <message>
+        <source>Go online</source>
+        <translation>Connexion en ligne</translation>
+    </message>
+    <message>
+        <source>On the same network?</source>
+        <translation>Sur le même réseau ?</translation>
+    </message>
+    <message>
+        <source>Friends and alerts show once you are online.</source>
+        <translation>Amis et alertes s’affichent une fois en ligne.</translation>
+    </message>
+    <message>
+        <source>A room holds one game at a time: the game its players run. It is free again once empty.</source>
+        <translation>Un salon accueille un seul jeu à la fois : celui de ses joueurs. Il redevient libre une fois vide.</translation>
+    </message>
+    <message>
+        <source>The room you choose stays yours until Erable closes. Erable starts offline the next time.</source>
+        <translation>Le salon choisi reste le tien jusqu’à la fermeture d’Erable. Au prochain lancement, Erable démarre hors ligne.</translation>
+    </message>
+    <message>
+        <source>Go offline</source>
+        <translation>Se déconnecter</translation>
+    </message>
+    <message>
+        <source>Leave</source>
+        <translation>Quitter</translation>
+    </message>
+    <message>
+        <source>Leave the room and see the others</source>
+        <translation>Quitter le salon et voir les autres</translation>
+    </message>
+    <message>
+        <source>Change room</source>
+        <translation>Changer de salon</translation>
+    </message>
+    <message>
+        <source>Kept until Erable closes</source>
+        <translation>Gardé jusqu’à la fermeture d’Erable</translation>
+    </message>
+    <message>
+        <source>Friends</source>
+        <translation>Amis</translation>
+    </message>
+    <message>
+        <source>Chat</source>
+        <translation>Discussion</translation>
+    </message>
+    <message>
+        <source>Alerts</source>
+        <translation>Alertes</translation>
+    </message>
+    <message>
+        <source>Friend code: ER-0000-0000-0000</source>
+        <translation>Code ami : ER-0000-0000-0000</translation>
+    </message>
+    <message>
+        <source>Friend code</source>
+        <translation>Code ami</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Ajouter</translation>
+    </message>
+    <message>
+        <source>Request sent.</source>
+        <translation>Demande envoyée.</translation>
+    </message>
+    <message>
+        <source>Manage friends...</source>
+        <translation>Gérer les amis…</translation>
+    </message>
+    <message>
+        <source>Room %1</source>
+        <translation>Salon %1</translation>
+    </message>
+    <message>
+        <source>Local Wi-Fi</source>
+        <translation>Wi-Fi local</translation>
+    </message>
+    <message>
+        <source>Joining %1...</source>
+        <translation>Connexion à %1…</translation>
+    </message>
+    <message>
+        <source>Online · choose a room</source>
+        <translation>En ligne · choisis un salon</translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation>Hors ligne</translation>
+    </message>
+    <message>
+        <source>Rooms</source>
+        <translation>Salons</translation>
+    </message>
+    <message>
+        <source>As %1, with your Erable account</source>
+        <translation>En tant que %1, avec ton compte Erable</translation>
+    </message>
+    <message>
+        <source>Needs an Erable account: you sign in first.</source>
+        <translation>Il faut un compte Erable : tu te connectes d’abord.</translation>
+    </message>
+    <message>
+        <source>Local Wi-Fi is on · Turn it off</source>
+        <translation>Wi-Fi local activé · Le couper</translation>
+    </message>
+    <message>
+        <source>Play on the local Wi-Fi (same network)</source>
+        <translation>Jouer en Wi-Fi local (même réseau)</translation>
+    </message>
+    <message>
+        <source>Joining the room...</source>
+        <translation>Connexion au salon…</translation>
+    </message>
+    <message>
+        <source>For %1</source>
+        <translation>Réservé à %1</translation>
+    </message>
+    <message>
+        <source>Free: the first game started here holds it</source>
+        <translation>Libre : le premier jeu lancé ici le réserve</translation>
+    </message>
+    <message>
+        <source>Alerts · %1</source>
+        <translation>Alertes · %1</translation>
+    </message>
+    <message>
+        <source>Friends · %1</source>
+        <translation>Amis · %1</translation>
+    </message>
+    <message>
+        <source>Fetching the rooms...</source>
+        <translation>Récupération des salons…</translation>
+    </message>
+    <message>
+        <source>Your room</source>
+        <translation>Ton salon</translation>
+    </message>
+    <message>
+        <source>Free</source>
+        <translation>Libre</translation>
+    </message>
+    <message>
+        <source>No friends yet: share your friend code (%1), or add theirs.</source>
+        <translation>Pas encore d’amis : partage ton code ami (%1), ou ajoute le leur.</translation>
+    </message>
+    <message>
+        <source>Plays %1 in %2</source>
+        <translation>Joue à %1 dans %2</translation>
+    </message>
+    <message>
+        <source>Plays %1</source>
+        <translation>Joue à %1</translation>
+    </message>
+    <message>
+        <source>In %1</source>
+        <translation>Dans %1</translation>
+    </message>
+    <message>
+        <source>Join</source>
+        <translation>Rejoindre</translation>
+    </message>
+    <message>
+        <source>Nothing new.</source>
+        <translation>Rien de nouveau.</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; wants to be your friend</source>
+        <translation>&lt;b&gt;%1&lt;/b&gt; veut être ton ami</translation>
+    </message>
+    <message>
+        <source>Accept</source>
+        <translation>Accepter</translation>
+    </message>
+    <message>
+        <source>Refuse</source>
+        <translation>Refuser</translation>
+    </message>
+    <message>
+        <source>Request sent to %1, waiting for their answer</source>
+        <translation>Demande envoyée à %1, en attente de sa réponse</translation>
+    </message>
+    <message>
+        <source>Another game holds this room</source>
+        <translation>Un autre jeu occupe ce salon</translation>
+    </message>
+    <message>
+        <source>%1 is played in %2: a room holds one game at a time. Choose another room to play %3 with friends, or go offline.</source>
+        <translation>%1 est joué dans %2 : un salon n’accueille qu’un seul jeu à la fois. Choisis un autre salon pour jouer à %3 avec des amis, ou passe hors ligne.</translation>
+    </message>
+    <message>
+        <source>See the rooms</source>
+        <translation>Voir les salons</translation>
+    </message>
+    <message numerus="yes">
+        <source>Online · %1 · %n player(s)</source>
+        <translation><numerusform>En ligne · %1 · %n joueur</numerusform><numerusform>En ligne · %1 · %n joueurs</numerusform><numerusform>En ligne · %1 · %n joueurs</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n player(s), no game yet</source>
+        <translation><numerusform>%n joueur, pas encore de jeu</numerusform><numerusform>%n joueurs, pas encore de jeu</numerusform><numerusform>%n joueurs, pas encore de jeu</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 · %n player(s)</source>
+        <translation><numerusform>%1 · %n joueur</numerusform><numerusform>%1 · %n joueurs</numerusform><numerusform>%1 · %n joueurs</numerusform></translation>
     </message>
 </context>
 <context>

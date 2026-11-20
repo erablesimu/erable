@@ -21,7 +21,8 @@
 #include "erable/multiplayer/state.h"
 
 ClientRoomWindow::ClientRoomWindow(QWidget* parent)
-    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowSystemMenuHint),
+    : QDialog(parent, Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowSystemMenuHint |
+                          Qt::WindowMinimizeButtonHint),
       ui(std::make_unique<Ui::ClientRoom>()) {
     ui->setupUi(this);
     ui->chat->Initialize();

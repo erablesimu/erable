@@ -5,6 +5,26 @@ version. Les sections suivantes gardent l'historique.
 
 ## Nouveautés de cette version
 
+**Panneau « En ligne » sur l'accueil**
+- Un bouton en haut de l'accueil montre l'état (Hors ligne, salon et nombre de joueurs) et le
+  nombre de demandes d'ami en attente. Il ouvre un panneau à droite :
+  - « Connexion en ligne » (avec votre compte Erable), puis la liste des salons du serveur, avec
+    leurs joueurs et leur jeu ;
+  - une fois dans un salon : les amis (et « Rejoindre » leur salon), la discussion du salon et les
+    alertes (demandes d'ami à accepter ou refuser), plus l'ajout d'un ami par son code ;
+  - le bouton « – » réduit le panneau ; l'état reste affiché en haut.
+- Un salon accueille un seul jeu à la fois, celui de ses joueurs : lancer un autre jeu propose de
+  changer de salon. Un salon vide redevient libre.
+- Le salon choisi est gardé jusqu'à la fermeture d'Erable ; au lancement suivant, Erable démarre
+  hors ligne.
+- La fenêtre du salon peut maintenant être réduite.
+
+**Mario Kart World en sans fil local**
+- Le « Patientez » sans fin du mode sans fil local est corrigé, sans mode avion, seul comme dans un
+  salon : le jeu ne tente plus sa connexion aux serveurs de Nintendo, toujours bloquée.
+- Un groupe créé seul ne se ferme plus aussitôt avec une erreur.
+- Deux PC dans le même salon du serveur Erable se retrouvent en sans fil local.
+
 **Moins de saccades quand la mémoire manque**
 - Quand le cache de textures doit libérer de la place en urgence, il jette d'abord les images
   qu'il n'a pas besoin de recopier, au lieu d'attendre la carte graphique pour chacune. Dans

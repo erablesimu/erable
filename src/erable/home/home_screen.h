@@ -29,6 +29,10 @@ class QLabel;
 class QLineEdit;
 class QMenu;
 
+namespace Online {
+class OnlinePanel;
+}
+
 namespace Core {
 class System;
 }
@@ -128,6 +132,8 @@ private:
     void ToggleFavorite();
     void OpenGameSettingsOfSelected();
     void OpenGamesFolder();
+    /// The online status button follows the panel
+    void UpdateOnlineButton();
 
     GameList* game_list;
     PlayTime::PlayTimeManager& play_time;
@@ -152,6 +158,8 @@ private:
     PillButton* style_button = nullptr;
     PillButton* theme_button = nullptr;
     PillButton* fullscreen_button = nullptr;
+    PillButton* online_button = nullptr;
+    Online::OnlinePanel* online_panel = nullptr;
     LaunchOverlay* launch_overlay = nullptr;
     QLabel* controller_label = nullptr;
     QLabel* clock = nullptr;

@@ -32,6 +32,8 @@ struct Room {
     QString name;
     unsigned port{};
     QString password;
+    int players{}; ///< The other players online in it (0 when the server is older)
+    QString game;  ///< The game its players run: a room holds one game at a time
 };
 
 /// A friend, as the last sync saw them

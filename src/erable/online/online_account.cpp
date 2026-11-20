@@ -280,7 +280,9 @@ void Account::FetchRooms(Callback done) {
                      rooms.append(
                          {.name = room.value(QStringLiteral("name")).toString(),
                           .port = static_cast<unsigned>(room.value(QStringLiteral("port")).toInt()),
-                          .password = room.value(QStringLiteral("password")).toString()});
+                          .password = room.value(QStringLiteral("password")).toString(),
+                          .players = room.value(QStringLiteral("players")).toInt(),
+                          .game = room.value(QStringLiteral("game")).toString()});
                  }
              } else if (result.error == QStringLiteral("no_session")) {
                  ClearSession();

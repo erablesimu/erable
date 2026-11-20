@@ -19,6 +19,7 @@
 #include "erable/multiplayer/lobby.h"
 #include "erable/multiplayer/message.h"
 #include "erable/multiplayer/state.h"
+#include "erable/online/online_mode.h"
 #include "erable/util/clickable_label.h"
 
 MultiplayerState::MultiplayerState(QWidget* parent, QStandardItemModel* game_list_model_,
@@ -151,8 +152,10 @@ void MultiplayerState::OnNetworkStateChanged(const Network::RoomMember::State& s
     LOG_INFO(Network, "Room state: {}", Network::GetStateStr(state));
     if (state == Network::RoomMember::State::Joined ||
         state == Network::RoomMember::State::Moderator) {
-
-        OnOpenNetworkRoom();
+        // A room of the Erable server has its chat in the home's online panel: no window then
+        if (Online::CurrentMode() != Online::Mode::Server) {
+            OnOpenNetworkRoom();
+        }
         SetNotificationStatus(NotificationStatus::Connected);
     } else {
         SetNotificationStatus(NotificationStatus::Disconnected);
