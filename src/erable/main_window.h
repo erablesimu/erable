@@ -427,6 +427,8 @@ private slots:
     void OnInstallDecryptionKeys();
     void OnWhatsNew();
     void OnTutorial();
+    /// On the very first start: the recommended settings for this PC, then the tutorial
+    void OfferFirstStart();
     void OnRecordSession();
     void OnAbout();
     void OnEdenDependencies();

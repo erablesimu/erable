@@ -32,6 +32,8 @@ version. Les sections suivantes gardent l'historique.
   tirés de ta console), ajouter ses jeux, jouer, les réglages pour son PC, les manettes, le jeu en
   ligne, les mises à jour et l'aide. Il s'ouvre depuis le bouton « Tutoriel » de l'accueil ou
   Aide › Tutoriel.
+- À la toute première ouverture d'Erable, il propose d'appliquer les réglages recommandés pour
+  ton PC, puis ouvre le tutoriel.
 
 **Discussion entre amis, plus de discussion dans les salons**
 - Les salons n'ont plus de discussion : on n'y croise plus les messages d'inconnus.

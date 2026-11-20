@@ -547,6 +547,10 @@ MainWindow::MainWindow(bool has_broken_vulkan)
         UISettings::values.show_whats_new.GetValue()) {
         QTimer::singleShot(0, this, &MainWindow::OnWhatsNew);
     }
+    // The very first start offers the settings for this PC, then the tutorial
+    if (UISettings::values.first_start.GetValue()) {
+        QTimer::singleShot(500, this, &MainWindow::OfferFirstStart);
+    }
 
     if (DebugSession::IsRecording()) {
         LOG_INFO(Frontend, "Debug session: recording (Debug mode > Record my session)");
@@ -4875,6 +4879,21 @@ void MainWindow::OnInstallDecryptionKeys() {
 
     game_list->PopulateAsync(UISettings::values.game_dirs);
     OnCheckFirmwareDecryption();
+}
+
+void MainWindow::OfferFirstStart() {
+    // After the first start's other questions (the profile): try again once they are answered
+    if (QApplication::activeModalWidget() != nullptr) {
+        QTimer::singleShot(1000, this, &MainWindow::OfferFirstStart);
+        return;
+    }
+    if (emulation_running) {
+        return;
+    }
+    OnApplyRecommendedSettings();
+    OnTutorial();
+    UISettings::values.first_start = false;
+    OnSaveConfig();
 }
 
 void MainWindow::OnTutorial() {
