@@ -6,6 +6,7 @@
 
 #include <filesystem>
 #include <fstream>
+#include "common/nextendo.h"
 #include "core/core.h"
 #include "core/hle/kernel/k_event.h"
 #include "core/hle/service/ipc_helpers.h"
@@ -72,11 +73,24 @@ static u128 MakeUuidFromName(std::string_view name) {
 
 // A joined room is the emulated network, even in airplane mode. Its sockets only reach room
 // members, and LAN games (e.g. Mario Kart World LAN Play) need their connection request accepted.
-static bool IsNetworkAvailable() {
+static bool IsNetworkAvailable(Core::System& system) {
     if (Network::GetRoomIPv4Address()) {
         return true;
     }
-    return Network::GetHostIPv4Address().has_value() && !Settings::values.airplane_mode.GetValue();
+    if (!Network::GetHostIPv4Address().has_value() || Settings::values.airplane_mode.GetValue()) {
+        return false;
+    }
+    // Mario Kart World, once its internet request is accepted, logs in to Nintendo's servers,
+    // which stay blocked, and its local wireless mode then waits for that login forever. Without
+    // a server of its own to reach, it is told there is no internet, as in airplane mode, where
+    // its local wireless works. Local wireless itself does not go through nifm.
+    constexpr u64 MarioKartWorld = 0x0400C3F00006E000;
+    if (system.GetApplicationProcessProgramID() == MarioKartWorld &&
+        !Common::Nextendo::OnlinePlayActive() &&
+        !Settings::values.online_service_redirect.GetValue()) {
+        return false;
+    }
+    return true;
 }
 
 // This is nn::nifm::RequestState
@@ -450,7 +464,7 @@ private:
         LOG_DEBUG(Service_NIFM, "(STUBBED) called");
 
         const auto result = [this] {
-            const auto has_connection = IsNetworkAvailable();
+            const auto has_connection = IsNetworkAvailable(system);
             switch (state) {
             case RequestState::NotSubmitted:
                 return has_connection ? ResultSuccess : ResultNetworkCommunicationDisabled;
@@ -1014,7 +1028,7 @@ void IGeneralService::IsAnyInternetRequestAccepted(HLERequestContext& ctx) {
 
     IPC::ResponseBuilder rb{ctx, 3};
     rb.Push(ResultSuccess);
-    if (IsNetworkAvailable()) {
+    if (IsNetworkAvailable(system)) {
         rb.Push<u8>(1);
     } else {
         rb.Push<u8>(0);
