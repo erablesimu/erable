@@ -136,6 +136,14 @@ Ses sauvegardes restent sur le disque, mais plus aucun profil d&apos;Erable ne l
 <context>
     <name>HomeScreen</name>
     <message>
+        <source>Tutorial</source>
+        <translation>Tutoriel</translation>
+    </message>
+    <message>
+        <source>How Erable works: games, keys, playing, settings, online</source>
+        <translation>Comment marche Erable : jeux, clés, jeu, réglages, en ligne</translation>
+    </message>
+    <message>
         <source>Online play, friends and alerts</source>
         <translation>Jeu en ligne, amis et alertes</translation>
     </message>
@@ -7395,6 +7403,10 @@ Message de débogage :</translation>
 <context>
     <name>MainWindow</name>
     <message>
+        <source>Tutorial</source>
+        <translation>Tutoriel</translation>
+    </message>
+    <message>
         <source>Apply Recommended &amp;Settings...</source>
         <translation>Appliquer les &amp;réglages recommandés…</translation>
     </message>
@@ -12593,6 +12605,22 @@ Entrez votre mot de passe pour confirmer :</translation>
 <context>
     <name>Online::OnlinePanel</name>
     <message>
+        <source>Game:</source>
+        <translation>Jeu :</translation>
+    </message>
+    <message>
+        <source>Show the rooms of</source>
+        <translation>Afficher les salons de</translation>
+    </message>
+    <message>
+        <source>All games</source>
+        <translation>Tous les jeux</translation>
+    </message>
+    <message>
+        <source>Rooms for any game</source>
+        <translation>Salons tous jeux</translation>
+    </message>
+    <message>
         <source>Any game</source>
         <translation>Tous jeux</translation>
     </message>
@@ -12943,6 +12971,97 @@ Mets-les en pause pour jouer en ligne : ils reviennent quand tu passes hors lign
     <message numerus="yes">
         <source>%1 · %n player(s)</source>
         <translation><numerusform>%1 · %n joueur</numerusform><numerusform>%1 · %n joueurs</numerusform><numerusform>%1 · %n joueurs</numerusform></translation>
+    </message>
+</context>
+<context>
+    <name>TutorialDialog</name>
+    <message>
+        <source>Erable tutorial</source>
+        <translation>Tutoriel d’Erable</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Précédent</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Suivant</translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation>Terminer</translation>
+    </message>
+    <message>
+        <source>Welcome to Erable</source>
+        <translation>Bienvenue dans Erable</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Erable plays Nintendo Switch and Nintendo Switch 2 games on your PC.&lt;/p&gt;&lt;p&gt;It needs three things that come from &lt;b&gt;your own console&lt;/b&gt;: your games, your keys and your firmware. Erable gives none of them: dump them from a console you own.&lt;/p&gt;&lt;p&gt;This tutorial walks through adding your games, playing, the settings for your PC, the controllers, playing online with friends, and getting help. You can open it again from &lt;b&gt;Help › Tutorial&lt;/b&gt; or the &lt;b&gt;Tutorial&lt;/b&gt; button of the home.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Erable fait tourner les jeux Nintendo Switch et Nintendo Switch 2 sur ton PC.&lt;/p&gt;&lt;p&gt;Il a besoin de trois choses qui viennent de &lt;b&gt;ta propre console&lt;/b&gt; : tes jeux, tes clés et ton firmware. Erable n'en fournit aucun : récupère-les depuis une console que tu possèdes.&lt;/p&gt;&lt;p&gt;Ce tutoriel explique comment ajouter tes jeux, jouer, régler Erable pour ton PC, brancher tes manettes, jouer en ligne avec tes amis et trouver de l'aide. Tu peux le rouvrir depuis &lt;b&gt;Aide › Tutoriel&lt;/b&gt; ou le bouton &lt;b&gt;Tutoriel&lt;/b&gt; de l'accueil.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Your games</source>
+        <translation>Tes jeux</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Put your game files in your games folder: the &lt;b&gt;My games&lt;/b&gt; button of the home opens it. They show up on the home on their own.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Updates and DLC go in the same folder: Erable joins them to their game.&lt;/li&gt;&lt;li&gt;Extract archives (.zip, .7z, .rar) first.&lt;/li&gt;&lt;li&gt;A file OneDrive keeps online only must be downloaded first (right-click it, &lt;i&gt;Always keep on this device&lt;/i&gt;).&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;When a file cannot be shown, the home says why under its list.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Dépose les fichiers de tes jeux dans ton dossier de jeux : le bouton &lt;b&gt;Mes jeux&lt;/b&gt; de l'accueil l'ouvre. Ils apparaissent tout seuls sur l'accueil.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Les mises à jour et DLC vont dans le même dossier : Erable les rattache à leur jeu.&lt;/li&gt;&lt;li&gt;Décompresse d'abord les archives (.zip, .7z, .rar).&lt;/li&gt;&lt;li&gt;Un fichier que OneDrive garde en ligne doit d'abord être téléchargé (clic droit, &lt;i&gt;Toujours conserver sur cet appareil&lt;/i&gt;).&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Quand un fichier ne peut pas être affiché, l'accueil indique pourquoi sous sa liste.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Keys and firmware</source>
+        <translation>Clés et firmware</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Games are encrypted: Erable reads them with the keys (&lt;b&gt;prod.keys&lt;/b&gt;) and the firmware dumped from your console.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Tools › Install Decryption Keys&lt;/b&gt; takes your prod.keys.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Tools › Install Firmware&lt;/b&gt; takes your firmware, from a folder or a .zip.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;A recent game may need keys dumped from a recent firmware: if a game does not start, dump your keys and firmware again after updating your console.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Les jeux sont chiffrés : Erable les lit avec les clés (&lt;b&gt;prod.keys&lt;/b&gt;) et le firmware récupérés sur ta console.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Outils › Installer les clés de déchiffrement&lt;/b&gt; prend ton prod.keys.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Outils › Installer le firmware&lt;/b&gt; prend ton firmware, depuis un dossier ou un .zip.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Un jeu récent peut demander des clés tirées d'un firmware récent : si un jeu ne se lance pas, récupère à nouveau tes clés et ton firmware après avoir mis ta console à jour.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Playing</source>
+        <translation>Jouer</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;On the home, pick a game with the mouse, the arrows or a controller, then:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Play&lt;/b&gt; (A) starts it;&lt;/li&gt;&lt;li&gt;&lt;b&gt;Game settings&lt;/b&gt; (+) sets this game apart from the others;&lt;/li&gt;&lt;li&gt;&lt;b&gt;Options&lt;/b&gt; (X) holds favourites and more;&lt;/li&gt;&lt;li&gt;&lt;b&gt;Report a problem&lt;/b&gt; (−) sends what we need to fix it.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;b&gt;F11&lt;/b&gt; switches between full screen and a window. The first time, a game prepares its shaders and can stutter a little: it goes away the next times.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Sur l'accueil, choisis un jeu à la souris, aux flèches ou à la manette, puis :&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Jouer&lt;/b&gt; (A) le lance ;&lt;/li&gt;&lt;li&gt;&lt;b&gt;Réglages du jeu&lt;/b&gt; (+) règle ce jeu à part des autres ;&lt;/li&gt;&lt;li&gt;&lt;b&gt;Options&lt;/b&gt; (X) regroupe les favoris et le reste ;&lt;/li&gt;&lt;li&gt;&lt;b&gt;Signaler un problème&lt;/b&gt; (−) nous envoie de quoi le corriger.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;b&gt;F11&lt;/b&gt; passe du plein écran à une fenêtre. La première fois, un jeu prépare ses shaders et peut saccader un peu : ça disparaît les fois suivantes.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Settings for your PC</source>
+        <translation>Des réglages pour ton PC</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;&lt;b&gt;Help › Apply Recommended Settings&lt;/b&gt; looks at your graphics card, processor and memory, and picks the resolution, the console mode, the upscaling and the filtering that suit them. &lt;i&gt;Restore my previous settings&lt;/i&gt; puts yours back.&lt;/p&gt;&lt;p&gt;If Erable stutters on a capable PC, make Windows' page file larger (automatic, or at least 16 GB) and close the programs that use a lot of memory.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;b&gt;Aide › Appliquer les réglages recommandés&lt;/b&gt; regarde ta carte graphique, ton processeur et ta mémoire, et choisit la résolution, le mode de la console, la mise à l'échelle et le filtrage qui leur conviennent. &lt;i&gt;Restaurer mes réglages précédents&lt;/i&gt; remet les tiens.&lt;/p&gt;&lt;p&gt;Si Erable saccade sur un PC bien équipé, agrandis le fichier d'échange de Windows (automatique, ou au moins 16 Go) et ferme les programmes gourmands en mémoire.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Controllers</source>
+        <translation>Manettes</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;Plug in or pair your controller: Erable finds it on its own, and the top of the home says when one is connected.&lt;/p&gt;&lt;p&gt;To change the buttons, or to set up a controller for each player, open &lt;b&gt;Settings&lt;/b&gt; on the home, then &lt;b&gt;Controls&lt;/b&gt;.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Branche ou appaire ta manette : Erable la trouve tout seul, et le haut de l'accueil indique quand elle est connectée.&lt;/p&gt;&lt;p&gt;Pour changer les boutons, ou donner une manette à chaque joueur, ouvre &lt;b&gt;Réglages&lt;/b&gt; sur l'accueil, puis &lt;b&gt;Contrôles&lt;/b&gt;.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Playing online</source>
+        <translation>Jouer en ligne</translation>
+    </message>
+    <message>
+        <source>&lt;p&gt;The button at the top of the home shows your online state: &lt;b&gt;red&lt;/b&gt; offline, &lt;b&gt;green&lt;/b&gt; online. It opens the &lt;b&gt;Online&lt;/b&gt; panel.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Go online&lt;/b&gt; with your Erable account. Your nickname must hold no insult.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Rooms&lt;/b&gt;: the rooms of the Erable server, sorted by game, with their places. Join the room of your game, then use the game's local wireless mode: the other players of the room show up as if they were next to you. When the rooms of a game are full, open one more.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Friends&lt;/b&gt;: add a friend with their friend code, join their room, and write to them (messages are kept 15 days).&lt;/li&gt;&lt;li&gt;&lt;b&gt;Alerts&lt;/b&gt;: the friend requests.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Mods and cheats are not allowed in the rooms: Erable offers to pause them in one click. The games' official online modes need Nintendo's servers, which Erable does not reach.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Le bouton en haut de l'accueil montre ton état en ligne : &lt;b&gt;rouge&lt;/b&gt; hors ligne, &lt;b&gt;vert&lt;/b&gt; en ligne. Il ouvre le panneau &lt;b&gt;En ligne&lt;/b&gt;.&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Connexion en ligne&lt;/b&gt; avec ton compte Erable. Ton pseudo ne doit contenir aucune insulte.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Salons&lt;/b&gt; : les salons du serveur Erable, triés par jeu, avec leurs places. Rejoins le salon de ton jeu, puis lance le mode sans fil local du jeu : les autres joueurs du salon apparaissent comme s'ils étaient à côté de toi. Quand les salons d'un jeu sont pleins, ouvre-en un de plus.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Amis&lt;/b&gt; : ajoute un ami avec son code ami, rejoins son salon et écris-lui (les messages sont gardés 15 jours).&lt;/li&gt;&lt;li&gt;&lt;b&gt;Alertes&lt;/b&gt; : les demandes d'ami.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Les mods et les codes de triche sont interdits dans les salons : Erable propose de les mettre en pause d'un clic. Les modes en ligne officiels des jeux passent par les serveurs de Nintendo, qu'Erable ne contacte pas.&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>Updates and help</source>
+        <translation>Mises à jour et aide</translation>
+    </message>
+    <message>
+        <source>&lt;ul&gt;&lt;li&gt;When a new version of Erable is out, the &lt;b&gt;Update&lt;/b&gt; button of the home gets a red dot. &lt;b&gt;Help › Check for Updates&lt;/b&gt; looks for one at any time.&lt;/li&gt;&lt;li&gt;&lt;b&gt;What's new&lt;/b&gt; on the home tells what each version changed.&lt;/li&gt;&lt;li&gt;A game misbehaves? &lt;b&gt;Report a problem&lt;/b&gt; (−) sends its description with the logs we need. &lt;b&gt;Debug mode › Record my session&lt;/b&gt; keeps a fuller log to join to a report.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Have fun!&lt;/p&gt;</source>
+        <translation>&lt;ul&gt;&lt;li&gt;Quand une nouvelle version d'Erable sort, le bouton &lt;b&gt;Mise à jour&lt;/b&gt; de l'accueil prend un point rouge. &lt;b&gt;Aide › Rechercher les mises à jour&lt;/b&gt; en cherche une à tout moment.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Nouveautés&lt;/b&gt; sur l'accueil raconte ce que chaque version a changé.&lt;/li&gt;&lt;li&gt;Un jeu fait des siennes ? &lt;b&gt;Signaler un problème&lt;/b&gt; (−) envoie sa description avec les journaux dont nous avons besoin. &lt;b&gt;Mode debug › Enregistrer ma session&lt;/b&gt; garde un journal plus complet à joindre à un rapport.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;Bon jeu !&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation>%1 sur %2</translation>
     </message>
 </context>
 <context>

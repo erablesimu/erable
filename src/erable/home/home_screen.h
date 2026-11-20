@@ -85,6 +85,7 @@ signals:
     void ShowLibrary();
     void OpenSettings();
     void OpenWhatsNew();
+    void OpenTutorial();
     void OpenCaptures();
     /// The dock's Saves button: the saves window, opened on taking another emulator's saves.
     void OpenSaves();

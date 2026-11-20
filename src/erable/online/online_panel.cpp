@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include <QApplication>
+#include <QComboBox>
 #include <QDate>
 #include <QDateTime>
 #include <QEvent>
@@ -21,6 +22,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QSignalBlocker>
 #include <QStackedWidget>
 #include <QTextBrowser>
 #include <QVBoxLayout>
@@ -262,6 +264,17 @@ QWidget* OnlinePanel::BuildRoomsTab() {
     column->addWidget(MakeLabel(tr("A room holds one game at a time: the game its players run. "
                                    "It is free again once empty."),
                                 "muted", page_widget));
+    // The rooms of one game, or all of them sorted by game
+    auto* filter_row = new QHBoxLayout;
+    filter_row->addWidget(MakeLabel(tr("Game:"), "muted", page_widget));
+    game_filter = new QComboBox(page_widget);
+    game_filter->setAccessibleName(tr("Show the rooms of"));
+    connect(game_filter, &QComboBox::activated, this, [this] {
+        shown_game = game_filter->currentData().toString();
+        RebuildRooms();
+    });
+    filter_row->addWidget(game_filter, 1);
+    column->addLayout(filter_row);
     rooms_status = MakeLabel({}, "hint", page_widget);
     column->addWidget(rooms_status);
     column->addWidget(MakeList(rooms_list, page_widget), 1);
@@ -666,6 +679,38 @@ void OnlinePanel::RebuildRooms() {
         }
     }
     const unsigned joined = JoinedPort();
+    // Sorted by game, the rooms for any game last, then by number
+    std::stable_sort(rooms.begin(), rooms.end(), [](const Room& a, const Room& b) {
+        if (a.reserved != b.reserved) {
+            if (a.reserved.isEmpty() || b.reserved.isEmpty()) {
+                return b.reserved.isEmpty();
+            }
+            return QString::localeAwareCompare(a.reserved, b.reserved) < 0;
+        }
+        return a.port < b.port;
+    });
+    // The filter offers the games found, keeping the one chosen
+    {
+        QStringList games;
+        for (const Room& room : rooms) {
+            if (!games.contains(room.reserved)) {
+                games.append(room.reserved);
+            }
+        }
+        const QSignalBlocker blocker{game_filter};
+        game_filter->clear();
+        game_filter->addItem(tr("All games"), QStringLiteral("*"));
+        for (const QString& game : games) {
+            game_filter->addItem(game.isEmpty() ? tr("Rooms for any game") : game, game);
+        }
+        if (shown_game != QStringLiteral("*") && !games.contains(shown_game)) {
+            shown_game = QStringLiteral("*");
+        }
+        game_filter->setCurrentIndex(std::max(0, game_filter->findData(shown_game)));
+    }
+    const auto shown = [this](const QString& reserved) {
+        return shown_game == QStringLiteral("*") || shown_game == reserved;
+    };
     // The games one more room can be opened for: those whose rooms are all full, and those for
     // which the server lets players open one at any time
     QStringList full_games;
@@ -678,6 +723,9 @@ void OnlinePanel::RebuildRooms() {
         }
     }
     for (const Room& room : rooms) {
+        if (!shown(room.reserved)) {
+            continue;
+        }
         const QString game = !room.reserved.isEmpty() ? room.reserved
                              : !room.game.isEmpty()   ? room.game
                                                       : tr("Any game");
@@ -706,6 +754,9 @@ void OnlinePanel::RebuildRooms() {
         }
     }
     for (const QString& reserved : openable) {
+        if (!shown(reserved)) {
+            continue;
+        }
         auto* open = MakeButton(reserved.isEmpty() ? tr("Open one more room for any game")
                                                    : tr("Open one more room for %1").arg(reserved),
                                 "link", nullptr);

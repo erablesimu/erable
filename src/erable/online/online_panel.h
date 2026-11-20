@@ -12,6 +12,7 @@
 
 #include "common/common_types.h"
 
+class QComboBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
@@ -120,6 +121,8 @@ private:
     QStackedWidget* tabs = nullptr;
 
     QLabel* rooms_status = nullptr;
+    QComboBox* game_filter = nullptr; ///< The game whose rooms are shown, or all
+    QString shown_game = QStringLiteral("*"); ///< "*" for every game, "" for the rooms of any game
     QVBoxLayout* rooms_list = nullptr;
 
     QStackedWidget* friends_pages = nullptr;

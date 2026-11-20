@@ -160,7 +160,7 @@ QPainterPath MapleLeaf(QPointF centre, double size) {
     return path;
 }
 
-enum class Icon { Library, News, Folder, Captures, Saves, Debug, Settings, Update };
+enum class Icon { Library, News, Folder, Captures, Saves, Debug, Settings, Update, Help };
 
 /// The dock's line icons, drawn on a 24-unit grid in `box`.
 void DrawIcon(QPainter& painter, Icon icon, const QRectF& box, const QColor& color) {
@@ -237,6 +237,13 @@ void DrawIcon(QPainter& painter, Icon icon, const QRectF& box, const QColor& col
             painter.drawLine(from, to);
         }
         break;
+    case Icon::Help:
+        // A question mark in a circle
+        painter.drawEllipse(QRectF{3, 3, 18, 18});
+        painter.drawArc(QRectF{9, 7, 6, 6}, 180 * 16, -270 * 16);
+        painter.drawLine(QPointF{12, 13}, QPointF{12, 14.5});
+        painter.drawPoint(QPointF{12, 17.5});
+        break;
     case Icon::Update:
         // A circling arrow around a downward one: a new version to install
         painter.drawArc(QRectF{3, 3, 18, 18}, 120 * 16, 300 * 16);
@@ -272,6 +279,12 @@ public:
         updateGeometry();
         update();
     }
+    /// A colour for the outline, text and badge, with a light fill of it (a state: online,
+    /// offline); invalid for the usual look
+    void SetTint(const QColor& tint) {
+        tint_ = tint;
+        update();
+    }
     /// The profile's picture in the avatar circle, and its colour when it has none.
     void SetAvatarPicture(const QPixmap& picture, const QColor& colour) {
         avatar_picture_ = picture;
@@ -298,6 +311,11 @@ protected:
             fill.setColorAt(1, Maple);
             painter.setPen(Qt::NoPen);
             painter.setBrush(fill);
+        } else if (tint_.isValid()) {
+            QColor fill = tint_;
+            fill.setAlpha(hovered ? 70 : 45);
+            painter.setPen(QPen{tint_, 1.6});
+            painter.setBrush(fill);
         } else {
             painter.setPen(QPen{isChecked() ? Maple : Line, isChecked() ? 1.6 : 1.0});
             painter.setBrush(hovered ? SurfaceHi : Surface);
@@ -306,7 +324,10 @@ protected:
         painter.drawRoundedRect(pill, radius, radius);
 
         double x = pill.left() + (avatar_ ? 6 : 18);
-        const QColor ink = primary_ ? Ink : (isChecked() ? Maple : Text);
+        const QColor ink = primary_            ? Ink
+                           : tint_.isValid()   ? tint_.lighter(125)
+                           : isChecked()       ? Maple
+                                               : Text;
         if (!badge_.isEmpty()) {
             const double size = avatar_ ? 34 : 24;
             const QRectF circle{x, pill.center().y() - size / 2, size, size};
@@ -364,6 +385,7 @@ private:
     bool avatar_ = false;
     QPixmap avatar_picture_;
     QColor avatar_colour_;
+    QColor tint_;
 };
 
 /// One game: its picture with rounded corners and its title, larger and ringed in maple when
@@ -730,6 +752,9 @@ HomeScreen::HomeScreen(GameList* game_list_, PlayTime::PlayTimeManager& play_tim
             &HomeScreen::ShowLibrary);
     connect(add_dock(Icon::News, tr("What's new")), &QAbstractButton::clicked, this,
             &HomeScreen::OpenWhatsNew);
+    DockButton* const tutorial = add_dock(Icon::Help, tr("Tutorial"));
+    tutorial->setToolTip(tr("How Erable works: games, keys, playing, settings, online"));
+    connect(tutorial, &QAbstractButton::clicked, this, &HomeScreen::OpenTutorial);
     DockButton* const games_folder = add_dock(Icon::Folder, tr("My games"));
     games_folder->setToolTip(tr("Open the folder your games are in"));
     connect(games_folder, &QAbstractButton::clicked, this, [this, games_folder] {
@@ -1269,7 +1294,10 @@ void HomeScreen::UpdateOnlineButton() {
     online_button->setText(alerts > 0 ? QStringLiteral("%1 · %2").arg(online_panel->StatusText())
                                             .arg(alerts)
                                       : online_panel->StatusText());
-    online_button->SetBadge(online_panel->IsOnline() ? QStringLiteral("●") : QStringLiteral("○"));
+    // Green when online, red when offline
+    const bool online = online_panel->IsOnline();
+    online_button->SetBadge(QStringLiteral("●"));
+    online_button->SetTint(online ? QColor{0x57, 0xc7, 0x6b} : QColor{0xe5, 0x48, 0x4d});
 }
 
 void HomeScreen::OpenGameSettingsOfSelected() {

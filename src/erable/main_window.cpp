@@ -50,6 +50,7 @@
 #include "erable/nup_dialogs.h"
 #include "erable/recommended_settings_dialog.h"
 #include "erable/shader_warm_dialog.h"
+#include "erable/tutorial_dialog.h"
 #include "erable/whats_new_dialog.h"
 #include "erable/bug_report_dialog.h"
 #include "video_core/shader_warm/shader_warm_builder.h"
@@ -1049,6 +1050,7 @@ void MainWindow::InitializeWidgets() {
         OnSaveConfig();
     });
     connect(home_screen, &HomeScreen::OpenWhatsNew, this, &MainWindow::OnWhatsNew);
+    connect(home_screen, &HomeScreen::OpenTutorial, this, &MainWindow::OnTutorial);
 #ifdef ENABLE_UPDATE_CHECKER
     connect(home_screen, &HomeScreen::InstallUpdate, this, &MainWindow::ShowPendingUpdate);
     if (pending_update) {
@@ -1894,6 +1896,8 @@ void MainWindow::ConnectMenuEvents() {
     connect_menu(ui->action_Data_Manager, &MainWindow::OnDataDialog);
     connect_menu(ui->action_Saves, &MainWindow::OnSavesDialog);
 
+    connect(ui->menu_Help->addAction(tr("Tutorial")), &QAction::triggered, this,
+            &MainWindow::OnTutorial);
 #ifdef ENABLE_UPDATE_CHECKER
     connect(ui->menu_Help->addAction(tr("Check for Updates...")), &QAction::triggered, this,
             &MainWindow::CheckForUpdatesNow);
@@ -4871,6 +4875,11 @@ void MainWindow::OnInstallDecryptionKeys() {
 
     game_list->PopulateAsync(UISettings::values.game_dirs);
     OnCheckFirmwareDecryption();
+}
+
+void MainWindow::OnTutorial() {
+    TutorialDialog dialog(this);
+    dialog.exec();
 }
 
 void MainWindow::OnWhatsNew() {
