@@ -46,6 +46,12 @@ public:
         return false;
     }
 
+    /// The running count grew too long and should be folded into the total (synced) before the
+    /// next report, instead of being dropped
+    virtual bool WantsFold() const {
+        return false;
+    }
+
     virtual void PresyncWrites() {
         /* Do Nothing */
     }

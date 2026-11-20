@@ -5,6 +5,11 @@ version. Les sections suivantes gardent l'historique.
 
 ## Nouveautés de cette version
 
+**Corrections**
+- Pokémon Épée et Bouclier : moins de flashs de lumière soudains. Le compteur de pixels dont le
+  jeu se sert pour l'éblouissement du soleil était remis à zéro quatre fois par seconde ; il est
+  maintenant conservé.
+
 **Mises à jour**
 - Une mise à jour refusée, reportée ou pas terminée au lancement n'est plus perdue : un bouton
   « Mise à jour » apparaît dans le dock de l'accueil tant qu'elle n'est pas installée, et

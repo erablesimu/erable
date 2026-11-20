@@ -272,6 +272,14 @@ void QueryCacheBase<Traits>::CounterReport(GPUVAddr addr, QueryType counter_type
         return;
     }
     DAddr cpu_addr = *cpu_addr_opt;
+    if (streamer->WantsFold()) [[unlikely]] {
+        // As at a wait for idle: the reports so far are written and the count carries on as the
+        // total, so the query restarts short without losing what it counted
+        streamer->PresyncWrites();
+        impl->runtime.Barriers(true);
+        streamer->SyncWrites();
+        impl->runtime.Barriers(false);
+    }
     const size_t new_query_id = streamer->WriteCounter(cpu_addr, has_timestamp, payload, subreport);
     auto* query = streamer->GetQuery(new_query_id);
     if (is_fence) {

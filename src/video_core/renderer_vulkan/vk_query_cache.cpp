@@ -257,24 +257,49 @@ public:
     // reset-to-report window can span one.
     void CloseCounter() override {
         PauseCounter();
-        // A title that counts without resetting or reporting grows the query by a slot at every
-        // submission and render pass, and the query keeps every bank it touches alive. Ocarina of
-        // Time's title screen and file select reached 16,384 slots over 64 banks, while gameplay
-        // windows in Hyrule Field, Kakariko Village, and the Shooting Gallery reach up to 346
-        // slots across two banks. Past 4 banks (1,024 slots), drop the count as a reset would.
+        // A title that counts without resetting grows the query by a slot at every submission and
+        // render pass, and the query keeps every bank it touches alive. Ocarina of Time's title
+        // screen and file select reached 16,384 slots over 64 banks, while gameplay windows in
+        // Hyrule Field, Kakariko Village, and the Shooting Gallery reach up to 346 slots across
+        // two banks.
         static constexpr size_t MaxRunningQuerySlots = 4 * SamplesQueryBank::BANK_SIZE;
-        if (current_query && current_query->size_slots > MaxRunningQuerySlots) {
-            // It drops a real count. Logged on the 1st, 2nd, 4th, 8th... drop, so a window this
-            // long during gameplay doesn't go unnoticed and a title screen doesn't flood the log.
-            ++bank_bound_resets;
-            if ((bank_bound_resets & (bank_bound_resets - 1)) == 0) {
-                LOG_WARNING(Render_Vulkan,
-                            "Samples query ran {} slots with no reset or report, dropped its "
-                            "count (drop {})",
-                            current_query->size_slots, bank_bound_resets);
-            }
-            ResetCounter();
+        static constexpr size_t MaxFoldingQuerySlots = 64 * SamplesQueryBank::BANK_SIZE;
+        if (!current_query || current_query->size_slots <= MaxRunningQuerySlots) {
+            return;
         }
+        // Past 4 banks with reports waiting, the count is folded into the total at the next
+        // report, as at a wait for idle. Games that report a counter they never reset and use
+        // the difference between two reports (Pokémon Sword and Shield's sun glare, 4 times a
+        // second) saw it go back to zero when it was dropped: a flash of light.
+        if (HasPendingSync() && current_query->size_slots <= MaxFoldingQuerySlots) {
+            if (!fold_wanted) {
+                fold_wanted = true;
+                ++bank_bound_folds;
+                if ((bank_bound_folds & (bank_bound_folds - 1)) == 0) {
+                    LOG_INFO(Render_Vulkan,
+                             "Samples query ran {} slots with no reset, folding its count into "
+                             "the total (fold {})",
+                             current_query->size_slots, bank_bound_folds);
+                }
+            }
+            return;
+        }
+        // Nothing reported meanwhile (a title screen): drop the count as a reset would. Logged
+        // on the 1st, 2nd, 4th, 8th... drop, so a window this long during gameplay doesn't go
+        // unnoticed and a title screen doesn't flood the log.
+        ++bank_bound_resets;
+        if ((bank_bound_resets & (bank_bound_resets - 1)) == 0) {
+            LOG_WARNING(Render_Vulkan,
+                        "Samples query ran {} slots with no reset or report, dropped its "
+                        "count (drop {})",
+                        current_query->size_slots, bank_bound_resets);
+        }
+        fold_wanted = false;
+        ResetCounter();
+    }
+
+    bool WantsFold() const override {
+        return fold_wanted;
     }
 
     bool HasPendingSync() const override {
@@ -295,6 +320,7 @@ public:
     }
 
     void PresyncWrites() override {
+        fold_wanted = false;
         if (pending_sync.empty()) {
             return;
         }
@@ -744,6 +770,8 @@ private:
     VideoCommon::HostQueryBase* current_query;
     bool has_started{};
     u64 bank_bound_resets{}; ///< Counts CloseCounter dropped once a query outgrew the bank bound.
+    u64 bank_bound_folds{}; ///< Counts folded at a report once a query outgrew the bank bound
+    bool fold_wanted{};     ///< The running count is to be folded at the next report
     std::mutex flush_guard;
     std::optional<QueriesPrefixScanPass> queries_prefix_scan_pass;
 };
