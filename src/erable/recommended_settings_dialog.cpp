@@ -93,7 +93,10 @@ bool RecommendedSettingsDialog::Ask(QWidget* parent) {
     box.setWindowTitle(tr("Recommended settings"));
     box.setText(tr("Do you want to use the recommended Erable settings?"));
     box.setInformativeText(
-        tr("They improve performance for most games. Games with their own value for one of these "
+        tr("They improve performance for most games, and the resolution, console mode and "
+           "upscaler are chosen for your graphics card, processor and memory. Games with their "
+           "own value for one of the general settings in their per-game settings use the "
+           "recommended value too; other per-game "
            "settings in their per-game settings use the recommended value too; other per-game "
            "settings do not change. Erable keeps your own settings, global and per-game, so you "
            "can go back at any time with Help > Restore My Previous Settings."));

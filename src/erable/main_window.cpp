@@ -4888,7 +4888,11 @@ void MainWindow::OnApplyRecommendedSettings() {
     if (!RecommendedSettingsDialog::Ask(this) || emulation_running) {
         return;
     }
-    const auto changes = FrontendCommon::ApplyRecommendedSettings(Settings::values);
+    // The settings that depend on the PC (resolution, console mode, upscaler) come with them
+    const auto hardware =
+        VkDeviceInfo::ProbeHostHardware(Settings::values.vulkan_device.GetValue());
+    const auto changes = FrontendCommon::ApplyRecommendedSettings(
+        Settings::values, hardware ? &*hardware : nullptr);
     LOG_INFO(Config, "Applied the recommended settings: {} changed", changes.size());
     Settings::UpdateGPUAccuracy();
     OnSaveConfig();

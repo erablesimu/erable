@@ -78,8 +78,8 @@ std::optional<std::string> GameValue(const CSimpleIniA& ini, const char* section
 } // namespace
 
 std::vector<Settings::RecommendedSettingChange> ApplyRecommendedSettings(
-    Settings::Values& settings) {
-    auto changes = Settings::ApplyRecommendedSettings(settings);
+    Settings::Values& settings, const Settings::HostHardware* hardware) {
+    auto changes = Settings::ApplyRecommendedSettings(settings, hardware);
     ForEachGameConfigSection([&](const std::string& game, const char* section, CSimpleIniA& ini) {
         auto backup =
             Settings::ParseRecommendedSettingsBackup(ini.GetValue(section, BackupKey, ""));

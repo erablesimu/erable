@@ -5,6 +5,18 @@ version. Les sections suivantes gardent l'historique.
 
 ## Nouveautés de cette version
 
+**Réglages recommandés selon votre PC**
+- Aide > « Appliquer les réglages recommandés » choisit aussi la résolution, le mode de la console
+  et la mise à l'échelle selon votre carte graphique, votre processeur et votre mémoire :
+  - résolution 1x partout : les jeux Switch 2 s'agrandissent eux-mêmes (DLSS ou FSR), et le 2x
+    saturait la mémoire de Windows dans Ocarina of Time, même sur une RTX 4070 SUPER ;
+  - mode docké (1080p) sur les cartes graphiques dédiées, portable sur les puces intégrées ;
+  - NVIDIA DLSS sur les GeForce RTX, sans anti-crénelage par-dessus ; FSR 4 sur les Radeon RDNA 4 ;
+  - SMAA, filtrage anisotrope 16x et mise à l'échelle FSR à partir des cartes de milieu de gamme ;
+    FXAA et filtrage bilinéaire sur les plus modestes (Radeon RX 400/500, puces intégrées) ;
+  - Mario Kart World en 60 images par seconde (30 quand ça ralentit) sur les PC haut de gamme.
+- « Restaurer mes réglages précédents » remet aussi ces réglages comme avant.
+
 **Jeu en ligne**
 - Erable ne rejoint plus tout seul, au démarrage, le dernier salon du serveur externe : on choisit
   « Serveur externe » (ou « Rejoindre » chez un ami) quand on veut jouer. Le mode Wi-Fi reste tel

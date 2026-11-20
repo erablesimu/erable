@@ -7359,6 +7359,14 @@ Message de débogage :</translation>
 <context>
     <name>MainWindow</name>
     <message>
+        <source>Apply Recommended &amp;Settings...</source>
+        <translation>Appliquer les &amp;réglages recommandés…</translation>
+    </message>
+    <message>
+        <source>Restore My &amp;Previous Settings</source>
+        <translation>Restaurer mes réglages &amp;précédents</translation>
+    </message>
+    <message>
         <source>Check for Updates...</source>
         <translation>Rechercher les mises à jour…</translation>
     </message>
@@ -12662,6 +12670,69 @@ Entrez votre mot de passe pour confirmer :</translation>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; wants to be your friend on Erable.</source>
         <translation>&lt;b&gt;%1&lt;/b&gt; veut être votre ami sur Erable.</translation>
+    </message>
+</context>
+<context>
+    <name>RecommendedSettingsDialog</name>
+    <message>
+        <source>%1 (game %2)</source>
+        <translation>%1 (jeu %2)</translation>
+    </message>
+    <message>
+        <source>Recommended settings</source>
+        <translation>Réglages recommandés</translation>
+    </message>
+    <message>
+        <source>Do you want to use the recommended Erable settings?</source>
+        <translation>Voulez-vous utiliser les réglages recommandés d'Erable ?</translation>
+    </message>
+    <message>
+        <source>They improve performance for most games, and the resolution, console mode and upscaler are chosen for your graphics card, processor and memory. Games with their own value for one of the general settings in their per-game settings use the recommended value too; other per-game settings do not change. Erable keeps your own settings, global and per-game, so you can go back at any time with Help &gt; Restore My Previous Settings.</source>
+        <translation>Ils améliorent les performances de la plupart des jeux, et la résolution, le mode de la console et la mise à l'échelle sont choisis selon votre carte graphique, votre processeur et votre mémoire. Les jeux qui ont leur propre valeur pour l'un des réglages généraux dans leurs réglages par jeu prennent aussi la valeur recommandée ; les autres réglages par jeu ne changent pas. Erable garde vos propres réglages, globaux et par jeu : vous pouvez revenir en arrière à tout moment avec Aide &gt; Restaurer mes réglages précédents.</translation>
+    </message>
+    <message>
+        <source>Use recommended settings</source>
+        <translation>Utiliser les réglages recommandés</translation>
+    </message>
+    <message>
+        <source>Not now</source>
+        <translation>Pas maintenant</translation>
+    </message>
+    <message>
+        <source>Your settings already match the recommended settings. Nothing changed.</source>
+        <translation>Vos réglages correspondent déjà aux réglages recommandés. Rien n'a changé.</translation>
+    </message>
+    <message>
+        <source>Erable now uses the recommended settings, in every game.</source>
+        <translation>Erable utilise maintenant les réglages recommandés, dans tous les jeux.</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Activé</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>Désactivé</translation>
+    </message>
+    <message>
+        <source>To go back, use Help &gt; Restore My Previous Settings.</source>
+        <translation>Pour revenir en arrière : Aide &gt; Restaurer mes réglages précédents.</translation>
+    </message>
+    <message>
+        <source>Previous settings</source>
+        <translation>Réglages précédents</translation>
+    </message>
+    <message>
+        <source>Your settings already match your previous settings. Nothing changed.</source>
+        <translation>Vos réglages correspondent déjà à vos réglages précédents. Rien n'a changé.</translation>
+    </message>
+    <message>
+        <source>Erable uses your previous settings again.</source>
+        <translation>Erable utilise de nouveau vos réglages précédents.</translation>
+    </message>
+    <message>
+        <source>To use the recommended settings again, use Help &gt; Apply Recommended Settings.</source>
+        <translation>Pour reprendre les réglages recommandés : Aide &gt; Appliquer les réglages recommandés.</translation>
     </message>
 </context>
 </TS>

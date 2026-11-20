@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include <map>
+#include <algorithm>
 #include <memory>
 #include <set>
 #include <string>
 #include <type_traits>
 #include <utility>
 #include <catch2/catch_test_macros.hpp>
+#include "common/hardware_settings.h"
 #include "common/recommended_settings.h"
 
 namespace {
@@ -165,15 +167,64 @@ TEST_CASE("A backup only restores recommended settings", "[recommended_settings]
         setting.SetValue(setting.GetDefault());
     });
     settings->recommended_settings_backup =
-        "resolution_setup:0,unknown:7,broken," + label + ":" + other + ",speed_limit:,";
+        "language_index:0,unknown:7,broken," + label + ":" + other + ",speed_limit:,";
 
     const auto restored = Settings::RestorePreviousSettings(*settings);
     REQUIRE(restored.size() == 1);
     CHECK(restored[0].setting->GetLabel() == label);
     CHECK(restored[0].current == other);
-    CHECK(settings->resolution_setup.GetValue() == settings->resolution_setup.GetDefault());
+    CHECK(settings->language_index.GetValue() == settings->language_index.GetDefault());
     CHECK(settings->recommended_settings_backup.GetValue().empty());
     auto after = GlobalValues(*settings);
     after[label] = before.at(label);
     CHECK(after == before);
+}
+
+TEST_CASE("Recommended settings suit the PC", "[recommended_settings]") {
+    constexpr u64 GiB = u64{1} << 30;
+    const Settings::HostHardware rx570{.gpu_vendor_id = 0x1002, .vram_bytes = 8 * GiB,
+                                       .old_amd = true, .cpu_threads = 16, .ram_bytes = 16 * GiB};
+    const Settings::HostHardware rtx4070{.gpu_vendor_id = 0x10DE, .vram_bytes = 12 * GiB,
+                                         .dlss = true, .cpu_threads = 16, .ram_bytes = 32 * GiB};
+    const Settings::HostHardware igpu{.gpu_vendor_id = 0x1002, .vram_bytes = 2 * GiB,
+                                      .integrated = true, .cpu_threads = 16, .ram_bytes = 32 * GiB};
+    const Settings::HostHardware rx6600{.gpu_vendor_id = 0x1002, .vram_bytes = 8 * GiB,
+                                        .cpu_threads = 12, .ram_bytes = 16 * GiB};
+    CHECK(Settings::ClassifyHardware(rx570) == Settings::HardwareTier::Low);
+    CHECK(Settings::ClassifyHardware(rtx4070) == Settings::HardwareTier::High);
+    CHECK(Settings::ClassifyHardware(igpu) == Settings::HardwareTier::Low);
+    CHECK(Settings::ClassifyHardware(rx6600) == Settings::HardwareTier::Mid);
+
+    auto settings = std::make_unique<Settings::Values>();
+    settings->resolution_setup = Settings::ResolutionSetup::Res2X;
+    settings->anti_aliasing = Settings::AntiAliasing::Smaa;
+    const auto changes = Settings::ApplyRecommendedSettings(*settings, &rtx4070);
+    CHECK(settings->resolution_setup.GetValue() == Settings::ResolutionSetup::Res1X);
+    CHECK(settings->use_docked_mode.GetValue() == Settings::ConsoleMode::Docked);
+    CHECK(settings->anti_aliasing.GetValue() == Settings::AntiAliasing::None);
+    CHECK(settings->nvidia_dlss.GetValue());
+    // Set by both tables, listed once from its first value
+    CHECK(settings->mkw_60fps.GetValue());
+    CHECK(std::count_if(changes.begin(), changes.end(), [&](const auto& change) {
+              return change.setting == &settings->mkw_60fps && change.previous == "false";
+          }) == 1);
+
+    Settings::RestorePreviousSettings(*settings);
+    CHECK(settings->resolution_setup.GetValue() == Settings::ResolutionSetup::Res2X);
+    CHECK(settings->anti_aliasing.GetValue() == Settings::AntiAliasing::Smaa);
+    CHECK(!settings->nvidia_dlss.GetValue());
+    CHECK(!settings->mkw_60fps.GetValue());
+
+    // Without the PC, the PC's settings stay
+    Settings::ApplyRecommendedSettings(*settings);
+    CHECK(settings->resolution_setup.GetValue() == Settings::ResolutionSetup::Res2X);
+    Settings::RestorePreviousSettings(*settings);
+
+    Settings::ApplyRecommendedSettings(*settings, &rx570);
+    CHECK(settings->use_docked_mode.GetValue() == Settings::ConsoleMode::Docked);
+    CHECK(settings->scaling_filter.GetValue() == Settings::ScalingFilter::Bilinear);
+    CHECK(settings->anti_aliasing.GetValue() == Settings::AntiAliasing::Fxaa);
+    CHECK(!settings->mkw_60fps.GetValue());
+    Settings::ApplyRecommendedSettings(*settings, &igpu);
+    CHECK(settings->use_docked_mode.GetValue() == Settings::ConsoleMode::Handheld);
 }

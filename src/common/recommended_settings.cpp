@@ -4,6 +4,7 @@
 #include <map>
 #include <utility>
 #include "common/recommended_settings.h"
+#include "common/hardware_settings.h"
 
 namespace Settings {
 
@@ -32,12 +33,13 @@ std::string FormatRecommendedSettingsBackup(const std::map<std::string, std::str
     return backup;
 }
 
-std::vector<RecommendedSettingChange> ApplyRecommendedSettings(Values& settings) {
+std::vector<RecommendedSettingChange> ApplyRecommendedSettings(Values& settings,
+                                                               const HostHardware* hardware) {
     const auto saved =
         ParseRecommendedSettingsBackup(settings.recommended_settings_backup.GetValue());
     std::vector<RecommendedSettingChange> changes;
     std::map<std::string, std::string> backup;
-    ForEachRecommendedSetting(settings, [&](auto& setting, const auto& value) {
+    const auto apply = [&](auto& setting, const auto& value) {
         std::string previous = setting.ToStringGlobal();
         // A value backed up earlier stays; a setting the backup does not hold yet, such as one a
         // later build added to the table, joins it.
@@ -50,8 +52,24 @@ std::vector<RecommendedSettingChange> ApplyRecommendedSettings(Values& settings)
         setting.SetGlobal(true);
         setting.SetValue(value);
         setting.SetGlobal(using_global);
-        changes.push_back({&setting, std::move(previous), setting.ToStringGlobal()});
-    });
+        // A setting both tables set (Mario Kart World's FPS modes) is listed once, from the
+        // value it had before the first.
+        const auto first = std::find_if(changes.begin(), changes.end(),
+                                        [&setting](const RecommendedSettingChange& change) {
+                                            return change.setting == &setting;
+                                        });
+        if (first != changes.end()) {
+            previous = std::move(first->previous);
+            changes.erase(first);
+        }
+        if (previous != setting.ToStringGlobal()) {
+            changes.push_back({&setting, std::move(previous), setting.ToStringGlobal()});
+        }
+    };
+    ForEachRecommendedSetting(settings, apply);
+    if (hardware) {
+        ForEachHardwareSetting(settings, *hardware, apply);
+    }
     settings.recommended_settings_backup = FormatRecommendedSettingsBackup(backup);
     return changes;
 }
@@ -60,7 +78,7 @@ std::vector<RecommendedSettingChange> RestorePreviousSettings(Values& settings) 
     const auto saved =
         ParseRecommendedSettingsBackup(settings.recommended_settings_backup.GetValue());
     std::vector<RecommendedSettingChange> changes;
-    ForEachRecommendedSetting(settings, [&](auto& setting, const auto&) {
+    const auto restore = [&](auto& setting, const auto&) {
         const auto it = saved.find(setting.GetLabel());
         if (it == saved.end()) {
             return;
@@ -72,6 +90,14 @@ std::vector<RecommendedSettingChange> RestorePreviousSettings(Values& settings) 
         setting.SetGlobal(using_global);
         if (setting.ToStringGlobal() != previous) {
             changes.push_back({&setting, std::move(previous), setting.ToStringGlobal()});
+        }
+    };
+    ForEachRecommendedSetting(settings, restore);
+    // Only the labels matter here: the hardware table's settings are the same for every PC
+    ForEachHardwareSetting(settings, HostHardware{}, [&](auto& setting, const auto& value) {
+        if (std::none_of(changes.begin(), changes.end(),
+                         [&setting](const auto& change) { return change.setting == &setting; })) {
+            restore(setting, value);
         }
     });
     settings.recommended_settings_backup = std::string{};

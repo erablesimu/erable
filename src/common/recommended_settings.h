@@ -12,7 +12,8 @@ namespace Settings {
 
 /// Erable's recommended settings, started from the Lichii developer's. This table is the only place that lists them:
 /// change a value here to change what "Use recommended settings" writes. Personal and hardware
-/// choices (language, region, resolution, upscaler, backend, device) stay out of it.
+/// choices (language, region, backend, device) stay out of it; those that depend on the PC
+/// (resolution, upscaler, console mode) are in common/hardware_settings.h.
 template <typename Func>
 void ForEachRecommendedSetting(Values& settings, Func&& func) {
     const auto entry = [&func]<typename Type, bool ranged>(SwitchableSetting<Type, ranged>& setting,
@@ -102,7 +103,11 @@ struct RecommendedSettingChange {
 /// recommended_settings_backup takes the previous value of every recommended setting it does not
 /// hold yet. A value it holds stays until it is restored, so applying twice does not lose the
 /// values from before the first time.
-std::vector<RecommendedSettingChange> ApplyRecommendedSettings(Values& settings);
+/// With `hardware`, the settings that depend on the PC (common/hardware_settings.h) are applied
+/// too, after the table, and backed up the same way.
+struct HostHardware;
+std::vector<RecommendedSettingChange> ApplyRecommendedSettings(Values& settings,
+                                                               const HostHardware* hardware = nullptr);
 
 /// Puts back the global values recommended_settings_backup holds, clears it and returns the
 /// settings that changed. Only settings in the recommended table are restored.

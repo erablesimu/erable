@@ -13,8 +13,9 @@ namespace FrontendCommon {
 /// stay. Each section of a game's config keeps the overrides it reset under
 /// recommended_settings_backup; a value backed up earlier stays until it is restored. Returns the
 /// values that changed, the global ones first.
+/// With `hardware`, the settings that suit the PC are applied to the global values too.
 std::vector<Settings::RecommendedSettingChange> ApplyRecommendedSettings(
-    Settings::Values& settings);
+    Settings::Values& settings, const Settings::HostHardware* hardware = nullptr);
 
 /// Puts back the per-game overrides ApplyRecommendedSettings reset and the global values
 /// (Settings::RestorePreviousSettings), clears the backups and returns the values that changed,

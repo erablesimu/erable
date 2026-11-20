@@ -6,10 +6,12 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 #include "common/common_types.h"
+#include "common/hardware_settings.h"
 #include "common/settings_enums.h"
 #include "vulkan/vulkan_core.h"
 
@@ -69,4 +71,8 @@ public:
 
 // TODO(crueter): Port some configure_graphics.cpp stuff
 void PopulateRecords(std::vector<Record>& records, QWindow* window);
+
+/// The Vulkan device `device_index` and this PC, for the recommended settings that depend on
+/// them; nullopt when Vulkan has no such device.
+std::optional<Settings::HostHardware> ProbeHostHardware(u32 device_index);
 } // namespace VkDeviceInfo
