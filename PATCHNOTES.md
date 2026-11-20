@@ -5,6 +5,14 @@ version. Les sections suivantes gardent l'historique.
 
 ## Nouveautés de cette version
 
+**Jeu en ligne**
+- Erable ne rejoint plus tout seul, au démarrage, le dernier salon du serveur externe : on choisit
+  « Serveur externe » (ou « Rejoindre » chez un ami) quand on veut jouer. Le mode Wi-Fi reste tel
+  qu'il était.
+- Mario Kart World et les jeux qui ouvrent des connexions IPv6 : Erable les accepte désormais au
+  lieu de les refuser (le jeu en local sans fil de Mario Kart World restait bloqué sur
+  « Patientez »).
+
 **Corrections**
 - Pokémon Épée et Bouclier : moins de flashs de lumière soudains. Le compteur de pixels dont le
   jeu se sert pour l'éblouissement du soleil était remis à zéro quatre fois par seconde ; il est

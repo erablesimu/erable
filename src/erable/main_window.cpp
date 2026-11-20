@@ -525,11 +525,16 @@ MainWindow::MainWindow(bool has_broken_vulkan)
                             });
                     dialog.exec();
                 });
+        // A room of the external server is joined only when the player picks it (the profile
+        // window, a friend's Join): starting Erable no longer goes back to last time's room. Wi-Fi
+        // (LAN play) joins nothing and stays as chosen.
+        if (Online::CurrentMode() == Online::Mode::Server) {
+            Online::SetMode(Online::Mode::Off);
+        }
+        Online::ApplyMode(online_account, {});
         online_account->Refresh([online_account](const Online::Account::Result&) {
-            // The mode chosen last time, once the session and the rooms are known
-            online_account->FetchRooms([online_account](const Online::Account::Result&) {
-                Online::ApplyMode(online_account, {});
-            });
+            // The rooms' names and passwords, for the profile window
+            online_account->FetchRooms([](const Online::Account::Result&) {});
         });
     }
 
