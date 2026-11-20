@@ -70,6 +70,8 @@ public:
     /// Shows the dock's Update button for the version `tag` found and not installed, or hides it
     /// (empty `tag`).
     void SetUpdateAvailable(const QString& tag);
+    /// Opens the online panel (rooms, friends, alerts)
+    void OpenOnlinePanel();
 
     /// The folder Erable reads the player's games from first (Documents\Erable\Jeux).
     [[nodiscard]] static QString GamesFolder();

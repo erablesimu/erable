@@ -88,7 +88,6 @@ private:
     void Choose(unsigned port);
     void LeaveRoom();
     void GoOffline();
-    void ToggleWiFi();
     /// Turns back on the mods paused for the online play, saying so
     void RestoreMods();
     void OpenConversation(const QString& friend_code, const QString& nickname);
@@ -112,7 +111,6 @@ private:
 
     QLabel* offline_account = nullptr;
     QLabel* mods_note = nullptr;
-    QPushButton* wifi_button = nullptr;
 
     QWidget* room_card = nullptr;
     QLabel* room_name = nullptr;

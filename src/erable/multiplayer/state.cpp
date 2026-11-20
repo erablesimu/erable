@@ -297,20 +297,9 @@ void MultiplayerState::HideNotification() {
 }
 
 void MultiplayerState::OnOpenNetworkRoom() {
-    if (auto member = Network::GetRoomMember().lock()) {
-        if (member->IsConnected()) {
-            if (client_room == nullptr) {
-                client_room = new ClientRoomWindow(this);
-                connect(client_room, &ClientRoomWindow::ShowNotification, this,
-                        &MultiplayerState::ShowNotification);
-            }
-            BringWidgetToFront(client_room);
-            return;
-        }
-    }
-    // If the user is not a member of a room, show the lobby instead.
-    // This is currently only used on the clickable label in the status bar
-    OnViewLobby();
+    // Rooms are chosen, and friends reached, from the home's online panel: yuzu's public lobby
+    // and room window, which listed rooms of other servers, are not opened anymore
+    emit OpenOnlineRequested();
 }
 
 void MultiplayerState::OnDirectConnectToRoom() {

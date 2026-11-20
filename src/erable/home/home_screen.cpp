@@ -1255,6 +1255,12 @@ void HomeScreen::Launch() {
     }
 }
 
+void HomeScreen::OpenOnlinePanel() {
+    if (online_panel) {
+        online_panel->Open();
+    }
+}
+
 void HomeScreen::UpdateOnlineButton() {
     if (!online_button) {
         return;

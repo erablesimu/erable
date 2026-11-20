@@ -176,10 +176,6 @@ void OnlinePanel::BuildOfflinePage() {
     card_column->addWidget(offline_account);
     column->addWidget(card);
 
-    column->addWidget(MakeLabel(tr("On the same network?"), "muted", page_widget));
-    wifi_button = MakeButton({}, "row", page_widget);
-    connect(wifi_button, &QPushButton::clicked, this, &OnlinePanel::ToggleWiFi);
-    column->addWidget(wifi_button);
     mods_note = MakeLabel({}, "hint", page_widget);
     mods_note->hide();
     column->addWidget(mods_note);
@@ -518,8 +514,6 @@ void OnlinePanel::Update() {
     offline_account->setText(signed_in ? tr("As %1, with your Erable account")
                                              .arg(Shown(account->CurrentSession()->nickname))
                                        : tr("Needs an Erable account: you sign in first."));
-    wifi_button->setText(CurrentMode() == Mode::WiFi ? tr("Local Wi-Fi is on · Turn it off")
-                                                     : tr("Play on the local Wi-Fi (same network)"));
 
     nickname_notice->setVisible(signed_in && account->CurrentSession()->nickname_must_change);
 
@@ -776,13 +770,6 @@ void OnlinePanel::GoOffline() {
     RestoreMods();
     online = false;
     CloseConversation();
-    Update();
-}
-
-void OnlinePanel::ToggleWiFi() {
-    SetMode(CurrentMode() == Mode::WiFi ? Mode::Off : Mode::WiFi);
-    ApplyMode(account, {});
-    online = false;
     Update();
 }
 

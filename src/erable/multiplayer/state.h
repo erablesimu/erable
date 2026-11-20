@@ -87,6 +87,8 @@ signals:
     void NetworkError(const Network::RoomMember::Error&);
     void AnnounceFailed(const WebService::WebResult&);
     void SaveConfig();
+    /// The room status was clicked: the home's online panel is where rooms are chosen
+    void OpenOnlineRequested();
 
 private:
     Lobby* lobby = nullptr;

@@ -19,6 +19,10 @@ version. Les sections suivantes gardent l'historique.
 - Le salon choisi est gardé jusqu'à la fermeture d'Erable ; au lancement suivant, Erable démarre
   hors ligne.
 - La fenêtre du salon peut maintenant être réduite.
+- Le jeu local passe par les salons du serveur Erable : le mode Wi-Fi (même réseau) n'est plus
+  proposé, et s'il était activé il est coupé au démarrage.
+- L'ancien explorateur de salons publics de yuzu ne s'ouvre plus : cliquer sur l'état du salon,
+  en bas à droite, ouvre le panneau « En ligne » de l'accueil.
 
 **Discussion entre amis, plus de discussion dans les salons**
 - Les salons n'ont plus de discussion : on n'y croise plus les messages d'inconnus.

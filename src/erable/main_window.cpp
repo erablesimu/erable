@@ -528,10 +528,11 @@ MainWindow::MainWindow(bool has_broken_vulkan)
                             });
                     dialog.exec();
                 });
-        // A room of the external server is joined only when the player picks it (the profile
-        // window, a friend's Join): starting Erable no longer goes back to last time's room. Wi-Fi
-        // (LAN play) joins nothing and stays as chosen.
-        if (Online::CurrentMode() == Online::Mode::Server) {
+        // A room of the external server is joined only when the player picks it (the online
+        // panel, a friend's Join): starting Erable no longer goes back to last time's room. Local
+        // play goes through the Erable server's rooms: the Wi-Fi (LAN play) mode is not offered
+        // anymore, and one left on from before is turned off.
+        if (Online::CurrentMode() != Online::Mode::Off) {
             Online::SetMode(Online::Mode::Off);
         }
         Online::ApplyMode(online_account, {});
@@ -1818,6 +1819,13 @@ void MainWindow::ConnectMenuEvents() {
     connect(ui->action_Show_Room, &QAction::triggered, multiplayer_state,
             &MultiplayerState::OnOpenNetworkRoom);
     connect(multiplayer_state, &MultiplayerState::SaveConfig, this, &MainWindow::OnSaveConfig);
+    connect(multiplayer_state, &MultiplayerState::OpenOnlineRequested, this, [this] {
+        if (emulation_running) {
+            return; // The panel is on the home, out of reach while a game runs
+        }
+        ShowHome(true);
+        home_screen->OpenOnlinePanel();
+    });
 
     // Tools
     connect_menu(ui->action_Launch_PhotoViewer, [this] {

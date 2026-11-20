@@ -232,7 +232,8 @@ void ProfilePicker::MakeOnlineBar(QVBoxLayout* layout) {
     bar->addStretch();
     bar->addWidget(title);
     bar->addSpacing(6);
-    bar->addWidget(wifi_button);
+    // Local play goes through the Erable server's rooms: no Wi-Fi (LAN play) mode anymore
+    wifi_button->hide();
     bar->addWidget(server_button);
     bar->addSpacing(10);
     bar->addWidget(room_box);
