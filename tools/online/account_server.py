@@ -230,6 +230,135 @@ def check_code(code):
         raise ApiError(HTTPStatus.BAD_REQUEST, "bad_code")
 
 
+# Insults and swear words refused in nicknames: the Latin-script part of the list Erable masks in
+# the room chat (src/common/profanity_filter.cpp), with the same folding. Kinds: W the whole word
+# (a trailing "s" allowed), P its start, I anywhere; strict ones are compared as written.
+PROFANITY = [
+    ('fuck', "I", True), ('fuck', "W", False), ('fucking', "W", False), ('fucker', "P", False),
+    ('fucked', "W", False), ('shit', "P", True), ('bullshit', "P", True),
+    ('horseshit', "W", True), ('batshit', "W", True), ('dipshit', "W", True),
+    ('bitch', "P", False), ('bastard', "P", False), ('cunt', "W", True), ('dick', "W", True),
+    ('dickhead', "P", False), ('cock', "W", True), ('cocksuck', "P", False), ('pussy', "P", True),
+    ('whore', "P", False), ('asshole', "P", False), ('arsehole', "P", False),
+    ('wanker', "P", True), ('twat', "P", True), ('prick', "W", True), ('bollock', "P", False),
+    ('nigg', "P", True), ('faggot', "P", True), ('tranny', "W", True), ('kike', "W", True),
+    ('spic', "W", False), ('chink', "W", False), ('retarded', "W", False), ('merde', "W", True),
+    ('merdeux', "P", False), ('merdique', "P", False), ('putain', "P", False),
+    ('pute', "W", True), ('salope', "P", False), ('salopard', "P", False), ('salaud', "P", False),
+    ('connard', "P", False), ('connasse', "P", False), ('conne', "W", True), ('pédé', "W", True),
+    ('tarlouze', "P", False), ('tapette', "W", True), ('encule', "P", False),
+    ('enculer', "P", False), ('batard', "P", False), ('fdp', "W", False), ('ntm', "W", False),
+    ('nique', "W", False), ('niquer', "P", False), ('niktamer', "P", False),
+    ('couille', "P", False), ('couillon', "P", False), ('chier', "W", False),
+    ('petasse', "P", False), ('pouffiasse', "P", False), ('grognasse', "P", False),
+    ('enfoire', "P", False), ('bougnoule', "P", False), ('nègre', "W", True),
+    ('abruti', "P", False), ('cretin', "P", False), ('trouduc', "W", False), ('puta', "W", True),
+    ('puto', "W", True), ('mierda', "P", False), ('joder', "P", True), ('jodido', "P", False),
+    ('coño', "W", True), ('cabron', "P", False), ('gilipollas', "P", False),
+    ('gilipoyas', "P", False), ('pendejo', "P", False), ('maricon', "P", False),
+    ('polla', "W", True), ('culero', "W", False), ('chingar', "P", False),
+    ('chingada', "P", False), ('verga', "W", True), ('carajo', "W", False),
+    ('cojones', "W", False), ('zorra', "W", True), ('cazzo', "W", True), ('cazzi', "W", True),
+    ('cazzata', "P", True), ('cazzone', "P", True), ('merda', "W", False),
+    ('stronzo', "P", False), ('stronza', "P", False), ('vaffanculo', "P", False),
+    ('fanculo', "P", False), ('puttana', "P", False), ('coglione', "P", False),
+    ('minchia', "P", False), ('frocio', "P", False), ('froci', "W", False),
+    ('bastardo', "P", False), ('scheiße', "P", True), ('scheisse', "P", True),
+    ('scheiss', "W", True), ('arschloch', "P", False), ('arsch', "W", False),
+    ('fotze', "P", False), ('wichser', "P", False), ('wixer', "W", False),
+    ('hurensohn', "P", False), ('hure', "W", True), ('ficken', "P", True),
+    ('schlampe', "P", False), ('missgeburt', "P", False), ('spast', "W", False),
+    ('schwuchtel', "P", False), ('kanake', "W", False), ('porra', "W", True),
+    ('caralho', "P", False), ('foda', "W", True), ('fodase', "W", False), ('fodido', "P", False),
+    ('cuzão', "W", True), ('viado', "W", False), ('buceta', "P", False),
+    ('arrombado', "P", False), ('kut', "W", True), ('lul', "W", True), ('klootzak', "P", False),
+    ('godverdomme', "P", False), ('hoer', "W", False), ('neuken', "P", False),
+    ('mongool', "W", True), ('flikker', "P", True), ('tering', "P", False), ('tyfus', "W", True),
+    ('kurwa', "P", False), ('chuj', "P", False), ('pierdol', "P", False),
+    ('spierdal', "P", False), ('wypierdal', "P", False), ('jebac', "P", False),
+    ('jebany', "P", False), ('zajebac', "P", False), ('pizda', "P", False), ('pizdz', "P", False),
+    ('skurwysyn', "P", False), ('cipa', "W", True), ('dupek', "W", False), ('cwel', "W", False),
+    ('kurva', "P", False), ('kokot', "P", False), ('hovno', "W", False), ('zmrd', "W", False),
+    ('čurák', "W", False), ('prdel', "W", False), ('geci', "W", True), ('picsa', "P", False),
+    ('fasz', "W", True), ('faszt', "W", False), ('faszom', "W", False), ('fasza', "W", False),
+    ('bazmeg', "P", False), ('baszd', "P", False), ('buzi', "W", True), ('köcsög', "P", False),
+    ('muie', "W", False), ('futu', "W", False), ('futui', "W", False), ('căcat', "W", True),
+    ('poponar', "W", False), ('fitta', "W", True), ('kuk', "W", True), ('jävla', "W", False),
+    ('jævla', "W", False), ('knulla', "P", False), ('faen', "W", False), ('pikk', "W", True),
+    ('kuksuger', "P", False), ('fisse', "W", True), ('luder', "W", False), ('vittu', "P", True),
+    ('vitun', "W", True), ('vitut', "W", True), ('vituttaa', "P", True), ('perkele', "W", True),
+    ('paska', "W", True), ('kyrpä', "W", False), ('huora', "W", False), ('jebem', "P", False),
+    ('jebote', "P", False), ('jebi', "W", False), ('kurac', "W", False), ('kurca', "W", True),
+    ('kurcu', "W", True), ('govno', "P", False), ('orospu', "P", False), ('siktir', "P", False),
+    ('yarrak', "P", True), ('malakas', "W", False), ('poustis', "W", False),
+    ('poutana', "W", False), ('blyat', "P", False), ('blyad', "P", False), ('suka', "W", True),
+    ('cyka', "W", True), ('pizdec', "P", False), ('nahui', "W", True), ('nahuy', "W", True),
+    ('pidor', "P", False), ('mudak', "P", False),
+]
+PROFANITY_ALLOWED = {
+    'assassin', 'assassins', 'assassinat', 'bassin', 'classe', 'scunthorpe', 'shitake',
+    'shiitake', 'cocktail', 'cocktails', 'cockpit', 'peacock', 'hancock', 'dickens', 'pussycat',
+    'snigger', 'sniggered', 'salopette', 'salopettes', 'kurvy', 'prickly', 'dickson', 'putative',
+    'computer',
+}
+LEET = {"0": "o", "1": "i", "!": "i", "|": "i", "3": "e", "4": "a", "@": "a", "5": "s", "$": "s",
+        "7": "t", "8": "b"}
+SPECIAL_LETTERS = {"ß": "ss", "æ": "ae", "œ": "oe", "ø": "o", "ł": "l", "đ": "d", "þ": "th"}
+
+
+def fold_letters(text, strict):
+    """Lower case; for the loose form, accents gone, the spellings that sound the same written
+    one way, then each run of a letter as one"""
+    text = text.lower()
+    if strict:
+        return text
+    letters = "".join(
+        c for c in unicodedata.normalize("NFKD", "".join(SPECIAL_LETTERS.get(c, c) for c in text))
+        if not unicodedata.combining(c))
+    letters = letters.replace("ph", "f").replace("ck", "k").replace("y", "i").replace("w", "v")
+    return re.sub(r"(.)\1+", r"\1", letters)
+
+
+FOLDED_PROFANITY = [(fold_letters(word, strict), kind, strict) for word, kind, strict in PROFANITY]
+FOLDED_ALLOWED = {fold_letters(word, False) for word in PROFANITY_ALLOWED}
+
+
+def profanity_match(token):
+    loose = fold_letters(token, False)
+    if loose in FOLDED_ALLOWED:
+        return False
+    for word, kind, strict in FOLDED_PROFANITY:
+        text = token if strict else loose
+        if kind == "W" and text in (word, word + "s"):
+            return True
+        if kind == "P" and text.startswith(word):
+            return True
+        if kind == "I" and word in text:
+            return True
+    return False
+
+
+def is_offensive_nickname(nickname):
+    """Whether a nickname holds an insult or swear word, also in leet, dotted out or run into
+    another word ("Big_Connard", "s4l0pe", "c.o.n.n.a.r.d")"""
+    # The words of the nickname, also those run together in camel case ("BigConnard")
+    spaced = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", nickname)
+    letters = "".join(LEET.get(c, c) for c in spaced.lower())
+    tokens = [token for token in re.split(r"[^a-zß-ÿĀ-ɏ]+", letters) if token]
+    joined = "".join(tokens)
+    # The x's framing a gamer tag ("xXkurwaXx")
+    tokens.append(joined.strip("x"))
+    if any(profanity_match(token) for token in tokens + [joined]):
+        return True
+    # Run into another word ("BigConnard"): the long listed words anywhere in it, as the shorter
+    # ones hide in ordinary words ("conne" in "connection", "tering" in "entering")
+    loose_joined = fold_letters(joined, False)
+    if loose_joined in FOLDED_ALLOWED:
+        return False
+    return any(len(word) >= 7 and not strict and word in loose_joined
+               for word, _, strict in FOLDED_PROFANITY)
+
+
 def register(store, body, client):
     nickname = field(body, "nickname", 20).strip()
     email = normalize_email(field(body, "email"))
@@ -239,6 +368,8 @@ def register(store, body, client):
     code = field(body, "code", 12)
     if not NICKNAME_RE.fullmatch(nickname):
         raise ApiError(HTTPStatus.BAD_REQUEST, "bad_nickname")
+    if is_offensive_nickname(nickname):
+        raise ApiError(HTTPStatus.BAD_REQUEST, "offensive_nickname")
     if not EMAIL_RE.fullmatch(email):
         raise ApiError(HTTPStatus.BAD_REQUEST, "bad_email")
     check_password(password)

@@ -101,6 +101,8 @@ add_library(
     page_table.h
     param_package.cpp
     param_package.h
+    profanity_filter.cpp
+    profanity_filter.h
     parent_of_member.h
     point.h
     range_map.h

@@ -16,6 +16,7 @@
 #include <QStackedWidget>
 #include <QVBoxLayout>
 
+#include "common/profanity_filter.h"
 #include "common/settings.h"
 #include "erable/multiplayer/chat_room.h"
 #include "erable/online/account_dialog.h"
@@ -74,6 +75,11 @@ QScrollArea* MakeList(QVBoxLayout*& rows, QWidget* parent) {
     column->addStretch();
     area->setWidget(inner);
     return area;
+}
+
+/// A player's name as shown: insults and swear words as stars
+QString Shown(const QString& nickname) {
+    return QString::fromStdString(Common::Profanity::Mask(nickname.toStdString()));
 }
 
 } // Anonymous namespace
@@ -162,8 +168,8 @@ void OnlinePanel::BuildOfflinePage() {
     connect(wifi_button, &QPushButton::clicked, this, &OnlinePanel::ToggleWiFi);
     column->addWidget(wifi_button);
     column->addStretch();
-    column->addWidget(MakeLabel(tr("Friends and alerts show once you are online."), "hint",
-                                page_widget));
+    column->addWidget(
+        MakeLabel(tr("Friends and alerts show once you are online."), "hint", page_widget));
     pages->addWidget(page_widget);
 }
 
@@ -400,8 +406,7 @@ QString OnlinePanel::RoomLabel(unsigned port) const {
         return name;
     }
     const int index = static_cast<int>(port) - static_cast<int>(FirstRoomPort);
-    return index >= 0 && index < RoomCount ? tr("Room %1").arg(index + 1)
-                                           : tr("Room %1").arg(port);
+    return index >= 0 && index < RoomCount ? tr("Room %1").arg(index + 1) : tr("Room %1").arg(port);
 }
 
 QString OnlinePanel::StatusText() const {
@@ -437,9 +442,7 @@ void OnlinePanel::Update() {
     if (!signed_in && CurrentMode() != Mode::Server) {
         browsing = false;
     }
-    const Page wanted = browsing                    ? Page::Rooms
-                        : JoinedPort() != 0         ? Page::Room
-                                                    : Page::Offline;
+    const Page wanted = browsing ? Page::Rooms : JoinedPort() != 0 ? Page::Room : Page::Offline;
     if (wanted != page) {
         page = wanted;
         pages->setCurrentIndex(static_cast<int>(page));
@@ -450,11 +453,12 @@ void OnlinePanel::Update() {
     title->setText(page == Page::Rooms ? tr("Rooms") : tr("Online"));
     refresh_button->setVisible(page == Page::Rooms);
 
-    offline_account->setText(signed_in ? tr("As %1, with your Erable account")
-                                             .arg(account->CurrentSession()->nickname)
-                                       : tr("Needs an Erable account: you sign in first."));
-    wifi_button->setText(CurrentMode() == Mode::WiFi ? tr("Local Wi-Fi is on · Turn it off")
-                                                     : tr("Play on the local Wi-Fi (same network)"));
+    offline_account->setText(
+        signed_in ? tr("As %1, with your Erable account").arg(account->CurrentSession()->nickname)
+                  : tr("Needs an Erable account: you sign in first."));
+    wifi_button->setText(CurrentMode() == Mode::WiFi
+                             ? tr("Local Wi-Fi is on · Turn it off")
+                             : tr("Play on the local Wi-Fi (same network)"));
 
     if (page == Page::Room) {
         const unsigned port = JoinedPort();
@@ -490,8 +494,8 @@ void OnlinePanel::Update() {
         }
     }
     const int alerts = AlertCount();
-    tab_buttons[static_cast<int>(Tab::Alerts)]->setText(
-        alerts > 0 ? tr("Alerts · %1").arg(alerts) : tr("Alerts"));
+    tab_buttons[static_cast<int>(Tab::Alerts)]->setText(alerts > 0 ? tr("Alerts · %1").arg(alerts)
+                                                                   : tr("Alerts"));
     int online_friends = 0;
     if (account) {
         for (const Friend& player : account->Friends()) {
@@ -622,10 +626,10 @@ void OnlinePanel::RebuildFriends() {
     }
     const auto& friends = account->Friends();
     if (friends.isEmpty()) {
-        friends_list->addWidget(MakeLabel(
-            tr("No friends yet: share your friend code (%1), or add theirs.")
-                .arg(account->CurrentSession()->friend_code),
-            "hint", nullptr));
+        friends_list->addWidget(
+            MakeLabel(tr("No friends yet: share your friend code (%1), or add theirs.")
+                          .arg(account->CurrentSession()->friend_code),
+                      "hint", nullptr));
         return;
     }
     const unsigned joined = JoinedPort();
@@ -636,7 +640,7 @@ void OnlinePanel::RebuildFriends() {
         line->setContentsMargins(4, 4, 4, 4);
         auto* names = new QVBoxLayout;
         names->setSpacing(0);
-        names->addWidget(new QLabel(player.nickname.toHtmlEscaped(), row));
+        names->addWidget(new QLabel(Shown(player.nickname).toHtmlEscaped(), row));
         QString status;
         if (!player.online) {
             status = tr("Offline");
@@ -678,7 +682,8 @@ void OnlinePanel::RebuildAlerts() {
         auto* card_column = new QVBoxLayout(card);
         card_column->setContentsMargins(12, 10, 12, 10);
         card_column->addWidget(MakeLabel(
-            tr("<b>%1</b> wants to be your friend").arg(request.nickname.toHtmlEscaped()), "", card));
+            tr("<b>%1</b> wants to be your friend").arg(Shown(request.nickname).toHtmlEscaped()),
+            "", card));
         auto* answers = new QHBoxLayout;
         auto* accept = MakeButton(tr("Accept"), "accept", card);
         auto* refuse = MakeButton(tr("Refuse"), "small", card);
@@ -697,9 +702,9 @@ void OnlinePanel::RebuildAlerts() {
         alerts_list->addWidget(card);
     }
     for (const FriendRequest& request : outgoing) {
-        alerts_list->addWidget(MakeLabel(
-            tr("Request sent to %1, waiting for their answer").arg(request.nickname.toHtmlEscaped()),
-            "hint", nullptr));
+        alerts_list->addWidget(MakeLabel(tr("Request sent to %1, waiting for their answer")
+                                             .arg(Shown(request.nickname).toHtmlEscaped()),
+                                         "hint", nullptr));
     }
 }
 

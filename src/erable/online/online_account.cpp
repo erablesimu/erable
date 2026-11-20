@@ -136,6 +136,9 @@ QString Account::ErrorText(const QString& code) {
         return tr("The nickname needs 4 to 20 letters (without accents), digits, spaces, '.', "
                   "'_' or '-'.");
     }
+    if (code == QStringLiteral("offensive_nickname")) {
+        return tr("This nickname holds an insult or a swear word: choose another one.");
+    }
     if (code == QStringLiteral("bad_email")) {
         return tr("This e-mail address is not valid.");
     }

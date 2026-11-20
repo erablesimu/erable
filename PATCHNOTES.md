@@ -19,6 +19,16 @@ version. Les sections suivantes gardent l'historique.
   hors ligne.
 - La fenêtre du salon peut maintenant être réduite.
 
+**Filtre à insultes**
+- Dans la discussion des salons, les insultes et gros mots des langues européennes s'affichent
+  en étoiles (français, anglais, espagnol, italien, allemand, portugais, néerlandais, polonais,
+  tchèque, slovaque, hongrois, roumain, langues nordiques, finnois, croate et serbe, turc, grec,
+  russe, ukrainien, bulgare). Les messages envoyés partent déjà masqués.
+- Il voit à travers les fautes et les contournements : majuscules, accents, chiffres à la place
+  des lettres (« s4l0pe »), lettres répétées, espacées ou séparées par des points (« c.o.n »),
+  orthographes qui se prononcent pareil (« phuck »), deux lettres inversées dans les mots longs.
+- Le serveur refuse les pseudos qui en contiennent, même collés à un autre mot (« BigC0nnard »).
+
 **Mario Kart World en sans fil local**
 - Le « Patientez » sans fin du mode sans fil local est corrigé, sans mode avion, seul comme dans un
   salon : le jeu ne tente plus sa connexion aux serveurs de Nintendo, toujours bloquée.

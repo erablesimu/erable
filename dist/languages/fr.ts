@@ -12243,6 +12243,10 @@ Réessayer sans la recette ? Le jeu fonctionnera toujours depuis l'archive NX, m
 <context>
     <name>Online::Account</name>
     <message>
+        <source>This nickname holds an insult or a swear word: choose another one.</source>
+        <translation>Ce pseudo contient une insulte ou un gros mot : choisissez-en un autre.</translation>
+    </message>
+    <message>
         <source>No player has this friend code.</source>
         <translation>Aucun joueur n’a ce code ami.</translation>
     </message>

@@ -226,6 +226,7 @@ add_executable(tests
     common/nextendo.cpp
     common/page_table.cpp
     common/param_package.cpp
+    common/profanity_filter.cpp
     common/poll_window.cpp
     common/range_map.cpp
     common/ring_buffer.cpp

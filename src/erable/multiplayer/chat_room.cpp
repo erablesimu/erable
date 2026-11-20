@@ -18,6 +18,7 @@
 #include <QUrl>
 #include <QtConcurrentRun>
 #include "common/logging.h"
+#include "common/profanity_filter.h"
 #include "network/announce_multiplayer_session.h"
 #include "ui_chat_room.h"
 #include "qt_common/game_list/game_list_p.h"
@@ -33,9 +34,10 @@ public:
         /// Convert the time to their default locale defined format
         QLocale locale;
         timestamp = locale.toString(ts.isValid() ? ts : QTime::currentTime(), QLocale::ShortFormat);
-        nickname = QString::fromStdString(chat.nickname);
+        // Insults and swear words show as stars, from players of older versions too
+        nickname = QString::fromStdString(Common::Profanity::Mask(chat.nickname));
         username = QString::fromStdString(chat.username);
-        message = QString::fromStdString(chat.message);
+        message = QString::fromStdString(Common::Profanity::Mask(chat.message));
 
         // Check for user pings
         QString cur_nickname, cur_username;
@@ -339,7 +341,8 @@ void ChatRoom::OnSendChat() {
         if (!room_member->IsConnected()) {
             return;
         }
-        auto message = ui->chat_message->text().toStdString();
+        // Sent with its insults and swear words as stars, so older versions show them so too
+        auto message = Common::Profanity::Mask(ui->chat_message->text().toStdString());
         if (!ValidateMessage(message)) {
             return;
         }
