@@ -13,6 +13,8 @@
 #include <QStringList>
 #include <QUrl>
 
+#include "common/common_types.h"
+
 class QNetworkAccessManager;
 class QTimer;
 class QNetworkReply;
@@ -37,6 +39,17 @@ struct Room {
     QString password;
     int players{}; ///< The other players online in it (0 when the server is older)
     QString game;  ///< The game its players run: a room holds one game at a time
+    QString reserved;      ///< The game it is kept for, empty for any
+    QStringList title_ids; ///< That game's program ids (16 hex digits)
+    QStringList keywords;  ///< Words of that game's title, in any language
+    int max_players{8};
+    bool opened{}; ///< Opened on demand, once the others of its game were full
+
+    /// Whether the room takes this game: any game when it is kept for none
+    bool Takes(u64 program_id, const QString& title) const;
+    bool Full() const {
+        return players >= max_players;
+    }
 };
 
 /// A friend, as the last sync saw them
@@ -125,6 +138,9 @@ public:
     const QList<Room>& Rooms() const {
         return rooms;
     }
+    /// Opens one more room for `reserved` ("" for any game), once all those for it are full; the
+    /// server answers with it in `data["room"]`, and the list is fetched again
+    void OpenRoom(const QString& reserved, Callback done);
     /// The password of the room on `port`, if it was fetched
     QString RoomPassword(unsigned port) const;
     /// The name of the room on `port` ("Salon 3"), else empty

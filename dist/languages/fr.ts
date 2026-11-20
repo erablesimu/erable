@@ -12247,6 +12247,18 @@ Réessayer sans la recette ? Le jeu fonctionnera toujours depuis l'archive NX, m
 <context>
     <name>Online::Account</name>
     <message>
+        <source>A room for this game still has room: join it.</source>
+        <translation>Un salon de ce jeu a encore de la place : rejoins-le.</translation>
+    </message>
+    <message>
+        <source>The server has no room left to open: try again in a few minutes.</source>
+        <translation>Le serveur ne peut plus ouvrir de salon : réessaie dans quelques minutes.</translation>
+    </message>
+    <message>
+        <source>This server opens no more rooms.</source>
+        <translation>Ce serveur n’ouvre pas de salons supplémentaires.</translation>
+    </message>
+    <message>
         <source>Your nickname holds an insult or a swear word: change it to play online.</source>
         <translation>Ton pseudo contient une insulte ou un gros mot : change-le pour jouer en ligne.</translation>
     </message>
@@ -12580,6 +12592,46 @@ Entrez votre mot de passe pour confirmer :</translation>
 </context>
 <context>
     <name>Online::OnlinePanel</name>
+    <message>
+        <source>Any game</source>
+        <translation>Tous jeux</translation>
+    </message>
+    <message>
+        <source>Your room · %1</source>
+        <translation>Ton salon · %1</translation>
+    </message>
+    <message>
+        <source>%1 · full (%2/%2)</source>
+        <translation>%1 · complet (%2/%2)</translation>
+    </message>
+    <message>
+        <source>%1 · %2/%3 players</source>
+        <translation>%1 · %2/%3 joueurs</translation>
+    </message>
+    <message>
+        <source>Open one more room for any game</source>
+        <translation>Ouvrir un salon de plus, tous jeux</translation>
+    </message>
+    <message>
+        <source>Open one more room for %1</source>
+        <translation>Ouvrir un salon de plus pour %1</translation>
+    </message>
+    <message>
+        <source>Opening a room...</source>
+        <translation>Ouverture d’un salon…</translation>
+    </message>
+    <message>
+        <source>%1 is full: choose another room.</source>
+        <translation>%1 est complet : choisis un autre salon.</translation>
+    </message>
+    <message>
+        <source>This room is kept for another game</source>
+        <translation>Ce salon est réservé à un autre jeu</translation>
+    </message>
+    <message>
+        <source>%1 is kept for %2. Choose a room for %3, or go offline.</source>
+        <translation>%1 est réservé à %2. Choisis un salon pour %3, ou passe hors ligne.</translation>
+    </message>
     <message>
         <source>No mods in the rooms</source>
         <translation>Pas de mods dans les salons</translation>

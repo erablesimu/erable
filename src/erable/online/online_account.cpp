@@ -3,6 +3,8 @@
 
 #include "erable/online/online_account.h"
 
+#include <algorithm>
+
 #include <memory>
 
 #include <QCoreApplication>
@@ -135,6 +137,15 @@ QString Account::ErrorText(const QString& code) {
     if (code == QStringLiteral("bad_nickname")) {
         return tr("The nickname needs 4 to 20 letters (without accents), digits, spaces, '.', "
                   "'_' or '-'.");
+    }
+    if (code == QStringLiteral("rooms_available")) {
+        return tr("A room for this game still has room: join it.");
+    }
+    if (code == QStringLiteral("no_room_left")) {
+        return tr("The server has no room left to open: try again in a few minutes.");
+    }
+    if (code == QStringLiteral("no_room_opening") || code == QStringLiteral("unknown_room_game")) {
+        return tr("This server opens no more rooms.");
     }
     if (code == QStringLiteral("nickname_must_change")) {
         return tr("Your nickname holds an insult or a swear word: change it to play online.");
@@ -296,7 +307,16 @@ void Account::FetchRooms(Callback done) {
                           .port = static_cast<unsigned>(room.value(QStringLiteral("port")).toInt()),
                           .password = room.value(QStringLiteral("password")).toString(),
                           .players = room.value(QStringLiteral("players")).toInt(),
-                          .game = room.value(QStringLiteral("game")).toString()});
+                          .game = room.value(QStringLiteral("game")).toString(),
+                          .reserved = room.value(QStringLiteral("reserved")).toString(),
+                          .title_ids = room.value(QStringLiteral("title_ids"))
+                                           .toVariant()
+                                           .toStringList(),
+                          .keywords = room.value(QStringLiteral("keywords"))
+                                          .toVariant()
+                                          .toStringList(),
+                          .max_players = room.value(QStringLiteral("max_players")).toInt(8),
+                          .opened = room.value(QStringLiteral("dynamic")).toBool()});
                  }
              } else if (result.error == QStringLiteral("no_session")) {
                  ClearSession();
@@ -305,6 +325,31 @@ void Account::FetchRooms(Callback done) {
                  emit SessionChanged();
              }
              done(result);
+         });
+}
+
+bool Room::Takes(u64 program_id, const QString& title) const {
+    if (reserved.isEmpty() || (title_ids.isEmpty() && keywords.isEmpty())) {
+        return true;
+    }
+    const QString id = QStringLiteral("%1").arg(program_id, 16, 16, QLatin1Char('0')).toUpper();
+    if (title_ids.contains(id, Qt::CaseInsensitive)) {
+        return true;
+    }
+    return std::any_of(keywords.begin(), keywords.end(), [&](const QString& word) {
+        return title.contains(word, Qt::CaseInsensitive);
+    });
+}
+
+void Account::OpenRoom(const QString& reserved, Callback done) {
+    Send(QStringLiteral("POST"), QStringLiteral("/v1/rooms/open"),
+         {{QStringLiteral("reserved"), reserved}}, true,
+         [this, done = std::move(done)](const Result& result) {
+             if (!result.ok) {
+                 done(result);
+                 return;
+             }
+             FetchRooms([done, result](const Result&) { done(result); });
          });
 }
 

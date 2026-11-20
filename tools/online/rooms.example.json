@@ -1,0 +1,210 @@
+[
+  {
+    "name": "Salon 1",
+    "port": 24872,
+    "password": "CHANGE-ME-1",
+    "reserved": "Mario Kart World",
+    "title_ids": [
+      "0400C3F00006E000"
+    ],
+    "keywords": [
+      "Mario Kart World"
+    ],
+    "max_players": 8
+  },
+  {
+    "name": "Salon 2",
+    "port": 24873,
+    "password": "CHANGE-ME-2",
+    "reserved": "Mario Kart World",
+    "title_ids": [
+      "0400C3F00006E000"
+    ],
+    "keywords": [
+      "Mario Kart World"
+    ],
+    "max_players": 8
+  },
+  {
+    "name": "Salon 3",
+    "port": 24874,
+    "password": "CHANGE-ME-3",
+    "reserved": "Mario Kart World",
+    "title_ids": [
+      "0400C3F00006E000"
+    ],
+    "keywords": [
+      "Mario Kart World"
+    ],
+    "max_players": 8
+  },
+  {
+    "name": "Salon 4",
+    "port": 24875,
+    "password": "CHANGE-ME-4",
+    "reserved": "Mario Kart World",
+    "title_ids": [
+      "0400C3F00006E000"
+    ],
+    "keywords": [
+      "Mario Kart World"
+    ],
+    "max_players": 8
+  },
+  {
+    "name": "Salon 5",
+    "port": 24876,
+    "password": "CHANGE-ME-5",
+    "reserved": "Pokémon Legends: Z-A",
+    "title_ids": [],
+    "keywords": [
+      "Z-A"
+    ],
+    "max_players": 4
+  },
+  {
+    "name": "Salon 6",
+    "port": 24877,
+    "password": "CHANGE-ME-6",
+    "reserved": "Pokémon Legends: Z-A",
+    "title_ids": [],
+    "keywords": [
+      "Z-A"
+    ],
+    "max_players": 4
+  },
+  {
+    "name": "Salon 7",
+    "port": 24878,
+    "password": "CHANGE-ME-7",
+    "reserved": "Pokémon Scarlet & Violet",
+    "title_ids": [
+      "0100A3D008C5C000",
+      "01008F6008C5E000"
+    ],
+    "keywords": [
+      "Scarlet",
+      "Violet",
+      "Écarlate",
+      "Karmesin",
+      "Purpur",
+      "Escarlata",
+      "Púrpura",
+      "Scarlatto",
+      "Violetto"
+    ],
+    "max_players": 4
+  },
+  {
+    "name": "Salon 8",
+    "port": 24879,
+    "password": "CHANGE-ME-8",
+    "reserved": "Pokémon Scarlet & Violet",
+    "title_ids": [
+      "0100A3D008C5C000",
+      "01008F6008C5E000"
+    ],
+    "keywords": [
+      "Scarlet",
+      "Violet",
+      "Écarlate",
+      "Karmesin",
+      "Purpur",
+      "Escarlata",
+      "Púrpura",
+      "Scarlatto",
+      "Violetto"
+    ],
+    "max_players": 4
+  },
+  {
+    "name": "Salon 9",
+    "port": 24880,
+    "password": "CHANGE-ME-9",
+    "reserved": "Splatoon Raiders",
+    "title_ids": [
+      "0400380020056000"
+    ],
+    "keywords": [
+      "Splatoon Raiders"
+    ],
+    "max_players": 4
+  },
+  {
+    "name": "Salon 10",
+    "port": 24881,
+    "password": "CHANGE-ME-10",
+    "reserved": "Splatoon Raiders",
+    "title_ids": [
+      "0400380020056000"
+    ],
+    "keywords": [
+      "Splatoon Raiders"
+    ],
+    "max_players": 4
+  },
+  {
+    "name": "Salon 11",
+    "port": 24882,
+    "password": "CHANGE-ME-11",
+    "reserved": "Splatoon Raiders",
+    "title_ids": [
+      "0400380020056000"
+    ],
+    "keywords": [
+      "Splatoon Raiders"
+    ],
+    "max_players": 4
+  },
+  {
+    "name": "Salon 12",
+    "port": 24883,
+    "password": "CHANGE-ME-12",
+    "reserved": "Pokémon Pokopia",
+    "title_ids": [
+      "0400A3A01EE4C000"
+    ],
+    "keywords": [
+      "Pokopia"
+    ],
+    "max_players": 4
+  },
+  {
+    "name": "Salon 13",
+    "port": 24884,
+    "password": "CHANGE-ME-13",
+    "reserved": "Pokémon Pokopia",
+    "title_ids": [
+      "0400A3A01EE4C000"
+    ],
+    "keywords": [
+      "Pokopia"
+    ],
+    "max_players": 4
+  },
+  {
+    "name": "Salon 14",
+    "port": 24885,
+    "password": "CHANGE-ME-14",
+    "reserved": "Pokémon Pokopia",
+    "title_ids": [
+      "0400A3A01EE4C000"
+    ],
+    "keywords": [
+      "Pokopia"
+    ],
+    "max_players": 4
+  },
+  {
+    "name": "Salon 15",
+    "port": 24886,
+    "password": "CHANGE-ME-15",
+    "max_players": 8
+  },
+  {
+    "name": "Salon 16",
+    "port": 24887,
+    "password": "CHANGE-ME-16",
+    "max_players": 8
+  }
+]

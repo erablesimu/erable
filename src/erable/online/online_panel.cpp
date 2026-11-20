@@ -12,6 +12,7 @@
 #include <QEventLoop>
 #include <QHBoxLayout>
 #include <QInputDialog>
+#include <QJsonObject>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -671,22 +672,60 @@ void OnlinePanel::RebuildRooms() {
         }
     }
     const unsigned joined = JoinedPort();
+    // The games whose rooms are all full: one more can be opened for them
+    QStringList full_games;
+    QStringList open_games;
     for (const Room& room : rooms) {
+        (room.Full() ? full_games : open_games).append(room.reserved);
+    }
+    for (const Room& room : rooms) {
+        const QString game = !room.reserved.isEmpty() ? room.reserved
+                             : !room.game.isEmpty()   ? room.game
+                                                      : tr("Any game");
         QString state;
         if (room.port == joined) {
-            state = tr("Your room");
-        } else if (room.players == 0) {
-            state = tr("Free");
-        } else if (room.game.isEmpty()) {
-            state = tr("%n player(s), no game yet", "", room.players);
+            state = tr("Your room · %1").arg(game);
+        } else if (room.Full()) {
+            state = tr("%1 · full (%2/%2)").arg(game).arg(room.max_players);
         } else {
-            state = tr("%1 · %n player(s)", "", room.players).arg(room.game);
+            state = tr("%1 · %2/%3 players").arg(game).arg(room.players).arg(room.max_players);
         }
         auto* button = MakeButton(QStringLiteral("%1\n%2").arg(room.name, state),
                                   room.port == joined ? "roomJoined" : "room", nullptr);
+        button->setEnabled(room.port == joined || !room.Full());
         const unsigned port = room.port;
         connect(button, &QPushButton::clicked, this, [this, port] { Choose(port); });
         rooms_list->addWidget(button);
+    }
+    full_games.removeDuplicates();
+    for (const QString& reserved : full_games) {
+        if (open_games.contains(reserved)) {
+            continue;
+        }
+        auto* open = MakeButton(reserved.isEmpty() ? tr("Open one more room for any game")
+                                                   : tr("Open one more room for %1").arg(reserved),
+                                "link", nullptr);
+        connect(open, &QPushButton::clicked, this, [this, reserved] {
+            QPointer<OnlinePanel> self{this};
+            rooms_status->setText(tr("Opening a room..."));
+            account->OpenRoom(reserved, [self](const Account::Result& result) {
+                if (!self) {
+                    return;
+                }
+                self->rooms_status->setText(result.ok ? QString{}
+                                                      : Account::ErrorText(result.error));
+                self->RebuildRooms();
+                if (result.ok) {
+                    const auto port = static_cast<unsigned>(
+                        result.data.value(QStringLiteral("room")).toObject()
+                            .value(QStringLiteral("port")).toInt());
+                    if (port != 0) {
+                        self->Choose(port);
+                    }
+                }
+            });
+        });
+        rooms_list->addWidget(open);
     }
 }
 
@@ -698,6 +737,12 @@ void OnlinePanel::Choose(unsigned port) {
         return;
     }
     if (port != JoinedPort()) {
+        for (const Room& room : account->Rooms()) {
+            if (room.port == port && room.Full()) {
+                rooms_status->setText(tr("%1 is full: choose another room.").arg(room.name));
+                return;
+            }
+        }
         JoinRoom(account, port);
     }
     online = true;
@@ -952,6 +997,24 @@ bool OnlinePanel::MayLaunch(const QString& game_title, u64 program_id,
         } else {
             return false;
         }
+    }
+    for (const Room& room : account->Rooms()) {
+        if (room.port != port || room.Takes(program_id, game_title)) {
+            continue;
+        }
+        QMessageBox box(QMessageBox::Information, tr("This room is kept for another game"),
+                        tr("%1 is kept for %2. Choose a room for %3, or go offline.")
+                            .arg(room.name, room.reserved, game_title),
+                        QMessageBox::NoButton, window());
+        QPushButton* rooms_button = box.addButton(tr("See the rooms"), QMessageBox::AcceptRole);
+        box.addButton(QMessageBox::Cancel);
+        box.exec();
+        if (box.clickedButton() == rooms_button) {
+            online = true;
+            Open();
+            ShowTab(Tab::Rooms);
+        }
+        return false;
     }
     if (game_title.isEmpty()) {
         return true;

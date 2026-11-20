@@ -11,8 +11,14 @@ together: nothing is sent by e-mail.
     account_server.py --db /var/lib/erable-accounts/accounts.db \
         --cert cert.pem --key key.pem --port 24870 --rooms rooms.json
 
-rooms.json lists the rooms signed-in players may join, with their passwords:
-    [{"name": "Salon 1", "port": 24872, "password": "..."}, ...]
+rooms.json lists the rooms signed-in players may join, with their passwords, and optionally the
+game a room is kept for and how many players it takes (see rooms.example.json):
+    [{"name": "Salon 1", "port": 24872, "password": "...", "reserved": "Mario Kart World",
+      "title_ids": ["0400C3F00006E000"], "keywords": ["Mario Kart World"], "max_players": 8}, ...]
+
+With --room-binary (the eden-room program), this server also runs the rooms: those of rooms.json,
+restarted if they stop, and more on demand once every room of a game is full, on the ports of
+--dynamic-ports, up to --max-rooms in all; those close after 10 minutes empty.
 """
 
 import argparse
@@ -20,9 +26,11 @@ import hashlib
 import hmac
 import json
 import re
+import os
 import secrets
 import sqlite3
 import ssl
+import subprocess
 import threading
 import time
 import unicodedata
@@ -692,7 +700,116 @@ def load_rooms(path):
     with open(path, encoding="utf-8") as file:
         rooms = json.load(file)
     return [{"name": str(room["name"]), "port": int(room["port"]),
-             "password": str(room.get("password", ""))} for room in rooms]
+             "password": str(room.get("password", "")),
+             # The game the room is kept for ("" for any), how Erable recognises it (program ids,
+             # words of its title in any language), and the players it takes
+             "reserved": str(room.get("reserved", "")),
+             "title_ids": [str(i).upper() for i in room.get("title_ids", [])],
+             "keywords": [str(k) for k in room.get("keywords", [])],
+             "max_players": max(2, min(16, int(room.get("max_players", 8)))),
+             "dynamic": False} for room in rooms]
+
+
+DYNAMIC_ROOM_IDLE = 600  # An opened room closes after this long empty, in seconds
+
+
+def players_in_rooms(store, since):
+    return dict(store.db.execute(
+        "SELECT room_port, COUNT(*) FROM presence WHERE room_port != 0 AND seen_at >= ? "
+        "GROUP BY room_port", (since,)).fetchall())
+
+
+class RoomManager:
+    """The rooms: those of rooms.json, and the ones opened on demand once every room of a game is
+    full. With an eden-room program it runs them, one process a room: an idle room costs a few
+    MiB and no CPU, so the limit that matters is the number of rooms and the bandwidth."""
+
+    def __init__(self, rooms, binary="", dynamic_ports=(), max_rooms=64, log_dir=""):
+        self.static = rooms
+        self.dynamic = {}  # port -> room
+        self.binary = binary
+        self.dynamic_ports = list(dynamic_ports)
+        self.max_rooms = max_rooms
+        self.log_dir = log_dir
+        self.processes = {}  # port -> Popen
+        self.empty_since = {}  # port -> time an opened room was first seen empty
+
+    def all_rooms(self):
+        return self.static + [self.dynamic[port] for port in sorted(self.dynamic)]
+
+    def spawn(self, room):
+        if not self.binary:
+            return
+        port = room["port"]
+        command = [self.binary, "--room-name", room["name"], "--port", str(port),
+                   "--max-members", str(room["max_players"]),
+                   "--preferred-game", room["reserved"] or "Any game",
+                   "--preferred-game-id", room["title_ids"][0] if room["title_ids"] else "0"]
+        if room["password"]:
+            command += ["--password", room["password"]]
+        if self.log_dir:
+            command += ["--ban-list-file", os.path.join(self.log_dir, f"bans-{port}.txt"),
+                        "--log-file", os.path.join(self.log_dir, f"room-{port}.log")]
+        self.processes[port] = subprocess.Popen(command, stdin=subprocess.DEVNULL,
+                                                stdout=subprocess.DEVNULL,
+                                                stderr=subprocess.DEVNULL)
+
+    def start(self):
+        for room in self.static:
+            self.spawn(room)
+
+    def open(self, store, account_id, reserved):
+        """Opens a room for `reserved` ("" for any game) if every room for it is full"""
+        if not self.binary or not self.dynamic_ports:
+            raise ApiError(HTTPStatus.SERVICE_UNAVAILABLE, "no_room_opening")
+        template = next((room for room in self.static if room["reserved"] == reserved), None)
+        if template is None:
+            raise ApiError(HTTPStatus.BAD_REQUEST, "unknown_room_game")
+        same = [room for room in rooms_with_players(store, account_id, self.all_rooms())
+                if room["reserved"] == reserved]
+        if any(room["players"] < room["max_players"] for room in same):
+            raise ApiError(HTTPStatus.CONFLICT, "rooms_available")
+        if len(self.static) + len(self.dynamic) >= self.max_rooms:
+            raise ApiError(HTTPStatus.SERVICE_UNAVAILABLE, "no_room_left")
+        port = next((p for p in self.dynamic_ports
+                     if p not in self.dynamic and all(r["port"] != p for r in self.static)), None)
+        if port is None:
+            raise ApiError(HTTPStatus.SERVICE_UNAVAILABLE, "no_room_left")
+        store.check_throttle("open_room:" + str(account_id))
+        store.note_failure("open_room:" + str(account_id))
+        room = dict(template, name=f"Salon {len(self.static) + len(self.dynamic) + 1}",
+                    port=port, password=secrets.token_urlsafe(12), dynamic=True)
+        self.dynamic[port] = room
+        self.empty_since[port] = time.time()
+        self.spawn(room)
+        return room
+
+    def reap(self, store):
+        """Restarts the rooms that stopped, closes the opened ones empty for a while"""
+        now = time.time()
+        players = players_in_rooms(store, int(now) - ONLINE_FOR)
+        for port, process in list(self.processes.items()):
+            if process.poll() is not None:
+                room = next((r for r in self.all_rooms() if r["port"] == port), None)
+                if room is not None:
+                    self.spawn(room)
+        for port in list(self.dynamic):
+            if players.get(port, 0) > 0:
+                self.empty_since.pop(port, None)
+                continue
+            since = self.empty_since.setdefault(port, now)
+            if now - since >= DYNAMIC_ROOM_IDLE:
+                process = self.processes.pop(port, None)
+                if process is not None:
+                    process.terminate()
+                del self.dynamic[port]
+                self.empty_since.pop(port, None)
+
+    def reap_forever(self, store):
+        while True:
+            time.sleep(60)
+            with store.lock:
+                self.reap(store)
 
 
 def rooms_with_players(store, account_id, rooms):
@@ -749,6 +866,7 @@ ROUTES = {
 
 
 def make_handler(store, rooms):
+    manager = rooms if isinstance(rooms, RoomManager) else RoomManager(rooms)
     class Handler(BaseHTTPRequestHandler):
         server_version = "ErableAccounts/1"
         sys_version = ""
@@ -794,8 +912,19 @@ def make_handler(store, rooms):
                         if not store.has_access(account_id):
                             raise ApiError(HTTPStatus.PAYMENT_REQUIRED, "no_access")
                         require_proper_nickname(store, account_id)
-                        self.reply(HTTPStatus.OK, {"rooms": rooms_with_players(store, account_id,
-                                                                              rooms)})
+                        self.reply(HTTPStatus.OK, {"rooms": rooms_with_players(
+                            store, account_id, manager.all_rooms())})
+                        return
+                    if (method, self.path) == ("POST", "/v1/rooms/open"):
+                        account_id, _ = session_account(store, self.headers)
+                        if not store.has_access(account_id):
+                            raise ApiError(HTTPStatus.PAYMENT_REQUIRED, "no_access")
+                        require_proper_nickname(store, account_id)
+                        body = self.read_body()
+                        reserved = body.get("reserved") if isinstance(body.get("reserved"),
+                                                                      str) else ""
+                        room = manager.open(store, account_id, reserved)
+                        self.reply(HTTPStatus.OK, {"room": dict(room, players=0, game="")})
                         return
                     account_route = ACCOUNT_ROUTES.get((method, self.path))
                     if account_route is not None:
@@ -838,10 +967,22 @@ def main():
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=24870)
     parser.add_argument("--rooms", default="", help="JSON list of the rooms and their passwords")
+    parser.add_argument("--room-binary", default="",
+                        help="The eden-room program: runs the rooms and opens more on demand")
+    parser.add_argument("--dynamic-ports", default="24888-24935",
+                        help="The ports of the rooms opened on demand (first-last)")
+    parser.add_argument("--max-rooms", type=int, default=64, help="Rooms in all, opened included")
+    parser.add_argument("--room-log-dir", default="", help="Where the rooms keep logs and bans")
     args = parser.parse_args()
 
     store = Store(args.db)
-    server = ThreadingHTTPServer((args.host, args.port), make_handler(store, load_rooms(args.rooms)))
+    first, _, last = args.dynamic_ports.partition("-")
+    manager = RoomManager(load_rooms(args.rooms), args.room_binary,
+                          range(int(first), int(last or first) + 1), args.max_rooms,
+                          args.room_log_dir)
+    manager.start()
+    threading.Thread(target=manager.reap_forever, args=(store,), daemon=True).start()
+    server = ThreadingHTTPServer((args.host, args.port), make_handler(store, manager))
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.minimum_version = ssl.TLSVersion.TLSv1_2
     context.load_cert_chain(args.cert, args.key)
