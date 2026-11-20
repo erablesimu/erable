@@ -33,3 +33,10 @@ Règle :
   write-back d'images de Lichii (« AIO-10 component #1501 », #2133, #2134). Laissés de côté :
   #1445 (repose sur leurs traces d'upload) et la reprise de l'agrandissement d'Ocarina en
   portable (#1866), qui demande leur passe FSR.
+- build-45 (20 novembre 2026) : six correctifs hors shaders choisis à la veille du 19 novembre :
+  #2233 (déverrouillages de pages nulles bornés à 1 Mo sous Windows), #2234 (prepo 10500, plantage
+  2010-0212 d'Ocarina), #2235 (recherches de descripteurs bornées), #2236 (échantillonneur de
+  secours), #2252 (événements dont le propriétaire a disparu), #2253 (capture d'échec MME).
+  Laissés de côté : l'exécution native ARM64 et Apple Silicon (#2246, #2249, #2254), les
+  statistiques Dynarmic (#2248), la liaison des sauvegardes Ryujinx (#2245, en conflit avec notre
+  fenêtre Sauvegardes) et l'option Yoshi (#2242).

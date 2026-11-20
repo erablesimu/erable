@@ -9,6 +9,12 @@ version. Les sections suivantes gardent l'historique.
 - Pokémon Épée et Bouclier : moins de flashs de lumière soudains. Le compteur de pixels dont le
   jeu se sert pour l'éblouissement du soleil était remis à zéro quatre fois par seconde ; il est
   maintenant conservé.
+- Jeux Switch 2 (Ocarina of Time notamment) : plus de plantage avec l'erreur 2010-0212 au bout
+  d'une trentaine de secondes, ni de blocage en quittant le jeu ensuite.
+- Cartes graphiques dont le pilote refuse de créer de nouveaux échantillonneurs de textures : Erable
+  en réutilise un existant au lieu d'échouer.
+- Plus de stabilité : recherches dans le cache de textures bornées, événements internes orphelins
+  ignorés.
 
 **Mises à jour**
 - Une mise à jour refusée, reportée ou pas terminée au lancement n'est plus perdue : un bouton
