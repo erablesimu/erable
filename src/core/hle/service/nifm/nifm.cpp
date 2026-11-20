@@ -71,26 +71,28 @@ static u128 MakeUuidFromName(std::string_view name) {
     return {h1, h2};
 }
 
+// Mario Kart World, once its internet request is accepted, logs in to Nintendo's servers, which
+// stay blocked, and its local wireless mode then waits for that login forever, in a room too.
+// Without a server of its own to reach, it is told there is no internet, as in airplane mode,
+// where its local wireless works. Local wireless does not go through nifm, and goes through the
+// room when there is one. Its hidden LAN mode, which needs the request accepted, is given up.
+static bool IsInternetPointlessForProgram(Core::System& system) {
+    constexpr u64 MarioKartWorld = 0x0400C3F00006E000;
+    return system.GetApplicationProcessProgramID() == MarioKartWorld &&
+           !Common::Nextendo::OnlinePlayActive() &&
+           !Settings::values.online_service_redirect.GetValue();
+}
+
 // A joined room is the emulated network, even in airplane mode. Its sockets only reach room
-// members, and LAN games (e.g. Mario Kart World LAN Play) need their connection request accepted.
+// members.
 static bool IsNetworkAvailable(Core::System& system) {
+    if (IsInternetPointlessForProgram(system)) {
+        return false;
+    }
     if (Network::GetRoomIPv4Address()) {
         return true;
     }
-    if (!Network::GetHostIPv4Address().has_value() || Settings::values.airplane_mode.GetValue()) {
-        return false;
-    }
-    // Mario Kart World, once its internet request is accepted, logs in to Nintendo's servers,
-    // which stay blocked, and its local wireless mode then waits for that login forever. Without
-    // a server of its own to reach, it is told there is no internet, as in airplane mode, where
-    // its local wireless works. Local wireless itself does not go through nifm.
-    constexpr u64 MarioKartWorld = 0x0400C3F00006E000;
-    if (system.GetApplicationProcessProgramID() == MarioKartWorld &&
-        !Common::Nextendo::OnlinePlayActive() &&
-        !Settings::values.online_service_redirect.GetValue()) {
-        return false;
-    }
-    return true;
+    return Network::GetHostIPv4Address().has_value() && !Settings::values.airplane_mode.GetValue();
 }
 
 // This is nn::nifm::RequestState
