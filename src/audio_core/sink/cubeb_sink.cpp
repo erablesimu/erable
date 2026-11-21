@@ -239,13 +239,18 @@ private:
     }
 
     /**
-     * Cubeb callback for if a device state changes. Unused currently.
+     * Cubeb callback for when a stream state changes: logged, and an error reopens the stream.
      *
      * @param stream      - Cubeb-specific data about the stream.
      * @param user_data   - Custom data pointer passed along, points to a CubebSinkStream.
      * @param state       - New state of the device.
      */
     static void StateCallback(cubeb_stream*, void* user_data, cubeb_state state) {
+        if (state != CUBEB_STATE_STARTED && state != CUBEB_STATE_ERROR) {
+            LOG_INFO(Audio_Sink, "Audio stream {} state {}",
+                     static_cast<CubebSinkStream*>(user_data)->name,
+                     state == CUBEB_STATE_STOPPED ? "stopped" : "drained");
+        }
         if (state == CUBEB_STATE_ERROR) {
             auto* impl = static_cast<CubebSinkStream*>(user_data);
             LOG_ERROR(Audio_Sink, "Audio stream {} stopped on a device error, reopening it",

@@ -307,6 +307,9 @@ private:
     /// When the renderer last tried to reopen a faulted stream, and how many times in a row.
     std::chrono::steady_clock::time_point last_reopen{};
     u32 reopen_attempts{};
+    /// When the host last asked this output stream for samples (steady clock, ns), 0 before
+    /// the first time: a stream that stops asking without reporting an error is reopened too
+    std::atomic<s64> last_callback_ns{};
     /// Largest number of frames the host device has asked for in one callback (sysmix streams)
     std::atomic<u64> largest_request_frames{};
     /// The ring size for audio out buffers (usually 4, rarely 2 or 8)

@@ -233,6 +233,10 @@ void SinkStream::ProcessAudioIn(std::span<const s16> input_buffer, std::size_t n
 
 /// Render queued PCM with the stream's underrun policy and optional two-second diagnostics.
 void SinkStream::ProcessAudioOutAndRender(std::span<s16> output_buffer, std::size_t num_frames) {
+    last_callback_ns.store(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                               std::chrono::steady_clock::now().time_since_epoch())
+                               .count(),
+                           std::memory_order_relaxed);
     if (num_frames == 0) {
         return;
     }
@@ -388,7 +392,27 @@ void SinkStream::WaitFreeSpace(std::stop_token stop_token) {
     release_cv.wait_for(lk, std::chrono::milliseconds(7), can_continue);
 
     if (queued_buffers > max_queue_size + 3) {
-        release_cv.wait(lk, stop_token, can_continue);
+        // The host should ask for samples every few milliseconds. One that has not asked for a
+        // second, without pausing or reporting an error, stopped on its own (a device switched,
+        // as when a game opens the microphone): it is reopened like a faulted one, instead of
+        // the renderer, and the game's sound with it, waiting here for ever.
+        while (!release_cv.wait_for(lk, stop_token, std::chrono::milliseconds(250), can_continue)) {
+            if (stop_token.stop_requested() || type == StreamType::In) {
+                return;
+            }
+            const s64 last = last_callback_ns.load(std::memory_order_relaxed);
+            const s64 now = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                std::chrono::steady_clock::now().time_since_epoch())
+                                .count();
+            if (last != 0 && now - last > 1'000'000'000) {
+                LOG_WARNING(Audio_Sink,
+                            "Audio stream {} has not asked for samples for {} ms, reopening it",
+                            name, (now - last) / 1'000'000);
+                failed = true;
+                last_callback_ns.store(0, std::memory_order_relaxed);
+                return;
+            }
+        }
     }
 }
 

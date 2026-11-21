@@ -27,6 +27,11 @@ version. Les sections suivantes gardent l'historique.
 - L'ancien explorateur de salons publics de yuzu ne s'ouvre plus : cliquer sur l'état du salon,
   en bas à droite, ouvre le panneau « En ligne » de l'accueil.
 
+**Son qui ne coupe plus**
+- Quand la sortie audio de Windows cesse de réclamer du son sans signaler d'erreur (par exemple
+  quand un jeu ouvre le micro, comme Ocarina of Time au démarrage), Erable la rouvre au bout d'une
+  seconde, au lieu de laisser le jeu muet jusqu'à la fermeture.
+
 **Corrections reprises de Lichii**
 - Salons : le relais garde l'adresse et l'identité de chaque joueur, pour un jeu local plus fiable
   à travers le serveur.
