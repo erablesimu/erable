@@ -25,7 +25,7 @@ TEST_CASE("A play time manager that changed nothing does not save over newer pla
     std::filesystem::create_directories(original, make_error);
     REQUIRE(std::filesystem::is_directory(original));
     const auto directory = std::filesystem::temp_directory_path() /
-                           fmt::format("lichii-play-time-{}", std::random_device{}());
+                           fmt::format("erable-play-time-{}", std::random_device{}());
     REQUIRE(std::filesystem::create_directories(directory));
     Common::FS::SetEdenPath(Common::FS::EdenPath::PlayTimeDir, directory);
     SCOPE_EXIT {

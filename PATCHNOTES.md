@@ -27,6 +27,18 @@ version. Les sections suivantes gardent l'historique.
 - L'ancien explorateur de salons publics de yuzu ne s'ouvre plus : cliquer sur l'état du salon,
   en bas à droite, ouvre le panneau « En ligne » de l'accueil.
 
+**Corrections reprises de Lichii**
+- Salons : le relais garde l'adresse et l'identité de chaque joueur, pour un jeu local plus fiable
+  à travers le serveur.
+- Petites cartes graphiques dédiées et anciens pilotes AMD (Radeon RX 400/500) : blocs de mémoire
+  plus petits et deux compilations de pipelines au plus en même temps.
+- Moins de processeur gaspillé : la partie du GPU qui lit les commandes dort au lieu de tourner en
+  attendant.
+- Plantages corrigés : Xenoblade Chronicles DE en passant de docké à portable, mémoire de
+  Xenoblade 2, images de fenêtre au format 2 ; réglages enregistrés sans risque de fichier vide
+  après une coupure.
+- Cache de shaders : réutilise les pipelines déjà compilés pendant la session.
+
 **Tutoriel**
 - Un tutoriel en 8 chapitres explique Erable : ce qu'il faut (tes jeux, tes clés et ton firmware,
   tirés de ta console), ajouter ses jeux, jouer, les réglages pour son PC, les manettes, le jeu en

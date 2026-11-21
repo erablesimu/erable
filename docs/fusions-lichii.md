@@ -40,3 +40,14 @@ Règle :
   Laissés de côté : l'exécution native ARM64 et Apple Silicon (#2246, #2249, #2254), les
   statistiques Dynarmic (#2248), la liaison des sauvegardes Ryujinx (#2245, en conflit avec notre
   fenêtre Sauvegardes) et l'option Yoshi (#2242).
+- build-53 (21 novembre 2026) : 28 commits choisis aux veilles du 20 au soir et du 21 au matin.
+  Traducteur de shaders : #2301 (TrackAddend itératif), #1763 (recherche StorageBufferAddr par
+  prédicat). Ailleurs : relais des salons qui garde l'adresse et l'identité ENet de chaque joueur
+  (#2336) ; petites cartes dédiées et anciens pilotes AMD (#2316, #2311) ; front du GPU qui dort
+  au lieu de tourner (#2237, #2247) ; textures et cache (#1898, #2167) ; plantages et robustesse
+  (#2282, #2299, #2304, #2327, #2177, #1972) ; et #1858, #2151, #2176, #1540, #1971, #2292,
+  #2250, #2313, #2293, #1811, #2349, #2347, #2346. Laissés de côté : nom « Lichii Optical Flow »
+  (#1633), compteur Dynarmic (#2315), réglages Duskbloods (#2288, #2186), commits « AIO only »,
+  tests seuls ; en conflit, à porter plus tard : série Switch 2 Edition et NUP (#2329, #2332,
+  #2340, #2338, #2362), #2291, #2319, #2312, #2296, #2305, #2262, #2358, #2360, série FPS Unlock
+  d'Ocarina (#2179, #2314, #2317, #2318).
