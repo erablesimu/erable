@@ -51,3 +51,7 @@ Règle :
   tests seuls ; en conflit, à porter plus tard : série Switch 2 Edition et NUP (#2329, #2332,
   #2340, #2338, #2362), #2291, #2319, #2312, #2296, #2305, #2262, #2358, #2360, série FPS Unlock
   d'Ocarina (#2179, #2314, #2317, #2318).
+- build-55 (22 novembre 2026) : #2393 (décodage ASTC par lots sur toutes les cartes, sur les
+  pics de ménage du cache d'Ocarina) et #2414 (copie linéaire bornée), choisis à la veille du
+  22 au matin. Laissés de côté : la boutique de mods GameBanana (#2405, contraire au jeu en ligne
+  sans mods) et FlyHigh (#2406, modèle sous licence non commerciale, touche leurs workflows).

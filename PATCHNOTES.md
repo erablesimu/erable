@@ -32,6 +32,14 @@ version. Les sections suivantes gardent l'historique.
   quand un jeu ouvre le micro, comme Ocarina of Time au démarrage), Erable la rouvre au bout d'une
   seconde, au lieu de laisser le jeu muet jusqu'à la fermeture.
 
+**Textures qui scintillent**
+- Le compteur d'occlusion n'est plus remis à zéro en pleine partie quand le jeu tarde à le lire :
+  dans Ocarina of Time, cette remise à zéro faisait clignoter certains objets et textures (eau,
+  fenêtres).
+- Les grosses textures ASTC (Ocarina of Time) sont décodées par petits lots sur toutes les cartes
+  graphiques, au lieu de déborder en mémoire système et de forcer un grand ménage du cache.
+- Une copie de texture linéaire ne déborde plus de sa destination.
+
 **Corrections reprises de Lichii**
 - Salons : le relais garde l'adresse et l'identité de chaque joueur, pour un jeu local plus fiable
   à travers le serveur.
