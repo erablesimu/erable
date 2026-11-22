@@ -267,11 +267,13 @@ public:
         if (!current_query || current_query->size_slots <= MaxRunningQuerySlots) {
             return;
         }
-        // Past 4 banks with reports waiting, the count is folded into the total at the next
-        // report, as at a wait for idle. Games that report a counter they never reset and use
-        // the difference between two reports (Pokémon Sword and Shield's sun glare, 4 times a
-        // second) saw it go back to zero when it was dropped: a flash of light.
-        if (HasPendingSync() && current_query->size_slots <= MaxFoldingQuerySlots) {
+        // Past 4 banks, the count is folded into the total at the next report, as at a wait for
+        // idle. Games that report a counter they never reset and use the difference between two
+        // reports (Pokémon Sword and Shield's sun glare, 4 times a second) saw it go back to zero
+        // when it was dropped: a flash of light. Ocarina of Time also goes past 1,024 slots with
+        // no report waiting in gameplay (3 drops between 108 and 113 s of a build-54 session,
+        // with flickering textures): the count is kept for its next report there too.
+        if (current_query->size_slots <= MaxFoldingQuerySlots) {
             if (!fold_wanted) {
                 fold_wanted = true;
                 ++bank_bound_folds;
@@ -284,9 +286,10 @@ public:
             }
             return;
         }
-        // Nothing reported meanwhile (a title screen): drop the count as a reset would. Logged
-        // on the 1st, 2nd, 4th, 8th... drop, so a window this long during gameplay doesn't go
-        // unnoticed and a title screen doesn't flood the log.
+        // Past 64 banks with nothing reported (a title screen): drop the count as a reset would,
+        // rather than keep every bank alive. Logged on the 1st, 2nd, 4th, 8th... drop, so a
+        // window this long during gameplay doesn't go unnoticed and a title screen doesn't flood
+        // the log.
         ++bank_bound_resets;
         if ((bank_bound_resets & (bank_bound_resets - 1)) == 0) {
             LOG_WARNING(Render_Vulkan,
