@@ -203,6 +203,7 @@ add_executable(tests
     video_core/spirv_software_matrix.cpp
     video_core/spirv_program_name.cpp
     video_core/spirv_builtin_capabilities.cpp
+    video_core/spirv_frag_depth_d24.cpp
     video_core/spirv_min_max_denorms.cpp
     video_core/spirv_nan_safe_min_max.cpp
     video_core/spirv_scalar_constants.cpp
