@@ -96,6 +96,7 @@ add_executable(tests
     core/nx_archive.cpp
     frontend_common/nx_archive.cpp
     core/vfs_vector.cpp
+    core/vfs_real.cpp
     core/kip_ini.cpp
     core/add_on_application_id.cpp
     core/ncz_cache.cpp
