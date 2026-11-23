@@ -1004,7 +1004,7 @@ private:
     std::vector<std::pair<DAddr, u64>> uploaded_ranges;
 
     std::deque<PendingUnswizzle> unswizzle_queue;
-    u8 current_unswizzle_frame;
+    u8 current_unswizzle_frame{};
 
     // Join caching
     boost::container::small_vector<ImageId, 4> join_overlap_ids;
