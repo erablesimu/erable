@@ -1167,6 +1167,7 @@ bool GraphicsPipeline::ConfigureImpl(bool is_indexed) {
         scheduler.RequestOutsideRenderPassOperationContext();
     }
 
+    const u64 geometry_tick = scheduler.CurrentTick();
     {
         Profile::Scope scope{Profile::Zone::UpdateBuffers};
         buffer_cache.UpdateGraphicsBuffers(is_indexed);
@@ -1264,6 +1265,14 @@ bool GraphicsPipeline::ConfigureImpl(bool is_indexed) {
     if (IsBuilt() && (!pipeline || build->Failed())) {
         return false;
     }
+    if (scheduler.CurrentTick() != geometry_tick) {
+        const BufferArena::SideScope side;
+        buffer_cache.BindHostGeometryBuffers(is_indexed);
+        if (buffer_cache.any_buffer_uploaded) {
+            buffer_cache.runtime.PostCopyBarrier();
+            buffer_cache.any_buffer_uploaded = false;
+        }
+    }
     Profile::Scope scope{Profile::Zone::ConfigureDraw};
     return ConfigureDraw(rescaling, render_area);
 }
@@ -1332,6 +1341,7 @@ bool GraphicsPipeline::ConfigureDelta(bool is_indexed) {
             }
         }
     }
+    const u64 geometry_tick = scheduler.CurrentTick();
     {
         Profile::Scope scope{Profile::Zone::UpdateBuffers};
         buffer_cache.UpdateGraphicsBuffers(is_indexed);
@@ -1438,6 +1448,14 @@ bool GraphicsPipeline::ConfigureDelta(bool is_indexed) {
     }
     if (IsBuilt() && (!pipeline || build->Failed())) {
         return false;
+    }
+    if (scheduler.CurrentTick() != geometry_tick) {
+        const BufferArena::SideScope side;
+        buffer_cache.BindHostGeometryBuffers(is_indexed);
+        if (buffer_cache.any_buffer_uploaded) {
+            buffer_cache.runtime.PostCopyBarrier();
+            buffer_cache.any_buffer_uploaded = false;
+        }
     }
     Profile::Scope scope{Profile::Zone::ConfigureDraw};
     return ConfigureDraw(rescaling, render_area);
