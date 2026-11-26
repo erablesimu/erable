@@ -4,6 +4,8 @@
 // SPDX-FileCopyrightText: Copyright 2018 yuzu Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <algorithm>
+
 #include <boost/container/small_vector.hpp>
 
 #include "common/adpf.h"
@@ -80,7 +82,10 @@ void nvdisp_disp0::Composite(std::span<const Nvnflinger::HwcLayer> sorted_layers
             .layer_stack_mask = layer.layer_stack_mask,
         });
 
-        for (size_t i = 0; i < layer.acquire_fence.num_fences; i++) {
+        // The count comes from the guest's queued buffer: no more than the fences it holds.
+        const size_t num_fences =
+            (std::min)(size_t{layer.acquire_fence.num_fences}, layer.acquire_fence.fences.size());
+        for (size_t i = 0; i < num_fences; i++) {
             if (layer.acquire_fence.fences[i].id >= 0) {
                 output_fences.push_back(layer.acquire_fence.fences[i]);
             }
