@@ -922,8 +922,8 @@ void DeviceMemoryManager<Traits>::UpdatePagesCachedCountNoLock(DAddr addr, size_
 
 template <typename Traits>
 bool DeviceMemoryManager<Traits>::IsRangeCached(DAddr addr, size_t size) const {
-    const size_t page_end = Common::DivCeil(addr + size, Memory::LICHII_PAGESIZE);
-    for (size_t page = addr >> Memory::LICHII_PAGEBITS; page != page_end; ++page) {
+    const size_t page_end = Common::DivCeil(addr + size, Memory::ERABLE_PAGESIZE);
+    for (size_t page = addr >> Memory::ERABLE_PAGEBITS; page != page_end; ++page) {
         if (cached_pages->at(page >> subentries_shift).Count(page).load(
                 std::memory_order_acquire) == 0) {
             return false;
