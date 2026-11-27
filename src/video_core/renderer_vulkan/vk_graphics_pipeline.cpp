@@ -1266,7 +1266,6 @@ bool GraphicsPipeline::ConfigureImpl(bool is_indexed) {
         return false;
     }
     if (scheduler.CurrentTick() != geometry_tick) {
-        const BufferArena::SideScope side;
         buffer_cache.BindHostGeometryBuffers(is_indexed);
         if (buffer_cache.any_buffer_uploaded) {
             buffer_cache.runtime.PostCopyBarrier();
@@ -1450,7 +1449,6 @@ bool GraphicsPipeline::ConfigureDelta(bool is_indexed) {
         return false;
     }
     if (scheduler.CurrentTick() != geometry_tick) {
-        const BufferArena::SideScope side;
         buffer_cache.BindHostGeometryBuffers(is_indexed);
         if (buffer_cache.any_buffer_uploaded) {
             buffer_cache.runtime.PostCopyBarrier();
