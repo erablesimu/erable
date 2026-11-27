@@ -1407,11 +1407,12 @@ void RasterizerVulkan::PrepareDraw(bool is_indexed, Func&& draw_func, bool is_in
                 scene.size.width == oot_motion.extent.width &&
                 scene.size.height == oot_motion.extent.height && !scene.IsRescaled() &&
                 scene.range == VideoCommon::SubresourceRange{}) {
-                oot_effects_scene = scene.Handle(Shader::TextureType::Color2D);
+                oot_effects_view = scene_id;
+                oot_effects_generation = texture_cache.ImageViewGeneration(scene_id);
                 oot_effects_address = scene.gpu_addr;
                 oot_effects_frame = render_trace_frame;
-                oot_live_dlss->SaveEffectsBase(oot_effects_scene, oot_motion.extent,
-                                               render_trace_frame);
+                oot_live_dlss->SaveEffectsBase(scene.Handle(Shader::TextureType::Color2D),
+                                               oot_motion.extent, render_trace_frame);
             }
         }
     }
@@ -2415,6 +2416,21 @@ void RasterizerVulkan::Clear(u32 layer_count) {
     }
 }
 
+// The effects scene saved at the fog draw, if its view still is the one saved: a new view can take
+// the same guest address and cache slot before the compute write that marks it
+void RasterizerVulkan::MarkOcarinaEffectsIfAlive() {
+    if (const auto* scene =
+            texture_cache.GetImageViewIfCurrent(oot_effects_view, oot_effects_generation)) {
+        oot_live_dlss->MarkEffects(scene->Handle(Shader::TextureType::Color2D), render_trace_frame);
+    } else if (oot_effects_stale_warnings < 8) {
+        ++oot_effects_stale_warnings;
+        LOG_WARNING(Render_Vulkan,
+                    "OoT effects mark skipped: scene view at {:#x} was retired since the fog "
+                    "draw ({} so far)",
+                    oot_effects_address, oot_effects_stale_warnings);
+    }
+}
+
 void RasterizerVulkan::DispatchCompute() {
     VideoCommon::Nx2Profile::Scope profile_scope{VideoCommon::Nx2Profile::Zone::Compute};
     FlushWork();
@@ -2603,7 +2619,7 @@ void RasterizerVulkan::DispatchCompute() {
         if (std::ranges::any_of(written, [this](VideoCommon::ImageViewId id) {
                 return id && texture_cache.GetImageView(id).gpu_addr == oot_effects_address;
             })) {
-            oot_live_dlss->MarkEffects(oot_effects_scene, render_trace_frame);
+            MarkOcarinaEffectsIfAlive();
             oot_effects_frame.reset();
         }
     }

@@ -100,6 +100,7 @@ public:
     void DrawTexture() override;
     void Clear(u32 layer_count) override;
     void DispatchCompute() override;
+    void MarkOcarinaEffectsIfAlive();
     void ResetCounter(VideoCommon::QueryType type) override;
     void Query(GPUVAddr gpu_addr, VideoCommon::QueryType type,
                VideoCommon::QueryPropertiesFlags flags, u32 payload, u32 subreport) override;
@@ -369,7 +370,9 @@ private:
     VkImage oot_4k_guest_present{};
     std::optional<u64> oot_effects_frame;
     GPUVAddr oot_effects_address{};
-    VkImageView oot_effects_scene{};
+    VideoCommon::ImageViewId oot_effects_view{};
+    u32 oot_effects_generation{};
+    u32 oot_effects_stale_warnings{};
     struct OcarinaActorPose {
         u64 frame{};
         const Tegra::MemoryManager* channel{};
