@@ -27,6 +27,19 @@ version. Les sections suivantes gardent l'historique.
 - L'ancien explorateur de salons publics de yuzu ne s'ouvre plus : cliquer sur l'état du salon,
   en bas à droite, ouvre le panneau « En ligne » de l'accueil.
 
+**Nouveaux correctifs repris de Lichii (fin novembre)**
+- Ocarina of Time : l'effet FSR ne reprend plus une ancienne image de la scène (scintillement).
+- Shaders : valeurs fixes gardées dans les branches, indicateurs du GPU et instructions de lecture
+  de texture mieux traduits ; un shader de Hyrule Warriors corrigé.
+- Cartes graphiques sans profondeur 24 bits (AMD) : profondeur arrondie comme sur Switch.
+- Jeu local : les salons donnent un vrai masque de sous-réseau aux jeux.
+- Dessins moins coûteux pour le processeur (DK Bananza) et tampons inutilisés libérés.
+- Stabilité : mémoire Windows protégée après une libération partielle, commandes GPU coupées en
+  deux, fichiers remplacés proprement, arrêt du fil des barrières GPU dans le bon ordre, valeurs
+  envoyées par les jeux vérifiées.
+- Captures PNG lisibles dans l'Album, plein écran gardé à la fermeture, touche Tab assignable.
+- Nouvelle option « Garder la taille de la fenêtre » au lancement d'un jeu.
+
 **Son qui ne coupe plus**
 - Quand la sortie audio de Windows cesse de réclamer du son sans signaler d'erreur (par exemple
   quand un jeu ouvre le micro, comme Ocarina of Time au démarrage), Erable la rouvre au bout d'une

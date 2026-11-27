@@ -55,3 +55,12 @@ Règle :
   pics de ménage du cache d'Ocarina) et #2414 (copie linéaire bornée), choisis à la veille du
   22 au matin. Laissés de côté : la boutique de mods GameBanana (#2405, contraire au jeu en ligne
   sans mods) et FlyHigh (#2406, modèle sous licence non commerciale, touche leurs workflows).
+- build-56 (27 novembre 2026) : choisis aux veilles du 22 au 27 novembre. Traducteur de shaders :
+  #2416, #2421, #2480, #2523, #2567, #2577, #2614, #2647. Ailleurs : #2361, #2415, #2420, #2436,
+  #2464, #2173, #2215, #2452, #2488, #2498, #2418, #2533, #2465, #2539, #2483, #2551, #2608,
+  #2609, #2619, #2610, #2623, #2628, #2641, #2643, #2657 ; portés à la main : #2566 et #2573
+  (vues de la scène d'Ocarina). Laissés de côté : #2482 (annulé chez Lichii), #2459 (lightmaps de
+  Mario Kart World, constructeur d'image trop différent du nôtre, et seulement utile quand la
+  mémoire vidéo manque), fil de rendu GPU séparé (#2425, #2449), Optical Flow (#2386), boutique
+  de mods, et les conflits #2470, #2481, #2466, #2542, #2517, #2485, #1640, #2502, #2411, #2576,
+  #2591, #2605, #2606.

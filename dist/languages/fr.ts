@@ -7403,6 +7403,14 @@ Message de débogage :</translation>
 <context>
     <name>MainWindow</name>
     <message>
+        <source>Preserve Window Size Across Sessions</source>
+        <translation>Garder la taille de la fenêtre</translation>
+    </message>
+    <message>
+        <source>Keep the saved window size instead of resizing automatically when a game starts.</source>
+        <translation>Garde la taille de fenêtre enregistrée au lieu de la changer au lancement d'un jeu.</translation>
+    </message>
+    <message>
         <source>Tutorial</source>
         <translation>Tutoriel</translation>
     </message>
